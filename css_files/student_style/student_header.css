@@ -103,6 +103,7 @@ HEADER LAGI NI
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  overflow: hidden;
 }
 
 .profile-label {
@@ -110,3 +111,4 @@ HEADER LAGI NI
   font-weight: 500;
   color: #334155;
 }
+

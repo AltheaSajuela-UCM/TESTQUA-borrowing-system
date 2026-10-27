@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- STYLE -->
+    <link rel="stylesheet" href="../../../css_files/admin_style/admin_global.css">
+    <link rel="stylesheet" href="../../../css_files/admin_style/admin_header.css">
+    <link rel="stylesheet" href="../../../css_files/admin_style/admin_body.css">
+
+    <!-- TITLE! -->
+    <title>Webventory: Admin Portal</title>
+</head>
+
+<body>
+
+    <!-- TOP HEADER -->
+    <header class="app-header">
+        <div class="header-left">
+            <button class="menu-btn">☰ Menu</button>
+            <span class="brand-title">Webventory: Admin Portal</span>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn" title="Notifications">🔔</button>
+            <div class="profile-avatar">AD</div>
+            <span class="profile-text">Profile</span>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTAINER -->
+    <main class="dashboard-container">
+
+        <!-- WELCOME BANNER -->
+        <section class="welcome-banner">
+            <div class="welcome-text">
+                <h1>Welcome , Johnpaul!</h1>
+                <p>Monday, September 21, 2026</p>
+            </div>
+            <button class="guide-btn">View Admin Guide</button>
+        </section>
+
+        <!-- METRIC CARDS -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-label">TOTAL USERS</span>
+                <span class="metric-value">0</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">TOTAL ITEMS</span>
+                <span class="metric-value">500</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">ACTIVE TRANSACTIONS</span>
+                <span class="metric-value blue">0</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">OVERDUE</span>
+                <span class="metric-value red">0</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">ACCOUNTABILITY CASES</span>
+                <span class="metric-value orange">0</span>
+            </div>
+        </section>
+
+        <!-- CONTENT GRID (CHART & SIDE STATS) -->
+        <section class="content-grid">
+
+            <!-- BORROWING TREND CHART BOX -->
+            <div class="card chart-card">
+                <h2>Borrowing Trend (2026)</h2>
+                <div class="chart-placeholder">
+                    <!-- Months axis -->
+                    <div class="chart-months">
+                        <span>Jun</span>
+                        <span>Jul</span>
+                        <span>Aug</span>
+                        <span>Sep</span>
+                        <span>Oct</span>
+                        <span>Nov</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY & TOP BORROWED STATS -->
+            <div class="card side-stats-card">
+                <h2>Category Distribution</h2>
+
+                <!-- Progress Bar 1 -->
+                <div class="progress-group">
+                    <div class="progress-header">
+                        <span>Non-Academic</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: 78%;"></div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar 2 -->
+                <div class="progress-group">
+                    <div class="progress-header">
+                        <span>Academic</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: 22%;"></div>
+                    </div>
+                </div>
+
+                <h2 class="sub-heading">Top Borrowed</h2>
+                <ul class="top-list">
+                    <li>
+                        <span>None</span>
+                        <span class="count">-</span>
+                    </li>
+                    <li>
+                        <span>None</span>
+                        <span class="count">-</span>
+                    </li>
+                    <li>
+                        <span>None</span>
+                        <span class="count">-</span>
+                    </li>
+                </ul>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

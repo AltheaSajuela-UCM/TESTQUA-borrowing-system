@@ -1,0 +1,179 @@
+/* MAIN CONTAINER */
+.dashboard-container {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* WELCOME BANNER */
+.welcome-banner {
+  background-color: #1d63ed;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.welcome-text h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.welcome-text p {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.guide-btn {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.guide-btn:hover {
+  background-color: #f1f5f9;
+}
+
+/* METRIC CARDS GRID */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.metric-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.metric-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.metric-value.blue { color: #1d63ed; }
+.metric-value.red { color: #dc2626; }
+.metric-value.orange { color: #d97706; }
+
+/* CONTENT GRID (CHART & SIDE STATS) */
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.card h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+/* CHART PLACEHOLDER */
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+}
+
+.chart-placeholder {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 8px;
+}
+
+.chart-months {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* SIDE STATS CARD */
+.progress-group {
+  margin-bottom: 14px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.progress-bar-bg {
+  width: 0;
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: pink;
+  border-radius: 4px;
+}
+
+.sub-heading {
+  margin-top: 20px;
+}
+
+.top-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.top-list li:last-child {
+  border-bottom: none;
+}
+
+.top-list .count {
+  font-weight: 600;
+  color: #64748b;
+}
+

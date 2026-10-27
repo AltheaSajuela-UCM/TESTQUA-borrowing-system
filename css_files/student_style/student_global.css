@@ -19,4 +19,12 @@ body {
   background-color: white;
 }
 
-  
+/* RESPONSIVE LAYOUT FOR SMALL SCREENS */
+@media (max-width: 900px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
