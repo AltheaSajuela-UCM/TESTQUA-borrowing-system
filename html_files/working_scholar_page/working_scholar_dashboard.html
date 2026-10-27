@@ -1,11 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- CSS FILES -->
+    <link rel="stylesheet" href="../../../css_files/working_scholar_style/working_scholar_global.css" />
+    <link rel="stylesheet" href="../../../css_files/working_scholar_style/working_scholar_header.css" />
+    <link rel="stylesheet" href="../../../css_files/working_scholar_style/working_scholar_body.css" />
+
+    <!-- TITLE! -->
+    <title>Webventory: Working Scholar Portal</title>
+
 </head>
+
 <body>
-    
+
+    <!-- TOP HEADER -->
+    <header class="app-header">
+        <div class="header-left">
+            <button class="menu-btn">☰ Menu</button>
+            <span class="brand-title">Webventory: Working Scholar Portal</span>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn" title="Notifications">🔔</button>
+            <div class="profile-avatar">WS</div>
+            <span class="profile-text">Profile</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="dashboard-container">
+
+        <!-- PRIMARY TASK BANNER -->
+        <section class="primary-task-card">
+            <div class="task-info">
+                <span class="badge-primary">PRIMARY TASK</span>
+                <h2>Process Borrow Requests</h2>
+                <p>Review student details, approve complete requests, or reject incomplete submissions.</p>
+            </div>
+            <div class="task-actions">
+                <button class="btn-secondary">View WS Guide</button>
+                <button class="btn-primary">Process Requests</button>
+            </div>
+        </section>
+
+        <!-- PENDING REQUESTS TABLE CARD -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Pending Requests</h3>
+                <a href="#" class="view-all-link">View all →</a>
+            </div>
+            <table class="requests-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Item</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><span class="status-badge pending">-</span></td>
+                        <td><button class="btn-table">-</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- WELCOME BANNER -->
+        <section class="welcome-banner">
+            <h2>Welcome , Working Scholar!</h2>
+            <p>?, ? ?, ?</p>
+        </section>
+
+        <!-- METRICS GRID (4 CARDS) -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-label">PENDING REQUESTS</span>
+                <span class="metric-value orange">0</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">BORROWED ITEMS</span>
+                <span class="metric-value blue">0</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">OVERDUE</span>
+                <span class="metric-value red">0</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">AVAILABLE ITEMS</span>
+                <span class="metric-value dark">0</span>
+            </div>
+        </section>
+
+        <!-- QUICK ACTIONS -->
+        <section class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="actions-buttons">
+                <button class="btn-primary">Process Requests</button>
+                <button class="btn-secondary">Record Return</button>
+                <button class="btn-secondary">View Inventory</button>
+            </div>
+        </section>
+
+        <!-- OVERDUE ALERTS CARD -->
+        <section class="card">
+            <div class="card-header border-bottom">
+                <h3>Overdue Alerts</h3>
+            </div>
+            <div class="alerts-list">
+
+                <!-- Alert Item 1 -->
+                <div class="alert-item">
+                    
+                </div>
+        </section>
+
+    </main>
+
 </body>
+
 </html>
