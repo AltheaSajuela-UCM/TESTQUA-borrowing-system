@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CSS files -->
+    <link rel="stylesheet" href="../css files/global.css">
+    <link rel="stylesheet" href="../css files/student_header.css">
+    <link rel="stylesheet" href="../css files/student_body.css">
+
+    <title>Webventory</title>
+</head>
+
+<body>
+    <!-- Header ni -->
+    <header class="site-header">
+        <!-- Left Section: Menu & Brand -->
+        <div class="header-left">
+            <button class="menu-btn" aria-label="Open navigation menu">
+                <span class="menu-symbol">=</span> Menu
+            </button>
+            <div class="brand-container">
+                <span class="brand-name">Webventory:</span>
+                <span class="brand-context">Student Portal</span>
+            </div>
+        </div>
+
+        <!-- Right Section: Notifications & User Profile -->
+        <div class="header-right">
+            <button class="icon-btn" aria-label="View notifications">
+                <span role="img" aria-hidden="true">🔔</span>
+            </button>
+
+            <div class="user-profile">
+                <div class="avatar">JD</div>
+                <span class="profile-label">Profile</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Body ni -->
+    <div class="dashboard-body">
+
+        <!-- 1. Hero Action / Borrow Section -->
+        <section class="card hero-card">
+            <div class="hero-header">
+                <div>
+                    <span class="sub-heading">START HERE</span>
+                    <h1 class="main-heading">What would you like to borrow?</h1>
+                    <p class="hero-subtext">Tap a category to browse available items.</p>
+                </div>
+                <button class="btn-secondary">How borrowing works</button>
+            </div>
+
+            <!-- Category Action Cards -->
+            <div class="category-grid">
+                <button class="cat-card cat-blue">
+                    <div class="icon-box">📊</div>
+                    <div class="cat-info">
+                        <h3>Academic</h3>
+                        <p>Browse calculators</p>
+                    </div>
+                </button>
+
+                <button class="cat-card cat-blue">
+                    <div class="icon-box">🎲</div>
+                    <div class="cat-info">
+                        <h3>Non-Academic</h3>
+                        <p>Browse games & activities</p>
+                    </div>
+                </button>
+
+                <button class="cat-card cat-cancel">
+                    <div class="icon-box">🚫</div>
+                    <div class="cat-info">
+                        <h3>Cancel Borrow Request</h3>
+                        <p>No pending request yet</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Welcome Banner -->
+        <section class="banner-welcome">
+            <h2>Welcome, kalalaw!</h2>
+            <p>Monday, September 21, 2026</p>
+        </section>
+
+        <!-- 3. Stat Summary Cards -->
+        <section class="stats-grid">
+            <div class="card stat-card">
+                <span class="stat-label">ACTIVE BORROWINGS</span>
+                <span class="stat-value text-blue">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">OVERDUE ITEMS</span>
+                <span class="stat-value text-red">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">AVAILABLE ITEMS</span>
+                <span class="stat-value text-dark">500</span> 
+                <span class="stat-subtext">in catalog</span>
+            </div>
+        </section>
+
+        <!-- 4. Active Borrowings Table -->
+        <section class="card table-card">
+            <h3 class="card-title">Active Borrowings</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Code</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            No active borrowings yet. Choose a category above to get started.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 5. Recent Notifications Container -->
+        <section class="card notifications-card">
+            <h3 class="card-title">Recent Notifications</h3>
+            <div class="notification-item">
+                <span class="notif-icon">🔔</span>
+                <div>
+                    <p class="notif-text"><strong>Welcome to Webventory, kalalaw.</strong> Choose a category above to
+                        borrow your first item.</p>
+                    <span class="notif-time">Just now</span>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</body>
+
+</html>
