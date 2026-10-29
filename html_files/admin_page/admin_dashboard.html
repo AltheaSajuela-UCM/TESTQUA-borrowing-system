@@ -17,18 +17,77 @@
 
     <!-- TOP HEADER -->
     <header class="app-header">
+        <!-- Left side -->
         <div class="header-left">
-            <button class="menu-btn">☰ Menu</button>
+            <!-- Dropdown Menu -->
+            <div class="dropdown-content-menu" id="dropdownContentMenu">
+                <button class="menu-btn" id="menuBtn">☰ Menu</button>
+
+                <div class="dropdown-content-menu-display">
+                    <img src="#" alt="source: sogon">
+                    <p>Administrator</p>
+                    <button class="close-btn" id="closeBtn">close</button>
+                    <hr>
+                    <a href="#">Dashboard</a>
+                    <a href="#">Users</a>
+                    <a href="#">Inventory</a>
+                    <a href="#">Categories</a>
+                    <a href="#">Reports</a>
+                    <a href="#">History</a>
+                    <a href="#">Audit Trail</a>
+                    <a href="#">Accountability</a>
+                </div>
+            </div>
+
             <span class="brand-title">Webventory: Admin Portal</span>
-            <h1>Hello world!</h1>
         </div>
+
+        <!-- Right side -->
         <div class="header-right">
-            <button class="icon-btn" title="Notifications">🔔</button>
-            <div class="profile-avatar">AD</div>
-            <span class="profile-text">Profile</span>
+
+            <!-- Notification -->
+            <div class="notification" id="notification">
+                <button class="notification-btn" id="notificationBtn">🔔 TAE</button>
+                
+                <div class="dropdown-notification" id="dropdownNotification">
+                    <div class="notification-all">
+                        <p>ALL</p>
+                        <div>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="notification-unread">
+                        <p>UNREAD</p>
+                        <div>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="notification-alerts">
+                        <p>ALERTS</p>
+                        <div>
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Profile -->
+            <div class="profile" id="profile">
+                <div class="profile-avatar">AD</div>
+                <button class="profile-btn" id="profileBtn">Profile</button>
+
+                <div class="dropdown-profile">
+                    <button class="account-setting">Account Setting</button>
+                    <button class="logout">Logout</button>
+                </div>
+
+
+            </div>
+
         </div>
     </header>
-
+    
     <!-- MAIN DASHBOARD CONTAINER -->
     <main class="dashboard-container">
 
@@ -39,6 +98,7 @@
                 <p>?, ? ?, ?</p>
             </div>
             <button class="guide-btn">View Admin Guide</button>
+            <!-- Basta ako rani buhaton -->
         </section>
 
         <!-- METRIC CARDS -->
@@ -70,7 +130,7 @@
 
             <!-- BORROWING TREND CHART BOX -->
             <div class="card chart-card">
-                <h2>Borrowing Trend (2026)</h2>
+                <h2>Borrowing Trend ( -- ?(Year) -- ) </h2>
                 <div class="chart-placeholder">
                     <!-- Months axis -->
                     <div class="chart-months">
@@ -130,6 +190,7 @@
 
     </main>
 
+    <script src="../../../script_files/admin_script/admin_navigation.js"></script>
 </body>
 
 </html>
