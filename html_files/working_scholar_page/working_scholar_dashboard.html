@@ -12,21 +12,112 @@
 
     <!-- TITLE! -->
     <title>Webventory: Working Scholar Portal</title>
-
 </head>
 
 <body>
 
+    <!-- OVERLAY FOR SIDE MENU -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- SIDE NAVIGATION MENU (DRAWER) -->
+    <aside class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <div class="brand-info">
+                <span class="logo-icon">W</span>
+                <div>
+                    <h3 class="brand-title">Webventory</h3>
+                    <span class="role-subtitle">SAO Working Scholar</span>
+                </div>
+            </div>
+            <button class="close-btn" id="closeMenuBtn">Close</button>
+        </div>
+
+        <nav class="side-menu-links">
+            <a href="#" class="menu-link active">
+                <span class="icon">⊞</span> Dashboard
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">📊</span> Pending Requests
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">🚫</span> Cancellation Requests
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">📦</span> Inventory
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">📋</span> Borrowed Items
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">↩</span> Return Processing
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">⏱</span> History
+            </a>
+        </nav>
+
+        <div class="side-menu-footer">
+            <button class="logout-btn">
+                <span class="icon">↪</span> Logout
+            </button>
+        </div>
+    </aside>
+
     <!-- TOP HEADER -->
     <header class="app-header">
         <div class="header-left">
-            <button class="menu-btn">☰ Menu</button>
+            <button class="menu-btn" id="menuBtn">☰ Menu</button>
             <span class="brand-title">Webventory: Working Scholar Portal</span>
         </div>
         <div class="header-right">
-            <button class="icon-btn" title="Notifications">🔔</button>
-            <div class="profile-avatar">WS</div>
-            <span class="profile-text">Profile</span>
+            
+            <!-- NOTIFICATION DROPDOWN CONTAINER -->
+            <div class="dropdown-wrapper" id="notifDropdownWrapper">
+                <button class="icon-btn" id="notifBtn" title="Notifications">🔔</button>
+
+                <!-- Notification Popup -->
+                <div class="dropdown-menu notif-popup" id="notifPopup">
+                    <!-- Tabs -->
+                    <div class="notif-tabs">
+                        <button class="tab-btn active" data-tab="all">All</button>
+                        <button class="tab-btn" data-tab="unread">Unread</button>
+                        <button class="tab-btn" data-tab="alerts">Alerts</button>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="notif-list">
+                        <div class="notif-card is-unread" data-type="normal">
+                            <p>A new borrowing request is waiting for review.</p>
+                            <button class="mark-read-btn">Mark as read</button>
+                        </div>
+
+                        <div class="notif-card is-alert is-unread" data-type="alert">
+                            <p>An overdue reminder needs to be sent.</p>
+                            <button class="mark-read-btn">Mark as read</button>
+                        </div>
+                    </div>
+
+                    <!-- Footer Link -->
+                    <div class="notif-footer">
+                        <button class="open-page-btn">Open Notifications Page</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USER PROFILE DROPDOWN CONTAINER -->
+            <div class="dropdown-wrapper" id="profileDropdownWrapper">
+                <div class="user-profile" id="profileBtn">
+                    <div class="profile-avatar">WS</div>
+                    <span class="profile-text">Profile</span>
+                </div>
+
+                <!-- Profile Popup -->
+                <div class="dropdown-menu profile-popup" id="profilePopup">
+                    <a href="#" class="profile-item">Account Settings</a>
+                    <a href="#" class="profile-item danger">Logout</a>
+                </div>
+            </div>
+
         </div>
     </header>
 
@@ -41,7 +132,7 @@
                 <p>Review student details, approve complete requests, or reject incomplete submissions.</p>
             </div>
             <div class="task-actions">
-                <button class="btn-secondary">View WS Guide</button>
+                <button class="btn-secondary" id="viewGuideBtn">View WS Guide</button>
                 <button class="btn-primary">Process Requests</button>
             </div>
         </section>
@@ -74,8 +165,8 @@
 
         <!-- WELCOME BANNER -->
         <section class="welcome-banner">
-            <h2>Welcome , Working Scholar!</h2>
-            <p>?, ? ?, ?</p>
+            <h2>Welcome, Ana!</h2>
+            <p>Monday, September 21, 2026</p>
         </section>
 
         <!-- METRICS GRID (4 CARDS) -->
@@ -114,15 +205,39 @@
                 <h3>Overdue Alerts</h3>
             </div>
             <div class="alerts-list">
-
-                <!-- Alert Item 1 -->
                 <div class="alert-item">
-                    
+                    <div>
+                        <strong>-</strong>
+                        <p class="alert-sub">No active overdue alerts</p>
+                    </div>
                 </div>
+            </div>
         </section>
 
     </main>
 
+    <!-- ====================================
+    WORKING SCHOLAR GUIDE MODAL (4 STEPS)
+    ==================================== -->
+    <div class="guide-overlay" id="guideOverlay">
+        <div class="guide-modal">
+            <div class="guide-header">
+                <span class="guide-step-tag" id="guideStepTag">WORKING SCHOLAR GUIDE · STEP 1 OF 4</span>
+                <button class="guide-exit-btn" id="guideExitBtn">Exit</button>
+            </div>
+            
+            <h2 class="guide-title" id="guideTitle">Welcome, Ana!</h2>
+            <p class="guide-desc" id="guideDesc">You will use the Working Scholar Portal to process requests, release inventory, record returns, and assist students.</p>
+
+            <div class="guide-footer">
+                <button class="guide-action-btn secondary" id="guideBackBtn" disabled>Back</button>
+                <button class="guide-action-btn primary" id="guideNextBtn">Next step</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT FILE -->
+    <script src="../../../script_files/working_scholar_script/working_scholar_script.js"></script>
 </body>
 
 </html>
