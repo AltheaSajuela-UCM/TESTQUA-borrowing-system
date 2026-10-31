@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory: Student Portal</title>
+    <link rel="stylesheet" href="sample_css.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-left">
+            <button id="menu-btn" class="menu-btn">
+                <i class="fa-solid fa-bars"></i> Menu
+            </button>
+            <span class="portal-title">Webventory: Student Portal</span>
+        </div>
+        <div class="nav-right">
+            <button class="notif-btn" aria-label="Notifications">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            
+            <!-- Profile Dropdown Container -->
+            <div class="profile-dropdown-container">
+                <button id="profile-menu-btn" class="profile-btn">
+                    <span class="avatar-initials">JD</span>
+                    <span class="profile-text">Profile</span>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div id="profile-dropdown" class="dropdown-menu hidden">
+                    <a href="#account-settings" class="dropdown-item">Account Settings</a>
+                    <a href="#logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="content-header">
+            <div>
+                <h1>Account Settings</h1>
+                <p>Review and maintain your profile and contact information.</p>
+            </div>
+            <button id="edit-btn" class="btn-primary">Edit Account Settings</button>
+        </div>
+
+        <!-- Settings Card -->
+        <div class="card">
+            <div class="user-header">
+                <div class="user-avatar-large">JS</div>
+                <div class="user-info">
+                    <h2>Juan Santos Dela Cruz</h2>
+                    <span class="user-role">Student</span>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Profile Form Fields -->
+            <form id="settings-form" class="form-grid">
+                <div class="form-group">
+                    <label for="full-name">Full Name</label>
+                    <input type="text" id="full-name" value="Juan Santos Dela Cruz" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="student-id">Student ID</label>
+                    <input type="text" id="student-id" value="20240001" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="mobile-number">Mobile Number</label>
+                    <input type="text" id="mobile-number" value="09171234567" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="campus">Campus</label>
+                    <input type="text" id="campus" value="UC-MAIN" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="academic-level">Academic Level</label>
+                    <input type="text" id="academic-level" value="College" disabled>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="sample_javascript.js"></script>
+</body>
+</html>
