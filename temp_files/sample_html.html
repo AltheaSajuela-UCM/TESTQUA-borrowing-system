@@ -3,12 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webventory: Student Portal</title>
+
     <link rel="stylesheet" href="sample_css.css">
+
+    <title>Webventory: Student Portal</title>
+
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
+    <!-- Sidebar Menu Drawer -->
+    <aside id="sidebar" class="sidebar closed">
+        <div class="sidebar-header">
+            <div class="brand-title">
+                <span class="logo-icon">W</span>
+                <div>
+                    <h3>Webventory</h3>
+                    <p>Student</p>
+                </div>
+            </div>
+            <button id="close-sidebar-btn" class="close-btn">Close</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item"><i class="fa-solid fa-table-cells-large"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-box-open"></i> Browse items</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> My Borrowings</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i> Notifications</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Overlay when sidebar is open -->
+    <div id="sidebar-overlay" class="overlay hidden"></div>
 
     <!-- Top Navigation Bar -->
     <header class="navbar">
