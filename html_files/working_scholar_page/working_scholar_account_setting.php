@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Working Scholar Portal</title>
-    <link rel="stylesheet" href="../../../css_files/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
+    <link rel="stylesheet" href="../../css_files/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -22,15 +22,16 @@
             </div>
             <button id="close-sidebar-btn" class="close-btn">Close</button>
         </div>
-        <nav class="sidebar-nav">
-            <a href="working_scholar_dashboard.html" class="nav-item"><i class="fa-solid fa-table-cells-large"></i> Dashboard</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-clock"></i> Pending Requests</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-ban"></i> Cancellation Requests</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Borrowed Items</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-rotate-left"></i> Return Processing</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-history"></i> History</a>
-        </nav>
+            <nav class="sidebar-nav">
+                <!-- CHANGE THIS FROM .html TO .php -->
+                <a href="working_scholar_dashboard.php" class="nav-item"><i class="fa-solid fa-table-cells-large"></i> Dashboard</a>
+                <a href="working_scholar_requests.php" class="nav-item"><i class="fa-solid fa-clock"></i> Pending Requests</a>
+                <a href="working_scholar_cancellations.php" class="nav-item"><i class="fa-solid fa-ban"></i> Cancellation Requests</a>
+                <a href="working_scholar_inventory.php" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+                <a href="working_scholar_borrowed.php" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Borrowed Items</a>
+                <a href="working_scholar_returns.php" class="nav-item"><i class="fa-solid fa-rotate-left"></i> Return Processing</a>
+                <a href="working_scholar_history.php" class="nav-item"><i class="fa-solid fa-history"></i> History</a>
+            </nav>
         <div class="sidebar-footer">
             <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         </div>
@@ -113,6 +114,6 @@
         </div>
     </main>
 
-    <script src="../../../script_files/working_scholar_script/account_setting/working_scholar_all_in_one.js"></script>
+    <script src="../../script_files/working_scholar_script/account_setting/working_scholar_all_in_one.js"></script>
 </body>
 </html>
