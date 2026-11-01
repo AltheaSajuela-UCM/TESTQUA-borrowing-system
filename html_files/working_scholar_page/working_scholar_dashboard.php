@@ -1,3 +1,7 @@
+<?php 
+// Include the dashboard stats backend script using correct relative paths
+include '../../php_backend/working_scholar/ws_dashboard_stats.php'; 
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,10 +9,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- CSS FILES -->
-    <link rel="stylesheet" href="../../../css_files/working_scholar_style/dashboard/working_scholar_dashboard_global.css" />
-    <link rel="stylesheet" href="../../../css_files/working_scholar_style/dashboard/working_scholar_dashboard_header.css" />
-    <link rel="stylesheet" href="../../../css_files/working_scholar_style/dashboard/working_scholar_dashboard_body.css" />
+    <!-- CSS FILES (Corrected relative path: ../../ goes up to project root) -->
+    <link rel="stylesheet" href="../../css_files/working_scholar_style/dashboard/working_scholar_dashboard_global.css" />
+    <link rel="stylesheet" href="../../css_files/working_scholar_style/dashboard/working_scholar_dashboard_header.css" />
+    <link rel="stylesheet" href="../../css_files/working_scholar_style/dashboard/working_scholar_dashboard_body.css" />
 
     <!-- TITLE! -->
     <title>Webventory: Working Scholar Portal</title>
@@ -33,33 +37,33 @@
         </div>
 
         <nav class="side-menu-links">
-            <a href="working_scholar_dashboard.html" class="menu-link active">
-                <span class="icon">⊞</span> Dashboard
-            </a>
-            <a href="#" class="menu-link">
-                <span class="icon">📊</span> Pending Requests
-            </a>
-            <a href="#" class="menu-link">
-                <span class="icon">🚫</span> Cancellation Requests
-            </a>
-            <a href="#" class="menu-link">
-                <span class="icon">📦</span> Inventory
-            </a>
-            <a href="#" class="menu-link">
-                <span class="icon">📋</span> Borrowed Items
-            </a>
-            <a href="#" class="menu-link">
-                <span class="icon">↩</span> Return Processing
-            </a>
-            <a href="#" class="menu-link">
-                <span class="icon">⏱</span> History
-            </a>
-        </nav>
+    <a href="working_scholar_dashboard.php" class="menu-link active">
+        <span class="icon">⊞</span> Dashboard
+    </a>
+    <a href="working_scholar_requests.php" class="menu-link">
+        <span class="icon">📊</span> Pending Requests
+    </a>
+    <a href="working_scholar_cancellations.php" class="menu-link">
+        <span class="icon">🚫</span> Cancellation Requests
+    </a>
+    <a href="working_scholar_inventory.php" class="menu-link">
+        <span class="icon">📦</span> Inventory
+    </a>
+    <a href="working_scholar_borrowed.php" class="menu-link">
+        <span class="icon">📋</span> Borrowed Items
+    </a>
+    <a href="working_scholar_returns.php" class="menu-link">
+        <span class="icon">↩</span> Return Processing
+    </a>
+    <a href="working_scholar_history.php" class="menu-link">
+        <span class="icon">⏱</span> History
+    </a>
+</nav>
 
-        <div class="side-menu-footer">
-            <button class="logout-btn">
+        <<div class="side-menu-footer">
+            <a href="../../php_backend/working_scholar/ws_logout.php" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
                 <span class="icon">↪</span> Logout
-            </button>
+            </a>
         </div>
     </aside>
 
@@ -113,8 +117,8 @@
 
                 <!-- Profile Popup -->
                 <div class="dropdown-menu profile-popup" id="profilePopup">
-                    <a href="working_scholar_account_setting.html" class="profile-item">Account Settings</a>
-                    <a href="#" class="profile-item danger">Logout</a>
+                    <a href="working_scholar_account_setting.php" class="profile-item">Account Settings</a>
+                    <a href="../../php_backend/working_scholar/ws_logout.php" class="profile-item danger">Logout</a>
                 </div>
             </div>
 
@@ -153,12 +157,29 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>-</td>
-                        <td>-</td>
-                        <td><span class="status-badge pending">-</span></td>
-                        <td><button class="btn-table">-</button></td>
-                    </tr>
+                    <?php if (empty($pending_requests)): ?>
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #777;">No pending requests found.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($pending_requests as $req): ?>
+                            <?php 
+                                // Build the backend action URLs safely outside the HTML string
+                                $req_id = $req['id'];
+                                $approve_url = "../../php_backend/working_scholar/ws_process_action.php?id=" . $req_id . "&action=approve";
+                                $reject_url = "../../php_backend/working_scholar/ws_process_action.php?id=" . $req_id . "&action=reject";
+                            ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($req['student_name']); ?></td>
+                                <td><?php echo htmlspecialchars($req['item_name']); ?></td>
+                                <td><span class="status-badge pending"><?php echo htmlspecialchars($req['status']); ?></span></td>
+                                <td>
+                                    <a href="<?php echo $approve_url; ?>" class="btn-table" style="background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 12px;">Approve</a>
+                                    <a href="<?php echo $reject_url; ?>" class="btn-table" style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; margin-left: 4px;">Reject</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </section>
@@ -173,31 +194,31 @@
         <section class="metrics-grid">
             <div class="metric-card">
                 <span class="metric-label">PENDING REQUESTS</span>
-                <span class="metric-value orange">0</span>
+                <span class="metric-value orange"><?php echo $pending_count; ?></span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">BORROWED ITEMS</span>
-                <span class="metric-value blue">0</span>
+                <span class="metric-value blue"><?php echo $borrowed_count; ?></span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">OVERDUE</span>
-                <span class="metric-value red">0</span>
+                <span class="metric-value red"><?php echo $overdue_count; ?></span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">AVAILABLE ITEMS</span>
-                <span class="metric-value dark">0</span>
+                <span class="metric-value dark"><?php echo $available_count; ?></span>
             </div>
         </section>
 
         <!-- QUICK ACTIONS -->
         <section class="quick-actions">
-            <h3>Quick Actions</h3>
-            <div class="actions-buttons">
-                <button class="btn-primary">Process Requests</button>
-                <button class="btn-secondary">Record Return</button>
-                <button class="btn-secondary">View Inventory</button>
-            </div>
-        </section>
+    <h3>Quick Actions</h3>
+    <div class="actions-buttons">
+        <a href="working_scholar_requests.php" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Process Requests</a>
+        <a href="working_scholar_returns.php" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Record Return</a>
+        <a href="working_scholar_inventory.php" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View Inventory</a>
+    </div>
+</section>
 
         <!-- OVERDUE ALERTS CARD -->
         <section class="card">
@@ -205,12 +226,23 @@
                 <h3>Overdue Alerts</h3>
             </div>
             <div class="alerts-list">
-                <div class="alert-item">
-                    <div>
-                        <strong>-</strong>
-                        <p class="alert-sub">No active overdue alerts</p>
+                <?php if (empty($overdue_alerts)): ?>
+                    <div class="alert-item">
+                        <div>
+                            <strong>-</strong>
+                            <p class="alert-sub">No active overdue alerts</p>
+                        </div>
                     </div>
-                </div>
+                <?php else: ?>
+                    <?php foreach ($overdue_alerts as $alert): ?>
+                        <div class="alert-item" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">
+                            <div>
+                                <strong style="color: #dc3545;"><?php echo htmlspecialchars($alert['student_name']); ?></strong> - Borrowed <em><?php echo htmlspecialchars($alert['item_name']); ?></em>
+                                <p class="alert-sub" style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Due Date: <?php echo htmlspecialchars($alert['due_date']); ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -237,7 +269,7 @@
     </div>
 
     <!-- SCRIPT FILE -->
-    <script src="../../../script_files/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
+    <script src="../../script_files/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
 </body>
 
 </html>
