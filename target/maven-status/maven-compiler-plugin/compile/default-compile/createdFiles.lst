@@ -1,0 +1,12 @@
+com\webventory\tables\Inventory.class
+com\webventory\repository\WSBorrowRequestRepository.class
+com\webventory\tables\Notification.class
+com\webventory\controller\WSController.class
+com\webventory\controller\AdminController.class
+com\webventory\database\TransactionRepository.class
+com\webventory\WebventoryApplication.class
+com\webventory\database\InventoryRepository.class
+com\webventory\model\WSBorrowRequest.class
+com\webventory\database\NotificationRepository.class
+com\webventory\tables\Transaction.class
+com\webventory\logic\AdminFunctionalities.class

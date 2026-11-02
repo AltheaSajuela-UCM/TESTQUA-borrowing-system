@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CSS files -->
+    <link rel="stylesheet" href="../../../css_files/admin_style/dashboard/admin_account_setting_global.css">
+    <link rel="stylesheet" href="../../../css_files/admin_style/dashboard/admin_account_setting_header.css">
+    <link rel="stylesheet" href="../../../css_files/admin_style/dashboard/admin_account_setting_body.css">
+
+    <!-- TITLE! -->
+    <title>Webventory: Admin Portal</title>
+</head>
+
+<body>
+
+    <!-- OVERLAY FOR SIDE MENU -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- SIDE NAVIGATION MENU (DRAWER) -->
+    <aside class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <div class="brand-info">
+                <span class="logo-icon">W</span>
+                <div>
+                    <h3 class="brand-title">Webventory</h3>
+                    <span class="role-subtitle">Administrator</span>
+                </div>
+            </div>
+            <button class="close-btn" id="closeMenuBtn">Close</button>
+        </div>
+
+        <nav class="side-menu-links">
+            <a href="admin_dashboard.html" class="menu-link active">
+                <span class="icon">⊞</span> Dashboard
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">👥</span> Users
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">📦</span> Inventory
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">🏷️</span> Categories
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">📊</span> Reports
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">⏱</span> History
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">🔍</span> Audit Trail
+            </a>
+            <a href="#" class="menu-link">
+                <span class="icon">⚖️</span> Accountability
+            </a>
+        </nav>
+
+        <div class="side-menu-footer">
+            <button class="logout-btn">
+                <span class="icon">↪</span> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- TOP HEADER -->
+    <header class="site-header">
+        <!-- Menu & Brand on the left side -->
+        <div class="header-left">
+            <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
+                <span class="menu-symbol">=</span> Menu
+            </button>
+            <div class="brand-container">
+                <span class="brand-name">Webventory:</span>
+                <span class="brand-context">Admin Portal</span>
+            </div>
+        </div>
+
+        <!-- Notifications & User Profile on the right side -->
+        <div class="header-right">
+            
+            <!-- NOTIFICATION DROPDOWN CONTAINER -->
+            <div class="dropdown-wrapper" id="notifDropdownWrapper">
+                <button class="icon-btn" id="notifBtn" aria-label="View notifications">
+                    <span role="img" aria-hidden="true">🔔</span>
+                </button>
+
+                <!-- Notification Popup -->
+                <div class="dropdown-menu notif-popup" id="notifPopup">
+                    <!-- Tabs -->
+                    <div class="notif-tabs">
+                        <button class="tab-btn active" data-tab="all">All</button>
+                        <button class="tab-btn" data-tab="unread">Unread</button>
+                        <button class="tab-btn" data-tab="alerts">Alerts</button>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="notif-list">
+                        <div class="notif-card is-unread" data-type="normal">
+                            <p>System initialized. Waiting for database sync.</p>
+                            <button class="mark-read-btn">Mark as read</button>
+                        </div>
+                    </div>
+
+                    <!-- Footer Link -->
+                    <div class="notif-footer">
+                        <button class="open-page-btn">Open Notifications Page</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USER PROFILE DROPDOWN CONTAINER -->
+            <div class="dropdown-wrapper" id="profileDropdownWrapper">
+                <div class="user-profile" id="profileBtn">
+                    <div class="avatar">AD</div>
+                    <span class="profile-label">Profile</span>
+                </div>
+
+                <!-- Profile Popup -->
+                <div class="dropdown-menu profile-popup" id="profilePopup">
+                    <a href="admin_account_setting.html" class="profile-item">Account Settings</a>
+                    <a href="#" class="profile-item danger">Logout</a>
+                </div>
+            </div>
+            
+        </div>
+    </header>
+
+    <!-- DASHBOARD BODY CONTAINER -->
+    <div class="dashboard-body">
+
+        <!-- 1. Welcome Banner -->
+        <section class="banner-welcome">
+            <div class="welcome-text">
+                <h2>Welcome, System!</h2>
+                <p>Monday, September 21, 2026</p>
+            </div>
+            <button class="guide-btn" id="viewGuideBtn">View Admin Guide</button>
+        </section>
+
+        <!-- 2. Stat Summary Cards -->
+        <section class="stats-grid">
+            <div class="card stat-card">
+                <span class="stat-label">TOTAL USERS</span>
+                <span class="stat-value text-dark">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">TOTAL ITEMS</span>
+                <span class="stat-value text-dark">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">ACTIVE TRANSACTIONS</span>
+                <span class="stat-value text-blue">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">OVERDUE</span>
+                <span class="stat-value text-red">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">ACCOUNTABILITY CASES</span>
+                <span class="stat-value text-orange">0</span>
+            </div>
+        </section>
+
+        <!-- 3. Content Grid (Chart & Side Stats) -->
+        <section class="content-grid">
+
+            <!-- Borrowing Trend Chart Box -->
+            <div class="card chart-card">
+                <h2>Borrowing Trend (2026)</h2>
+                <div class="chart-placeholder">
+                    <div class="chart-months">
+                        <span>Jun</span>
+                        <span>Jul</span>
+                        <span>Aug</span>
+                        <span>Sep</span>
+                        <span>Oct</span>
+                        <span>Nov</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Distribution & Top Borrowed -->
+            <div class="card side-stats-card">
+                <h2>Category Distribution</h2>
+
+                <div class="progress-group">
+                    <div class="progress-header">
+                        <span>Non-Academic</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="progress-group">
+                    <div class="progress-header">
+                        <span>Academic</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <h2 class="sub-heading">Top Borrowed</h2>
+                <ul class="top-list">
+                    <li>
+                        <span>-</span>
+                        <span class="count">-</span>
+                    </li>
+                    <li>
+                        <span>-</span>
+                        <span class="count">-</span>
+                    </li>
+                    <li>
+                        <span>-</span>
+                        <span class="count">-</span>
+                    </li>
+                </ul>
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- ====================================
+    ADMIN GUIDE MODAL (7 STEPS)
+    ==================================== -->
+    <div class="guide-overlay" id="guideOverlay">
+        <div class="guide-modal">
+            <div class="guide-header">
+                <span class="guide-step-tag" id="guideStepTag">ADMIN GUIDE · STEP 1 OF 7</span>
+                <button class="guide-exit-btn" id="guideExitBtn">Exit</button>
+            </div>
+            
+            <h2 class="guide-title" id="guideTitle">Welcome, System!</h2>
+            <p class="guide-desc" id="guideDesc">The Admin Portal gives you oversight of users, inventory, transactions, reports, history, and accountability.</p>
+
+            <div class="guide-footer">
+                <button class="guide-action-btn secondary" id="guideBackBtn" disabled>Back</button>
+                <button class="guide-action-btn primary" id="guideNextBtn">Next step</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script file -->
+    <script src="../../../script_files/admin_script/dashboard/admin_navigation.js"></script>
+</body>
+
+</html>

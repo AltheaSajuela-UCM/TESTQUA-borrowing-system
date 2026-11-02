@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory: Admin Portal</title>
+    <link rel="stylesheet" href="../../../css_files/admin_style/account_setting/admin_account_setting_body.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Sidebar Menu Drawer -->
+    <aside id="sidebar" class="sidebar closed">
+        <div class="sidebar-header">
+            <div class="brand-title">
+                <span class="logo-icon">W</span>
+                <div>
+                    <h3>Webventory</h3>
+                    <p>Administrator</p>
+                </div>
+            </div>
+            <button id="close-sidebar-btn" class="close-btn">Close</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../admin_page/admin_dashboard.html" class="nav-item"><i class="fa-solid fa-table-cells-large"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-users"></i> Users</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-box-open"></i> Inventory</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Audit Trail</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> Accountability</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Overlay when sidebar is open -->
+    <div id="sidebar-overlay" class="overlay hidden"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-left">
+            <button id="menu-btn" class="menu-btn">
+                <i class="fa-solid fa-bars"></i> Menu
+            </button>
+            <span class="portal-title">Webventory: Admin Portal</span>
+        </div>
+        <div class="nav-right">
+            <button class="notif-btn" aria-label="Notifications">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            
+            <!-- Profile Dropdown Container -->
+            <div class="profile-dropdown-container">
+                <button id="profile-menu-btn" class="profile-btn">
+                    <span class="avatar-initials">AD</span>
+                    <span class="profile-text">Profile</span>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div id="profile-dropdown" class="dropdown-menu hidden">
+                    <a href="#account-settings.html" class="dropdown-item">Account Settings</a>
+                    <a href="#logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="content-header">
+            <div>
+                <h1>Account Settings</h1>
+                <p>Review and maintain your profile and contact information.</p>
+            </div>
+            <button id="edit-btn" class="btn-primary">Edit Account Settings</button>
+        </div>
+
+        <!-- Settings Card -->
+        <div class="card">
+            <div class="user-header">
+                <div class="user-avatar-large">SA</div>
+                <div class="user-info">
+                    <h2>System Administrator</h2>
+                    <span class="user-role">Administrator</span>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Profile Form Fields -->
+            <form id="settings-form" class="form-grid">
+                <div class="form-group">
+                    <label for="full-name">Full Name</label>
+                    <input type="text" id="full-name" value="System Administrator" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="admin-id">Admin ID</label>
+                    <input type="text" id="admin-id" value="00000001" disabled>
+                </div>
+                <div class="form-group full-width">
+                    <label for="mobile-number">Mobile Number</label>
+                    <input type="text" id="mobile-number" value="" placeholder="Enter mobile number" disabled>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="../../../script_files/admin_script/account_setting/admin_all_in_one.js"></script>
+</body>
+</html>

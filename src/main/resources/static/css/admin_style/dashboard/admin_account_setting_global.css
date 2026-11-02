@@ -1,0 +1,31 @@
+/* Default */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Document & Smooth Scrolling Defaults */
+html {
+  font-size: 100%; /* Respects user browser font size settings */
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased; /* Crisper text on macOS/iOS */
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /*Temporary for now, okay?*/
+  line-height: 1.5; /* Proper readable vertical rhythm */
+  color: #0f172a;
+  background-color: white;
+}
+
+
+/* RESPONSIVE LAYOUT FOR SMALL SCREENS */
+@media (max-width: 900px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}

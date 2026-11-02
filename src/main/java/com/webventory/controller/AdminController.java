@@ -1,4 +1,4 @@
-package main.java.com.webventory.controller;
+package com.webventory.controller;
 
 import com.webventory.logic.AdminFunctionalities;
 import com.webventory.tables.Transaction;

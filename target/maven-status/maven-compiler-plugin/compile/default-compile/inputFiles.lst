@@ -1,0 +1,12 @@
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\controller\AdminController.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\controller\WSController.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\database\InventoryRepository.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\database\NotificationRepository.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\database\TransactionRepository.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\database\WSBorrowRequestRepository.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\logic\AdminFunctionalities.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\model\WSBorrowRequest.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\tables\Inventory.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\tables\Notification.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\tables\Transaction.java
+C:\xampp\htdocs\TESTQUA-borrowing-system\src\main\java\com\webventory\WebventoryApplication.java
