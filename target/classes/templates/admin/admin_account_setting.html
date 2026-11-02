@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<<< HEAD:target/classes/templates/admin/admin_account_setting.html
     <title>Webventory: Admin Portal</title>
     <link rel="stylesheet" href="../../../css_files/admin_style/account_setting/admin_account_setting_body.css">
+========
+    <title>Webventory: Working Scholar Portal</title>
+    <link rel="stylesheet" href="../../css_files/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
+>>>>>>>> deb6f896793eca6a0a4eb60c583655557db155d5:html_files/working_scholar_page/working_scholar_account_setting.php
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -22,6 +27,7 @@
             </div>
             <button id="close-sidebar-btn" class="close-btn">Close</button>
         </div>
+<<<<<<<< HEAD:target/classes/templates/admin/admin_account_setting.html
         <nav class="sidebar-nav">
             <a href="../admin_page/admin_dashboard.html" class="nav-item"><i class="fa-solid fa-table-cells-large"></i> Dashboard</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-users"></i> Users</a>
@@ -32,6 +38,18 @@
             <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Audit Trail</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> Accountability</a>
         </nav>
+========
+            <nav class="sidebar-nav">
+                <!-- CHANGE THIS FROM .html TO .php -->
+                <a href="working_scholar_dashboard.php" class="nav-item"><i class="fa-solid fa-table-cells-large"></i> Dashboard</a>
+                <a href="working_scholar_requests.php" class="nav-item"><i class="fa-solid fa-clock"></i> Pending Requests</a>
+                <a href="working_scholar_cancellations.php" class="nav-item"><i class="fa-solid fa-ban"></i> Cancellation Requests</a>
+                <a href="working_scholar_inventory.php" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+                <a href="working_scholar_borrowed.php" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Borrowed Items</a>
+                <a href="working_scholar_returns.php" class="nav-item"><i class="fa-solid fa-rotate-left"></i> Return Processing</a>
+                <a href="working_scholar_history.php" class="nav-item"><i class="fa-solid fa-history"></i> History</a>
+            </nav>
+>>>>>>>> deb6f896793eca6a0a4eb60c583655557db155d5:html_files/working_scholar_page/working_scholar_account_setting.php
         <div class="sidebar-footer">
             <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         </div>
@@ -110,6 +128,10 @@
         </div>
     </main>
 
+<<<<<<<< HEAD:target/classes/templates/admin/admin_account_setting.html
     <script src="../../../script_files/admin_script/account_setting/admin_all_in_one.js"></script>
+========
+    <script src="../../script_files/working_scholar_script/account_setting/working_scholar_all_in_one.js"></script>
+>>>>>>>> deb6f896793eca6a0a4eb60c583655557db155d5:html_files/working_scholar_page/working_scholar_account_setting.php
 </body>
 </html>
