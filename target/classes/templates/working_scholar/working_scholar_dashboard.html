@@ -10,9 +10,13 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- CSS FILES -->
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/dashboard/working_scholar_dashboard_body.css">
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/dashboard/working_scholar_dashboard_global.css">
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/dashboard/working_scholar_dashboard_header.css">
+    <!-- <link rel="stylesheet" href="../static/css/working_scholar_style/dashboard/working_scholar_dashboard_global.css">
+    <link rel="stylesheet" href="../static/css/working_scholar_style/dashboard/working_scholar_dashboard_header.css">
+    <link rel="stylesheet" href="../static/css/working_scholar_style/dashboard/working_scholar_dashboard_body.css">
+ -->
+    
+    <link rel="stylesheet" href="../../static/css/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
+
     <!-- TITLE! -->
     <title>Webventory: Working Scholar Portal</title>
 </head>
@@ -36,7 +40,6 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
         </div>
 
         <nav class="side-menu-links">
-
             <a href="/working_scholar/dashboard" class="menu-link active">
                 <span class="icon">⊞</span> Dashboard
             </a>
@@ -61,37 +64,37 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
         </nav>
 
         <div class="side-menu-footer">
-            <a href="/logout" class="logout-btn"
-                style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                <a href="working_scholar_dashboard.php" class="menu-link active">
-                    <span class="icon">⊞</span> Dashboard
-                </a>
-                <a href="working_scholar_requests.php" class="menu-link">
-                    <span class="icon">📊</span> Pending Requests
-                </a>
-                <a href="working_scholar_cancellations.php" class="menu-link">
-                    <span class="icon">🚫</span> Cancellation Requests
-                </a>
-                <a href="working_scholar_inventory.php" class="menu-link">
-                    <span class="icon">📦</span> Inventory
-                </a>
-                <a href="working_scholar_borrowed.php" class="menu-link">
-                    <span class="icon">📋</span> Borrowed Items
-                </a>
-                <a href="working_scholar_returns.php" class="menu-link">
-                    <span class="icon">↩</span> Return Processing
-                </a>
-                <a href="working_scholar_history.php" class="menu-link">
-                    <span class="icon">⏱</span> History
-                </a>
-                </nav>
+            <a href="/logout" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
 
-                <div class="side-menu-footer">
-                    <a href="../../php_backend/working_scholar/ws_logout.php" class="logout-btn"
-                        style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                        <span class="icon">↪</span> Logout
-                    </a>
-                </div>
+    <a href="working_scholar_dashboard.php" class="menu-link active">
+        <span class="icon">⊞</span> Dashboard
+    </a>
+    <a href="working_scholar_requests.php" class="menu-link">
+        <span class="icon">📊</span> Pending Requests
+    </a>
+    <a href="working_scholar_cancellations.php" class="menu-link">
+        <span class="icon">🚫</span> Cancellation Requests
+    </a>
+    <a href="working_scholar_inventory.php" class="menu-link">
+        <span class="icon">📦</span> Inventory
+    </a>
+    <a href="working_scholar_borrowed.php" class="menu-link">
+        <span class="icon">📋</span> Borrowed Items
+    </a>
+    <a href="working_scholar_returns.php" class="menu-link">
+        <span class="icon">↩</span> Return Processing
+    </a>
+    <a href="working_scholar_history.php" class="menu-link">
+        <span class="icon">⏱</span> History
+    </a>
+</nav>
+
+        <div class="side-menu-footer">
+            <a href="../../php_backend/working_scholar/ws_logout.php" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+
+                <span class="icon">↪</span> Logout
+            </a>
+        </div>
     </aside>
 
     <!-- TOP HEADER -->
@@ -101,7 +104,7 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
             <span class="brand-title">Webventory: Working Scholar Portal</span>
         </div>
         <div class="header-right">
-
+            
             <!-- NOTIFICATION DROPDOWN CONTAINER -->
             <div class="dropdown-wrapper" id="notifDropdownWrapper">
                 <button class="icon-btn" id="notifBtn" title="Notifications">🔔</button>
@@ -163,8 +166,7 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
             </div>
             <div class="task-actions">
                 <button class="btn-secondary" id="viewGuideBtn">View WS Guide</button>
-                <a href="/working_scholar/requests" class="btn-primary" style="text-decoration:none;">Process
-                    Requests</a>
+                <a href="/working_scholar/requests" class="btn-primary" style="text-decoration:none;">Process Requests</a>
             </div>
         </section>
 
@@ -205,36 +207,29 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
                     </tr>
 
                     <?php if (empty($pending_requests)): ?>
-                    <tr>
-                        <td colspan="4" style="text-align: center; color: #777;">No pending requests found.</td>
-                    </tr>
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #777;">No pending requests found.</td>
+                        </tr>
                     <?php else: ?>
-                    <?php foreach ($pending_requests as $req): ?>
-                    <?php 
+                        <?php foreach ($pending_requests as $req): ?>
+                            <?php 
                                 // Build the backend action URLs safely outside the HTML string
                                 $req_id = $req['id'];
                                 $approve_url = "../../php_backend/working_scholar/ws_process_action.php?id=" . $req_id . "&action=approve";
                                 $reject_url = "../../php_backend/working_scholar/ws_process_action.php?id=" . $req_id . "&action=reject";
                             ?>
-                    <tr>
-                        <td>
-                            <?php echo htmlspecialchars($req['student_name']); ?>
-                        </td>
-                        <td>
-                            <?php echo htmlspecialchars($req['item_name']); ?>
-                        </td>
-                        <td><span class="status-badge pending">
-                                <?php echo htmlspecialchars($req['status']); ?>
-                            </span></td>
-                        <td>
-                            <a href="<?php echo $approve_url; ?>" class="btn-table"
-                                style="background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 12px;">Approve</a>
-                            <a href="<?php echo $reject_url; ?>" class="btn-table"
-                                style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; margin-left: 4px;">Reject</a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($req['student_name']); ?></td>
+                                <td><?php echo htmlspecialchars($req['item_name']); ?></td>
+                                <td><span class="status-badge pending"><?php echo htmlspecialchars($req['status']); ?></span></td>
+                                <td>
+                                    <a href="<?php echo $approve_url; ?>" class="btn-table" style="background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 12px;">Approve</a>
+                                    <a href="<?php echo $reject_url; ?>" class="btn-table" style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; margin-left: 4px;">Reject</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     <?php endif; ?>
+
                 </tbody>
             </table>
         </section>
@@ -262,27 +257,19 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
             <div class="metric-card">
                 <span class="metric-label">AVAILABLE ITEMS</span>
                 <span class="metric-value dark" th:text="${availableCount}">0</span>
-                <span class="metric-value orange">
-                    <?php echo $pending_count; ?>
-                </span>
+                <span class="metric-value orange"><?php echo $pending_count; ?></span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">BORROWED ITEMS</span>
-                <span class="metric-value blue">
-                    <?php echo $borrowed_count; ?>
-                </span>
+                <span class="metric-value blue"><?php echo $borrowed_count; ?></span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">OVERDUE</span>
-                <span class="metric-value red">
-                    <?php echo $overdue_count; ?>
-                </span>
+                <span class="metric-value red"><?php echo $overdue_count; ?></span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">AVAILABLE ITEMS</span>
-                <span class="metric-value dark">
-                    <?php echo $available_count; ?>
-                </span>
+                <span class="metric-value dark"><?php echo $available_count; ?></span>
             </div>
         </section>
 
@@ -290,30 +277,18 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
         <section class="quick-actions">
             <h3>Quick Actions</h3>
             <div class="actions-buttons">
-                <a href="/working_scholar/requests" class="btn-primary"
-                    style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Process
-                    Requests</a>
-                <a href="/working_scholar/returns" class="btn-secondary"
-                    style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Record
-                    Return</a>
-                <a href="/working_scholar/inventory" class="btn-secondary"
-                    style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View
-                    Inventory</a>
+                <a href="/working_scholar/requests" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Process Requests</a>
+                <a href="/working_scholar/returns" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Record Return</a>
+                <a href="/working_scholar/inventory" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View Inventory</a>
             </div>
         </section>
-        <h3>Quick Actions</h3>
-        <div class="actions-buttons">
-            <a href="working_scholar_requests.php" class="btn-primary"
-                style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Process
-                Requests</a>
-            <a href="working_scholar_returns.php" class="btn-secondary"
-                style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Record
-                Return</a>
-            <a href="working_scholar_inventory.php" class="btn-secondary"
-                style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View
-                Inventory</a>
-        </div>
-        </section>
+    <h3>Quick Actions</h3>
+    <div class="actions-buttons">
+        <a href="working_scholar_requests.php" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Process Requests</a>
+        <a href="working_scholar_returns.php" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Record Return</a>
+        <a href="working_scholar_inventory.php" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View Inventory</a>
+    </div>
+</section>
 
         <!-- OVERDUE ALERTS CARD -->
         <section class="card">
@@ -328,37 +303,29 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
                     </div>
                 </div>
 
-                <div class="alert-item" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;"
-                    th:each="alert : ${overdueAlerts}">
+                <div class="alert-item" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;" th:each="alert : ${overdueAlerts}">
                     <div>
-                        - <strong style="color: #dc3545;" th:text="${alert.studentName}">Student Name</strong> Borrowed
+                        - <strong style="color: #dc3545;" th:text="${alert.studentName}">Student Name</strong> Borrowed 
                         <em th:text="${alert.itemName}">Item Name</em>
-                        <p class="alert-sub" style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Due Date: <span
-                                th:text="${alert.dueDate}">2026-00-00</span></p>
+                        <p class="alert-sub" style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Due Date: <span th:text="${alert.dueDate}">2026-00-00</span></p>
                     </div>
                 </div>
                 <?php if (empty($overdue_alerts)): ?>
-                <div class="alert-item">
-                    <div>
-                        <strong>-</strong>
-                        <p class="alert-sub">No active overdue alerts</p>
+                    <div class="alert-item">
+                        <div>
+                            <strong>-</strong>
+                            <p class="alert-sub">No active overdue alerts</p>
+                        </div>
                     </div>
-                </div>
                 <?php else: ?>
-                <?php foreach ($overdue_alerts as $alert): ?>
-                <div class="alert-item" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">
-                    <div>
-                        <strong style="color: #dc3545;">
-                            <?php echo htmlspecialchars($alert['student_name']); ?>
-                        </strong> - Borrowed <em>
-                            <?php echo htmlspecialchars($alert['item_name']); ?>
-                        </em>
-                        <p class="alert-sub" style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Due Date:
-                            <?php echo htmlspecialchars($alert['due_date']); ?>
-                        </p>
-                    </div>
-                </div>
-                <?php endforeach; ?>
+                    <?php foreach ($overdue_alerts as $alert): ?>
+                        <div class="alert-item" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">
+                            <div>
+                                <strong style="color: #dc3545;"><?php echo htmlspecialchars($alert['student_name']); ?></strong> - Borrowed <em><?php echo htmlspecialchars($alert['item_name']); ?></em>
+                                <p class="alert-sub" style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Due Date: <?php echo htmlspecialchars($alert['due_date']); ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </section>
@@ -372,10 +339,9 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
                 <span class="guide-step-tag" id="guideStepTag">WORKING SCHOLAR GUIDE · STEP 1 OF 4</span>
                 <button class="guide-exit-btn" id="guideExitBtn">Exit</button>
             </div>
-
+            
             <h2 class="guide-title" id="guideTitle">Welcome, Ana!</h2>
-            <p class="guide-desc" id="guideDesc">You will use the Working Scholar Portal to process requests, release
-                inventory, record returns, and assist students.</p>
+            <p class="guide-desc" id="guideDesc">You will use the Working Scholar Portal to process requests, release inventory, record returns, and assist students.</p>
 
             <div class="guide-footer">
                 <button class="guide-action-btn secondary" id="guideBackBtn" disabled>Back</button>
@@ -384,14 +350,9 @@ include '../../php_backend/working_scholar/ws_dashboard_stats.php';
         </div>
     </div>
 
-    <!-- Ambot lang ngano kaha ni ay -->
     <!-- SCRIPT FILE -->
-    <!-- <script src="../../static/script/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script> -->
+    <script src="/script/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
 
-    <script src="../../static/script/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
-
-    <!-- <script src="/script/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
-    <script src="../../script_files/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script> -->
 </body>
 
 </html>
