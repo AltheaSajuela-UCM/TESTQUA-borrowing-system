@@ -14,13 +14,13 @@ const profilePopup = document.getElementById('profilePopup');
 
 // 1. SIDE MENU (DRAWER) TOGGLE
 function openSideMenu() {
-    if (sideMenu) sideMenu.classList.add('open');
-    if (menuOverlay) menuOverlay.classList.add('show');
+    if (sideMenu) sideMenu.classList.add('active');
+    if (menuOverlay) menuOverlay.classList.add('active');
 }
 
 function closeSideMenu() {
-    if (sideMenu) sideMenu.classList.remove('open');
-    if (menuOverlay) menuOverlay.classList.remove('show');
+    if (sideMenu) sideMenu.classList.remove('active');
+    if (menuOverlay) menuOverlay.classList.remove('active');
 }
 
 if (menuBtn) {
@@ -42,9 +42,8 @@ if (menuOverlay) {
 if (notifBtn && notifDropdownWrapper) {
     notifBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (profileDropdownWrapper) profileDropdownWrapper.classList.remove('show');
-        notifDropdownWrapper.classList.toggle('show');
-        if (notifPopup) notifPopup.classList.toggle('show');
+        if (profileDropdownWrapper) profileDropdownWrapper.classList.remove('active');
+        notifDropdownWrapper.classList.toggle('active');
     });
 }
 
@@ -52,22 +51,18 @@ if (notifBtn && notifDropdownWrapper) {
 if (profileBtn && profileDropdownWrapper) {
     profileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (notifDropdownWrapper) notifDropdownWrapper.classList.remove('show');
-        if (notifPopup) notifPopup.classList.remove('show');
-        profileDropdownWrapper.classList.toggle('show');
-        if (profilePopup) profilePopup.classList.toggle('show');
+        if (notifDropdownWrapper) notifDropdownWrapper.classList.remove('active');
+        profileDropdownWrapper.classList.toggle('active');
     });
 }
 
 // CLOSE ALL DROPDOWNS ON CLICK OUTSIDE
 document.addEventListener('click', (e) => {
     if (notifDropdownWrapper && !notifDropdownWrapper.contains(e.target)) {
-        notifDropdownWrapper.classList.remove('show');
-        if (notifPopup) notifPopup.classList.remove('show');
+        notifDropdownWrapper.classList.remove('active');
     }
     if (profileDropdownWrapper && !profileDropdownWrapper.contains(e.target)) {
-        profileDropdownWrapper.classList.remove('show');
-        if (profilePopup) profilePopup.classList.remove('show');
+        profileDropdownWrapper.classList.remove('active');
     }
 });
 
@@ -163,13 +158,13 @@ if (viewGuideBtn && guideOverlay) {
     viewGuideBtn.addEventListener('click', () => {
         currentWsGuideStep = 0;
         updateWsGuideModal();
-        guideOverlay.classList.add('show'); // Matched to .show
+        guideOverlay.classList.add('active');
     });
 }
 
 if (guideExitBtn && guideOverlay) {
     guideExitBtn.addEventListener('click', () => {
-        guideOverlay.classList.remove('show');
+        guideOverlay.classList.remove('active');
     });
 }
 
@@ -188,7 +183,7 @@ if (guideNextBtn && guideOverlay) {
             currentWsGuideStep++;
             updateWsGuideModal();
         } else {
-            guideOverlay.classList.remove('show');
+            guideOverlay.classList.remove('active');
         }
     });
 }
