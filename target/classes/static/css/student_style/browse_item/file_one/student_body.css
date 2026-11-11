@@ -435,3 +435,9 @@ textarea.form-control {
   display: flex;
   gap: 12px;
 }
+
+/* DROPDOWN DISPLAY FIX */
+.notif-dropdown.show,
+.profile-dropdown.show {
+    display: block !important;
+} 
