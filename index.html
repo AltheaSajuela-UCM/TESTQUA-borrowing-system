@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory Local Preview</title>
+    <style>
+        :root { color-scheme: light; font-family: Arial, sans-serif; color: #172033; background: #f3f6fb; }
+        body { margin: 0; padding: 48px 20px; }
+        main { max-width: 900px; margin: auto; }
+        h1 { margin-bottom: 8px; }
+        p { color: #5e687b; }
+        .portals { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 28px; }
+        article { padding: 22px; background: white; border: 1px solid #e1e7f0; border-radius: 12px; }
+        h2 { margin: 0 0 16px; font-size: 1.15rem; }
+        a { display: inline-block; margin: 6px 12px 0 0; color: #155eef; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Webventory</h1>
+        <p>Local preview for the portal pages currently included in this project.</p>
+        <section class="portals" aria-label="Available portal pages">
+            <article>
+                <h2>Administrator</h2>
+                <a href="target/classes/templates/admin/admin_dashboard.html">Dashboard</a>
+                <a href="target/classes/templates/admin/admin_account_setting.html">Account settings</a>
+            </article>
+            <article>
+                <h2>Student</h2>
+                <a href="target/classes/templates/student/student_dashboard.html">Dashboard</a>
+                <a href="target/classes/templates/student/student_account_setting.html">Account settings</a>
+            </article>
+            <article>
+                <h2>Working Scholar</h2>
+                <a href="target/classes/templates/working_scholar/working_scholar_dashboard.html">Dashboard</a>
+                <a href="target/classes/templates/working_scholar/working_scholar_account_setting.html">Account settings</a>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
