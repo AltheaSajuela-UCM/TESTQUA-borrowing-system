@@ -1,0 +1,7 @@
+User type	Username / ID	Password
+Admin	90000001	Admin123!
+Working Scholar (WS)	80000001	Scholar123!
+Working Scholar (WS)	80000002	Scholar123!
+Student	20240001	Student123!
+Student	20240002	Student123!
+Student	20240003	Student123!

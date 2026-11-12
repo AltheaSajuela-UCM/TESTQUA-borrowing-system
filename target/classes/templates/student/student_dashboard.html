@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- CSS files -->
     <link rel="stylesheet" href="../../static/css/student_style/dashboard/student_dashboard_body.css">
     <link rel="stylesheet" href="../../static/css/student_style/dashboard/student_dashboard_global.css">
@@ -36,18 +36,18 @@
             <a href="student_dashboard.html" class="menu-link active">
                 <span class="icon">⊞</span> Dashboard
             </a>
-            <a href="#" class="menu-link">
+            <a href="student_browse_item.html" class="menu-link">
                 <span class="icon">📋</span> Borrow Items
             </a>
-            <a href="#" class="menu-link">
+            <a href="student_my_borrowings.html" class="menu-link">
                 <span class="icon">📦</span> My Borrowings
             </a>
-            <a href="#" class="menu-link">
+            <!-- <a href="#" class="menu-link">
                 <span class="icon">⏱</span> History
             </a>
             <a href="#" class="menu-link">
                 <span class="icon">🔔</span> Notifications
-            </a>
+            </a> -->
         </nav>
 
         <div class="side-menu-footer">
@@ -72,7 +72,7 @@
 
         <!-- Notifications & User Profile on the right side -->
         <div class="header-right">
-            
+
             <!-- NOTIFICATION DROPDOWN CONTAINER -->
             <div class="dropdown-wrapper" id="notifDropdownWrapper">
                 <button class="icon-btn" id="notifBtn" aria-label="View notifications">
@@ -131,38 +131,37 @@
         <section class="card hero-card">
             <div class="hero-header">
                 <div>
-                    <span class="sub-heading">START HERE</span>
                     <h1 class="main-heading">What would you like to borrow?</h1>
                     <p class="hero-subtext">Tap a category to browse available items.</p>
                 </div>
-                <button class="btn-secondary">How borrowing works</button>
+                <button class="btn-secondary" id="openGuideBtn">How borrowing works</button>
             </div>
 
             <!-- Category Action Cards -->
             <div class="category-grid">
-                <button class="cat-card cat-blue">
+                <a href="student_browse_item.html" class="cat-card cat-blue">
                     <div class="icon-box">#</div>
                     <div class="cat-info">
                         <h3>Academic</h3>
                         <p>Browse calculators</p>
                     </div>
-                </button>
+                </a>
 
-                <button class="cat-card cat-blue">
+                <a href="student_browse_item.html" class="cat-card cat-blue">
                     <div class="icon-box">#</div>
                     <div class="cat-info">
                         <h3>Non-Academic</h3>
                         <p>Browse games & activities</p>
                     </div>
-                </button>
+                </a>
 
-                <button class="cat-card cat-cancel">
+                <a href="student_my_borrowings.html" class="cat-card cat-cancel">
                     <div class="icon-box">#</div>
                     <div class="cat-info">
                         <h3>Cancel Borrow Request</h3>
                         <p>No pending request yet</p>
                     </div>
-                </button>
+                </a>
             </div>
         </section>
 
@@ -186,7 +185,7 @@
 
             <div class="card stat-card">
                 <span class="stat-label">AVAILABLE ITEMS</span>
-                <span class="stat-value text-dark">0</span> 
+                <span class="stat-value text-dark">0</span>
                 <span class="stat-subtext">in catalog</span>
             </div>
         </section>
@@ -224,7 +223,41 @@
                 </div>
             </div>
         </section>
+    </div>
 
+    <!-- BORROWING GUIDE MODAL -->
+    <div id="guideModalOverlay" class="guide-modal-overlay hidden">
+        <div class="guide-modal-card">
+            <div class="guide-header">
+                <span id="guideStepTitle" class="guide-step-indicator">BORROWING GUIDE · STEP 1 OF 6</span>
+                <button id="guideExitBtn" class="guide-exit">Exit</button>
+            </div>
+
+            <h2 id="guideTitle" class="guide-main-title">Welcome to Webventory, Juan!</h2>
+
+            <!-- Progress Bars -->
+            <div class="guide-progress-bars">
+                <div class="progress-bar active" data-step="1"></div>
+                <div class="progress-bar" data-step="2"></div>
+                <div class="progress-bar" data-step="3"></div>
+                <div class="progress-bar" data-step="4"></div>
+                <div class="progress-bar" data-step="5"></div>
+                <div class="progress-bar" data-step="6"></div>
+            </div>
+
+            <p id="guideDescription" class="guide-desc">
+                Webventory is your Student Portal for requesting, claiming, managing, and returning items from the Student Affairs Office.
+            </p>
+
+            <div class="guide-info-box">
+                <p id="guideBoxText">This quick guide will show you the complete borrowing process before you begin.</p>
+            </div>
+
+            <div class="guide-footer">
+                <button id="guideBackBtn" class="guide-btn-back" disabled>Back</button>
+                <button id="guideNextBtn" class="guide-btn-next">Next step</button>
+            </div>
+        </div>
     </div>
 
     <script src="../../static/script/student_script/dashboard/student_all_in_one.js"></script>
