@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory: Student Portal - Catalog</title>
+    <!-- Fixed stylesheet paths -->
+    <link rel="stylesheet" href="../../static/css/student_style/browse_item/file_one/student_body.css">
+    <link rel="stylesheet" href="../../static/css/student_style/browse_item/file_one/student_global.css">
+    <link rel="stylesheet" href="../../static/css/student_style/browse_item/file_one/student_header.css">
+</head>
+<body>
+
+    <!-- SIDEBAR OVERLAY & DRAWER -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar-drawer" id="sidebarDrawer">
+        <div>
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-logo">W</div>
+                    <div>
+                        <div class="sidebar-title">Webventory</div>
+                        <div class="sidebar-role">Student</div>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeSidebarBtn">Close</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="student_dashboard.html" class="nav-item">📊 Dashboard</a>
+                <a href="student_browse_item.html" class="nav-item active">📋 Browse Items</a>
+                <a href="student_my_borrowings.html" class="nav-item">📑 My Borrowings</a>
+                <a href="student_history.html" class="nav-item">⏱ History</a>
+                <a href="student_notification.html" class="nav-item">🔔 Notifications</a>
+            </nav>
+        </div>
+        <div class="sidebar-footer">
+            <button class="logout-btn-full">↪ Logout</button>
+        </div>
+    </aside>
+
+    <!-- TOP HEADER -->
+    <header class="app-header">
+        <div class="header-left">
+            <button class="menu-btn">☰ Menu</button>
+            <span class="brand-title">Webventory: Student Portal</span>
+        </div>
+        <div class="header-right">
+            <!-- NOTIFICATION BUTTON & POPUP -->
+            <button class="icon-btn" id="notifBtn" title="Notifications">🔔</button>
+            <div class="notif-dropdown" id="notifDropdown">
+                <div class="notif-tabs">
+                    <button class="notif-tab active" data-tab="all">All</button>
+                    <button class="notif-tab" data-tab="unread">Unread</button>
+                    <button class="notif-tab" data-tab="alerts">Alerts</button>
+                </div>
+                <div class="notif-list">
+                    <div class="notif-item unread alert-item">
+                        <div>Chess is overdue. Return it to the SAO Office immediately.</div>
+                        <button class="mark-read-btn">Mark as read</button>
+                    </div>
+                    <div class="notif-item">
+                        <div>Henry approved your Scientific Calculator request.</div>
+                    </div>
+                    <div class="notif-item unread">
+                        <div>Your return schedule was set for 5:00 PM.</div>
+                        <button class="mark-read-btn">Mark as read</button>
+                    </div>
+                </div>
+                <button class="open-notif-btn">Open Notifications Page</button>
+            </div>
+
+            <!-- USER PROFILE & POPUP MENU -->
+            <div class="user-profile" id="userProfileBtn">
+                <div class="profile-avatar">JD</div>
+                <span class="profile-text">Profile</span>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <a href="student_account_setting.html" class="profile-dropdown-item">Account Settings</a>
+                <a href="../../login_page/index.html" class="profile-dropdown-item">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="portal-container">
+        
+        <!-- CATALOG VIEW -->
+        <div id="catalogView">
+            <div class="catalog-header">
+                <h1>Item Catalog</h1>
+                <p>Browse and borrow available items</p>
+            </div>
+
+            <!-- CATEGORY TOGGLES -->
+            <div class="category-toggle">
+                <button class="toggle-btn active" data-category="academic">Academic</button>
+                <button class="toggle-btn" data-category="non-academic">Non-Academic</button>
+            </div>
+
+            <!-- SEARCH AND FILTER -->
+            <div class="search-filter-row">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search items...">
+                </div>
+                <select id="statusFilter" class="select-filter">
+                    <option value="all">All</option>
+                    <option value="available">Available</option>
+                    <option value="borrowed">Borrowed</option>
+                </select>
+            </div>
+
+            <!-- ITEMS GRID -->
+            <div class="items-grid" id="itemsGrid">
+                
+                <!-- ================= ACADEMIC ITEMS ================= -->
+                
+                <!-- Scientific Calculator Card -->
+                <div class="item-card" data-category="academic" data-status="borrowed" data-description="Advanced scientific calculator for mathematics and engineering units." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div class="placeholder-graphic">
+                            <div class="graphic-block green"></div>
+                            <div class="graphic-block magenta"></div>
+                            <div class="graphic-block cyan"></div>
+                        </div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Scientific Calculator</span>
+                            <span class="status-badge borrowed">Borrowed</span>
+                        </div>
+                        <div class="item-code">AC-001</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Basic Calculator Card -->
+                <div class="item-card" data-category="academic" data-status="available" data-description="Standard basic calculator for arithmetic operations." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div class="placeholder-graphic">
+                            <div class="graphic-block green"></div>
+                            <div class="graphic-block magenta"></div>
+                            <div class="graphic-block cyan"></div>
+                        </div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Basic Calculator</span>
+                            <span class="status-badge available">Available</span>
+                        </div>
+                        <div class="item-code">AC-002</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+
+                <!-- ================= NON-ACADEMIC ITEMS ================= -->
+
+                <!-- Snakes and Ladders Card -->
+                <div class="item-card" data-category="non-academic" data-status="available" style="display: none;" data-description="Classic board game for recreational activities." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div style="font-size: 28px;">🎲</div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Snakes and Ladders</span>
+                            <span class="status-badge available">Available</span>
+                        </div>
+                        <div class="item-code">NA-001</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Scrabble Card -->
+                <div class="item-card" data-category="non-academic" data-status="available" style="display: none;" data-description="Word game where players score points by placing tiles." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div style="font-size: 28px;">🎲</div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Scrabble</span>
+                            <span class="status-badge available">Available</span>
+                        </div>
+                        <div class="item-code">NA-002</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Chess Card -->
+                <div class="item-card" data-category="non-academic" data-status="borrowed" style="display: none;" data-description="Two-player strategy board game." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div style="font-size: 28px;">🎲</div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Chess</span>
+                            <span class="status-badge borrowed">Borrowed</span>
+                        </div>
+                        <div class="item-code">NA-003</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Sungka Card -->
+                <div class="item-card" data-category="non-academic" data-status="available" style="display: none;" data-description="Traditional mancala board game." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div style="font-size: 28px;">🎲</div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Sungka</span>
+                            <span class="status-badge available">Available</span>
+                        </div>
+                        <div class="item-code">NA-004</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Math Board Card -->
+                <div class="item-card" data-category="non-academic" data-status="available" style="display: none;" data-description="Interactive learning board game for mathematics." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div style="font-size: 28px;">🎲</div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Math Board</span>
+                            <span class="status-badge available">Available</span>
+                        </div>
+                        <div class="item-code">NA-005</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Word Factory Card -->
+                <div class="item-card" data-category="non-academic" data-status="available" style="display: none;" data-description="Vocabulary building word game." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div style="font-size: 28px;">🎲</div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Word Factory</span>
+                            <span class="status-badge available">Available</span>
+                        </div>
+                        <div class="item-code">NA-006</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Giant Pick Up Sticks Card -->
+                <div class="item-card" data-category="non-academic" data-status="available" style="display: none;" data-description="Physical coordination pick-up sticks game." data-condition="Good" data-waiver="No" data-id-surrender="No">
+                    <div class="item-image-placeholder">
+                        <div style="font-size: 28px;">🎲</div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="card-top-info">
+                            <span class="item-name">Giant Pick Up Sticks</span>
+                            <span class="status-badge available">Available</span>
+                        </div>
+                        <div class="item-code">NA-007</div>
+                        <button type="button" class="btn-primary view-details-trigger">View Details</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- DETAILS VIEW (Dynamic Inline Card View) -->
+        <div id="detailsView" style="display: none;">
+            <a href="#" class="back-link" id="backToCatalogLink">← Back to Catalog</a>
+            <div class="breadcrumbs" id="detailBreadcrumb">Home / Items / Item Name</div>
+
+            <div class="details-layout">
+                <div class="details-image-box" id="detailImageBox">
+                    <div class="placeholder-graphic">
+                        <div class="graphic-block green"></div>
+                        <div class="graphic-block magenta"></div>
+                        <div class="graphic-block cyan"></div>
+                    </div>
+                </div>
+                <div class="details-info">
+                    <h1 id="detailItemName">Item Name</h1>
+                    <div class="details-subtitle" id="detailItemDesc">Description goes here</div>
+
+                    <div class="specs-grid">
+                        <div>
+                            <div class="spec-label">Category</div>
+                            <div class="spec-value" id="detailCategory">Academic</div>
+                        </div>
+                        <div>
+                            <div class="spec-label">Inventory Code</div>
+                            <div class="spec-value" id="detailCode">AC-000</div>
+                        </div>
+                        <div>
+                            <div class="spec-label">Condition</div>
+                            <div class="spec-value" id="detailCondition">Good</div>
+                        </div>
+                        <div>
+                            <div class="spec-label">Requires Waiver</div>
+                            <div class="spec-value" id="detailWaiver">No</div>
+                        </div>
+                        <div>
+                            <div class="spec-label">ID Surrender</div>
+                            <div class="spec-value" id="detailIdSurrender">No</div>
+                        </div>
+                        <div>
+                            <div class="spec-label">Status</div>
+                            <div class="spec-value" id="detailStatusContainer">
+                                <span class="status-badge available">Available</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-actions">
+                        <button type="button" class="btn-primary" id="detailActionBtn">Borrow This Item</button>
+                        <button type="button" class="btn-secondary" id="backBtn">Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../../static/script/student_script/browse_item/student_all_in_one.js"></script>
+</body>
+</html>

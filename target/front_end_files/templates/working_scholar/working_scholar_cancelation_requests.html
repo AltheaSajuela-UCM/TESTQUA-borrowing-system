@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory: Working Scholar Portal - Cancellation Requests</title>
+    <link rel="stylesheet" href="../../static/css/working_scholar_style/cancelation_requests/working_scholar_cancelation_requests_body.css">
+</head>
+<body>
+
+    <!-- Sidebar Navigation Drawer Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar Navigation Drawer -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo">W</div>
+                <div>
+                    <h3>Webventory</h3>
+                    <span>SAO Working Scholar</span>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="close-btn">Close</button>
+        </div>
+        <div class="sidebar-menu">
+            <a href="working_scholar_dashboard.html" class="menu-item"><span class="icon">田</span> Dashboard</a>
+            <a href="working_scholar_pending_requests.html" class="menu-item"><span class="icon">📥</span> Pending Requests</a>
+            <a href="working_scholar_cancelation_requests.html" class="menu-item active"><span class="icon">❌</span> Cancellation Requests</a>
+            <a href="working_scholar_inventory.html" class="menu-item"><span class="icon">📋</span> Inventory</a>
+            <a href="working_scholar_borrowed_items.html" class="menu-item"><span class="icon">📦</span> Borrowed Items</a>
+            <a href="working_scholar_return_processing.html" class="menu-item"><span class="icon">🔄</span> Return Processing</a>
+            <a href="working_scholar_history.html" class="menu-item"><span class="icon">⏱️</span> History</a>
+        </div>
+        <div class="sidebar-footer">
+            <button class="logout-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Top Navigation Header -->
+    <header class="header">
+        <div class="header-left">
+            <button id="menu-btn" class="menu-btn" onclick="toggleSidebar()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <span>Menu</span>
+            </button>
+            <span class="divider">|</span>
+            <h1>Webventory: Working Scholar Portal</h1>
+        </div>
+        <div class="header-right">
+            <!-- Notification Dropdown Container -->
+            <div class="dropdown-container">
+                <button class="notification-btn" onclick="toggleNotificationDropdown()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <span class="notification-dot" id="notif-dot" style="display: none;"></span>
+                </button>
+                <div id="notification-dropdown" class="dropdown-menu notification-menu">
+                    <div class="notif-tabs">
+                        <button class="tab-btn active" onclick="switchNotifTab('all')">All</button>
+                        <button class="tab-btn" onclick="switchNotifTab('unread')">Unread</button>
+                        <button class="tab-btn" onclick="switchNotifTab('alerts')">Alerts</button>
+                    </div>
+                    <div class="notif-list" id="notif-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown Container -->
+            <div class="dropdown-container">
+                <div class="profile-section" onclick="toggleProfileDropdown()">
+                    <div class="avatar">WS</div>
+                    <span>Profile</span>
+                </div>
+                <div id="profile-dropdown" class="dropdown-menu profile-menu">
+                    <a href="working_scholar_account_setting.html" class="dropdown-item">Account Settings</a>
+                    <a href="../../login_page/index.html" class="dropdown-item text-red">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Page Top Bar -->
+        <div class="page-top-bar">
+            <div>
+                <h2>Cancellation Requests</h2>
+                <p>Student requests to cancel their borrow submissions</p>
+            </div>
+        </div>
+
+        <!-- Cancellation Requests Table Section -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Student</th>
+                            <th>Item</th>
+                            <th>Date Requested</th>
+                            <th>Reason</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="accept-modal" class="modal-card">
+            <h3>Accept Cancellation?</h3>
+            <p class="modal-subtext" id="modal-subtitle">Confirm that Student's request to cancel borrowing Item will be accepted.</p>
+            <div class="modal-alert-blue">
+                System will log this and automatically notify the student.
+            </div>
+            <div class="modal-footer-split">
+                <button class="btn btn-primary" onclick="confirmAcceptCancellation()">Confirm</button>
+                <button class="btn btn-light" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../static/script/working_scholar_script/cancelation_requests/working_scholar_cancelation_requests_all_in_one.js"></script>
+</body>
+</html>

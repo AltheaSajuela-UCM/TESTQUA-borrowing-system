@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webventory: Student Portal</title>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="../../static/css/student_style/my_borrowings/student_my_borrowings_global.css">
+</head>
+
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <button id="open-menu-btn" class="menu-btn">
+        <i class="fa-solid fa-bars"></i> Menu
+      </button>
+      <div class="portal-title">
+        Webventory: <span>Student Portal</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Notification Icon & Button -->
+      <div class="dropdown-wrapper">
+        <button id="notif-btn" class="icon-btn">
+          <i class="fa-regular fa-bell"></i>
+          <span id="notif-badge" class="badge">2</span>
+        </button>
+
+        <!-- Notification Popover Card -->
+        <div id="notif-popover" class="popover hidden">
+          <div class="notif-tabs">
+            <button class="notif-tab active" data-tab="all">All</button>
+            <button class="notif-tab" data-tab="unread">Unread</button>
+            <button class="notif-tab" data-tab="alerts">Alerts</button>
+          </div>
+
+          <div id="notif-list" class="notif-list">
+            <!-- Populated via JavaScript -->
+          </div>
+
+          <div class="popover-footer">
+            <button class="footer-btn">Open Notifications Page</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Dropdown Button -->
+      <div class="dropdown-wrapper">
+        <button id="profile-btn" class="profile-btn">
+          <div class="avatar">JD</div>
+          <span>Profile</span>
+        </button>
+
+        <div id="profile-menu" class="profile-dropdown hidden">
+          <a href="student_account_setting.html">Account Settings</a>
+          <a href="../../login_page/index.html">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDE DRAWER NAVIGATION -->
+  <div id="drawer-container" class="drawer-container">
+    <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
+    <div id="drawer-content" class="drawer-content drawer-closed">
+      <div>
+        <div class="drawer-header">
+          <div class="drawer-brand">
+            <div class="brand-icon">W</div>
+            <div>
+              <div class="brand-title">Webventory</div>
+              <div class="brand-subtitle">Student</div>
+            </div>
+          </div>
+          <button id="close-drawer-btn" class="close-drawer">Close</button>
+        </div>
+
+        <nav class="drawer-nav">
+          <a href="student_dashboard.html"><i class="fa-solid fa-border-all"></i> Dashboard</a>
+          <a href="student_browse_item.html"><i class="fa-solid fa-pause" style="transform: rotate(90deg);"></i> Browse
+            Items</a>
+          <a href="student_my_borrowings.html" class="active"><i class="fa-solid fa-rectangle-list"></i> My
+            Borrowings</a>
+          <a href="student_history.html"><i class="fa-solid fa-power-off"></i> History</a>
+          <a href="student_notification.html"><i class="fa-solid fa-bell" style="color: #f59e0b;"></i> Notifications</a>
+        </nav>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket" style="transform: scaleX(-1);"></i>
+          Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>My Borrowings</h1>
+      <p>Active borrow transactions</p>
+    </div>
+
+    <div class="info-box">
+      Borrow requests can only be cancelled while they are pending approval. Borrowed or overdue items must be returned
+      through the SAO office.
+    </div>
+
+    <div class="table-card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Code</th>
+              <th>Date Borrowed</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-medium">Basic Calculator</td>
+              <td class="text-muted">AC-002</td>
+              <td>2026-11-11</td>
+              <td class="font-medium">Set by WS</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td class="text-right actions-cell">
+                <button onclick="openModal('Basic Calculator', 'AC-002', '2026-11-11', 'Set by WS', 'Pending')"
+                  class="action-btn">View</button>
+                <button onclick="openReceipt('Basic Calculator', 'AC-002', '2026-11-11')"
+                  class="action-btn">Receipt</button>
+                <button onclick="cancelRequest(this)" class="action-btn cancel-btn">Cancel Request</button>
+              </td>
+            </tr>
+            <tr>
+              <td class="font-medium">Basic Calculator</td>
+              <td class="text-muted">AC-002</td>
+              <td>2026-10-31</td>
+              <td class="font-medium">Set by WS</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td class="text-right actions-cell">
+                <button onclick="openModal('Basic Calculator', 'AC-002', '2026-10-31', 'Set by WS', 'Pending')"
+                  class="action-btn">View</button>
+                <button onclick="openReceipt('Basic Calculator', 'AC-002', '2026-10-31')"
+                  class="action-btn">Receipt</button>
+                <button onclick="cancelRequest(this)" class="action-btn cancel-btn">Cancel Request</button>
+              </td>
+            </tr>
+            <tr>
+              <td class="font-medium">Scientific Calculator</td>
+              <td class="text-muted">AC-001</td>
+              <td>2026-08-20</td>
+              <td class="font-medium">2026-08-23</td>
+              <td><span class="status-badge status-borrowed">Borrowed</span></td>
+              <td class="text-right actions-cell">
+                <button onclick="openModal('Scientific Calculator', 'AC-001', '2026-08-20', '2026-08-23', 'Borrowed')"
+                  class="action-btn">View</button>
+                <button onclick="openReceipt('Scientific Calculator', 'AC-001', '2026-08-20')"
+                  class="action-btn">Receipt</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- INTERACTIVE MODAL -->
+  <div id="detail-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3 id="modal-title">Item Details</h3>
+      <div class="modal-body">
+        <p><strong>Item:</strong> <span id="modal-item"></span></p>
+        <p><strong>Code:</strong> <span id="modal-code"></span></p>
+        <p><strong>Date Borrowed:</strong> <span id="modal-borrowed"></span></p>
+        <p><strong>Due Date:</strong> <span id="modal-due"></span></p>
+        <p><strong>Status:</strong> <span id="modal-status"></span></p>
+      </div>
+      <button onclick="closeModal()" class="modal-close-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="../../static/script/student_script/my_borrowings/student_all_in_one.js"></script>
+</body>
+
+</html>

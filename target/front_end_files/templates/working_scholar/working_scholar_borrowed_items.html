@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory: Working Scholar Portal - Borrowed Items & Returns</title>
+    <link rel="stylesheet" href="../../static/css/working_scholar_style/borrowed_items/working_scholar_borrowed_items_body.css">
+</head>
+<body>
+
+    <!-- Sidebar Navigation Drawer Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar Navigation Drawer -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo">W</div>
+                <div>
+                    <h3>Webventory</h3>
+                    <span>SAO Working Scholar</span>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="close-btn">Close</button>
+        </div>
+        <div class="sidebar-menu">
+            <a href="working_scholar_dashboard.html" class="menu-item"><span class="icon">田</span> Dashboard</a>
+            <a href="working_scholar_pending_requests.html" class="menu-item"><span class="icon">📥</span> Pending Requests</a>
+            <a href="working_scholar_cancelation_requests.html" class="menu-item"><span class="icon">❌</span> Cancellation Requests</a>
+            <a href="working_scholar_inventory.html" class="menu-item"><span class="icon">📋</span> Inventory</a>
+            <a href="working_scholar_borrowed_items.html" class="menu-item active"><span class="icon">📦</span> Borrowed Items</a>
+            <a href="working_scholar_return_processing.html" class="menu-item"><span class="icon">🔄</span> Return Processing</a>
+            <a href="working_scholar_history.html" class="menu-item"><span class="icon">⏱️</span> History</a>
+        </div>
+        <div class="sidebar-footer">
+            <button class="logout-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Top Navigation Header -->
+    <header class="header">
+        <div class="header-left">
+            <button id="menu-btn" class="menu-btn" onclick="toggleSidebar()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <span>Menu</span>
+            </button>
+            <span class="divider">|</span>
+            <h1>Webventory: Working Scholar Portal</h1>
+        </div>
+        <div class="header-right">
+            <!-- Notification Dropdown Container -->
+            <div class="dropdown-container">
+                <button class="notification-btn" onclick="toggleNotificationDropdown()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <span class="notification-dot" id="notif-dot" style="display: none;"></span>
+                </button>
+                <div id="notification-dropdown" class="dropdown-menu notification-menu">
+                    <div class="notif-tabs">
+                        <button class="tab-btn active" onclick="switchNotifTab('all')">All</button>
+                        <button class="tab-btn" onclick="switchNotifTab('unread')">Unread</button>
+                        <button class="tab-btn" onclick="switchNotifTab('alerts')">Alerts</button>
+                    </div>
+                    <div class="notif-list" id="notif-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown Container -->
+            <div class="dropdown-container">
+                <div class="profile-section" onclick="toggleProfileDropdown()">
+                    <div class="avatar">WS</div>
+                    <span>Profile</span>
+                </div>
+                <div id="profile-dropdown" class="dropdown-menu profile-menu">
+                    <a href="working_scholar_account_setting.html" class="dropdown-item">Account Settings</a>
+                    <a href="../../login_page/index.html" class="dropdown-item text-red">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- VIEW 1: Borrowed Items List View -->
+        <div id="view-borrowed-list" class="view-section active">
+            <div class="page-top-bar">
+                <div>
+                    <h2>Borrowed Items</h2>
+                    <p>Active borrow monitoring</p>
+                </div>
+                <button class="btn btn-light" onclick="exportTableToCSV()">Export CSV</button>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="content-tabs">
+                <button class="content-tab-btn active" onclick="switchFilter('All', event)">All</button>
+                <button class="content-tab-btn" onclick="switchFilter('Borrowed', event)">Borrowed</button>
+                <button class="content-tab-btn" onclick="switchFilter('Overdue', event)">Overdue</button>
+                <button class="content-tab-btn" onclick="switchFilter('Due Soon', event)">Due Soon</button>
+            </div>
+
+            <!-- Table Section -->
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table id="borrowed-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Borrower</th>
+                                <th>Date Borrowed</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: Return Processing Workspace -->
+        <div id="view-return-processing" class="view-section">
+            <button class="back-link-btn" onclick="showListView()">← Back</button>
+            <h2 class="view-title">Return Processing</h2>
+
+            <div class="return-card">
+                <h4>Find Transaction</h4>
+                <div class="form-group">
+                    <label>Transaction ID / Student ID / Item Code</label>
+                    <div class="input-btn-group">
+                        <input type="text" id="find-tx-input" value="TXN-221690">
+                        <button class="btn btn-primary" onclick="alert('Transaction searched')">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="return-card">
+                <div class="item-header-box">
+                    <div class="item-icon-box">🎲</div>
+                    <div>
+                        <h3 id="return-item-name">Basic Calculator</h3>
+                        <p id="return-item-meta">AC-002 · Juan Santos Dela Cruz · TXN-221690</p>
+                    </div>
+                    <span class="badge-status borrowed" style="margin-left: auto;">Borrowed</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Return Time (current)</label>
+                    <input type="text" id="return-time-val" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Return Condition</label>
+                    <select id="return-condition-select">
+                        <option value="Good">Good</option>
+                        <option value="Fair">Fair</option>
+                        <option value="Damaged">Damaged</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Late Return Notes</label>
+                    <textarea id="late-notes" placeholder="Reason for late return..."></textarea>
+                </div>
+
+                <button class="btn btn-light" style="width: fit-content;" onclick="alert('Student ID verified')">Confirm student ID return</button>
+
+                <button class="btn btn-primary btn-block" style="margin-top: 8px;" onclick="completeReturn()">Complete Return</button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: Return Success Feedback Screen -->
+        <div id="view-return-success" class="view-section feedback-screen">
+            <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Item Returned</h2>
+            <p id="success-msg" style="font-size: 13px; color: #64748b; margin-bottom: 24px;">Transaction TXN-221690 was completed at 11/13/2026, 2:59:33 AM. Condition recorded as Good.</p>
+            <button class="btn btn-primary" onclick="showListView()">Back to Borrowed Items</button>
+        </div>
+
+    </main>
+
+    <script src="../../static/script/working_scholar_script/borrowed_items/working_scholar_borrowed_items_all_in_one.js"></script>
+</body>
+</html>

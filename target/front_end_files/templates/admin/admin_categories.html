@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory: Admin Portal</title>
+    <link rel="stylesheet" href="../../static/css/admin_style/categories/admin_categories_body.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-left">
+            <button id="menuBtn" class="menu-btn"><i class="fa-solid fa-bars"></i> Menu</button>
+            <span class="portal-title">Webventory: Admin Portal</span>
+        </div>
+        <div class="nav-right">
+            <!-- Notification Bell & Dropdown -->
+            <div class="dropdown-container">
+                <button id="notifBtn" class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+                <div id="notifDropdown" class="dropdown-menu notif-dropdown hidden">
+                    <div class="notif-tabs">
+                        <button class="tab-btn active" data-tab="all">All</button>
+                        <button class="tab-btn" data-tab="unread">Unread</button>
+                        <button class="tab-btn" data-tab="alerts">Alerts</button>
+                    </div>
+                    <div class="notif-list" id="notifList">
+                        <!-- Populated via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Menu & Dropdown -->
+            <div class="dropdown-container">
+                <button id="profileBtn" class="profile-trigger">
+                    <span class="avatar">AD</span>
+                    <span class="profile-text">Profile</span>
+                </button>
+                <div id="profileDropdown" class="dropdown-menu profile-dropdown hidden">
+                    <a href="admin_account_setting.html" class="dropdown-item">Account Settings</a>
+                    <a href="#" class="dropdown-item logout-item" id="logoutBtn">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Categories & Borrowing Rules</h1>
+                <p>Configure borrowing policies per category</p>
+            </div>
+            <button id="openModalBtn" class="btn-primary">Add Category</button>
+        </div>
+
+        <!-- Categories List -->
+        <div class="category-cards-container">
+            <!-- Non-Academic Card -->
+            <div class="category-card">
+                <div class="card-header">
+                    <h3>Non-Academic</h3>
+                    <button class="btn-edit">Edit</button>
+                </div>
+                <div class="card-body">
+                    <div class="info-group">
+                        <span class="label">Requires Waiver</span>
+                        <span class="value yes">Yes</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">ID Surrender</span>
+                        <span class="value yes">Yes</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">Max Active Borrows</span>
+                        <span class="value">2 per student</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Card -->
+            <div class="category-card">
+                <div class="card-header">
+                    <h3>Academic</h3>
+                    <button class="btn-edit">Edit</button>
+                </div>
+                <div class="card-body">
+                    <div class="info-group">
+                        <span class="label">Requires Waiver</span>
+                        <span class="value no">No</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">ID Surrender</span>
+                        <span class="value no">No</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">Max Active Borrows</span>
+                        <span class="value">2 per student</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sidebar Menu Overlay (Open by default with no 'hidden' class) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <aside id="sidebar" class="sidebar active">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <span class="logo-badge">W</span>
+                <div>
+                    <h4>Webventory</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+            <button id="closeSidebarBtn" class="close-btn">Close</button>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="admin_dashboard.html"><i class="fa-solid fa-table-cells"></i> Dashboard</a></li>
+            <li><a href="admin_user.html"><i class="fa-solid fa-users"></i> Users</a></li>
+            <li><a href="admin_inventory.html"><i class="fa-solid fa-box-archive"></i> Inventory</a></li>
+            <li><a href="admin_categories.html" class="active"><i class="fa-solid fa-video"></i> Categories</a></li>
+            <li><a href="admin_reports.html"><i class="fa-solid fa-chart-pie"></i> Reports</a></li>
+            <li><a href="admin_history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
+            <li><a href="admin_audit_trail.html"><i class="fa-solid fa-magnifying-glass"></i> Audit Trail</a></li>
+            <li><a href="admin_accountability.html"><i class="fa-solid fa-triangle-exclamation"></i> Accountability</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Add Category Modal -->
+    <div id="categoryModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2>Add Category</h2>
+            <p class="modal-subtitle">Set the default borrowing constraints for this category.</p>
+            
+            <form id="addCategoryForm">
+                <div class="form-group">
+                    <label>Category Name</label>
+                    <input type="text" placeholder="e.g. Sports Equipment" required>
+                </div>
+
+                <div class="form-card-checkbox">
+                    <div class="checkbox-text">
+                        <label>Requires Waiver?</label>
+                        <p>Students must accept a waiver before submitting.</p>
+                    </div>
+                    <label class="checkbox-box-label">
+                        <input type="checkbox" id="waiverCheck">
+                        <span class="box-visual">No</span>
+                    </label>
+                </div>
+
+                <div class="form-card-checkbox">
+                    <div class="checkbox-text">
+                        <label>Requires ID Surrender?</label>
+                        <p>The student must surrender their ID at pickup.</p>
+                    </div>
+                    <label class="checkbox-box-label">
+                        <input type="checkbox" id="idCheck">
+                        <span class="box-visual">No</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Max Active Borrowings per Student</label>
+                    <input type="number" value="1" min="1">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Create Category</button>
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../static/script/admin_script/categories/admin_all_in_one.js"></script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webventory - SAO Item Borrowing System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="background-container">
+        <!-- Main Card Container -->
+        <div class="card">
+            
+            <!-- Header Section -->
+            <div class="card-header">
+                <div class="logo-icon">W</div>
+                <h2>Webventory</h2>
+                <p class="system-subtitle">SAO Item Borrowing System</p>
+                <span id="roleBadge" class="role-badge student-badge">Student</span>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="auth-tabs" id="authTabsContainer">
+                <button type="button" class="tab-btn active" id="tabCreateAccount" onclick="switchAuthTab('create')">Create Account</button>
+                <button type="button" class="tab-btn" id="tabSignIn" onclick="switchAuthTab('signin')">Sign In</button>
+            </div>
+
+            <!-- STEP WIZARD (Student Create Account) -->
+            <div id="stepWizardContainer">
+                <div class="wizard-steps">
+                    <div class="step-item active" id="wizardStep1">
+                        <div class="step-icon" id="stepIcon1">1</div>
+                        <span class="step-label">Details</span>
+                    </div>
+                    <div class="step-divider" id="stepDivider1"></div>
+                    <div class="step-item" id="wizardStep2">
+                        <div class="step-icon" id="stepIcon2">2</div>
+                        <span class="step-label">Account</span>
+                    </div>
+                    <div class="step-divider" id="stepDivider2"></div>
+                    <div class="step-item" id="wizardStep3">
+                        <div class="step-icon" id="stepIcon3">3</div>
+                        <span class="step-label">Review</span>
+                    </div>
+                </div>
+
+                <div class="step-title-area">
+                    <span class="step-counter" id="stepCounterText">STEP 1 OF 3</span>
+                    <h3 id="stepTitleText">Your Details</h3>
+                </div>
+            </div>
+
+            <!-- DYNAMIC FORM CONTENT -->
+            <form id="authForm" onsubmit="handleFormSubmit(event)" novalidate>
+                
+                <!-- VIEW 1: STUDENT CREATE ACCOUNT -->
+                <div id="formStudentCreate" class="form-view">
+                    
+                    <!-- STEP 1: DETAILS -->
+                    <div id="createStep1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" id="regFirstName" placeholder="Juan" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Middle Name</label>
+                                <input type="text" id="regMiddleName" placeholder="Santos (optional)">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" id="regLastName" placeholder="Dela Cruz" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Student ID</label>
+                                <input type="text" id="regStudentId" placeholder="12345678" maxlength="8" oninput="validateNumericInput(this)" required>
+                                <small class="input-hint">8-digit ID number</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Contact Number</label>
+                                <input type="text" id="regContact" placeholder="09000000000" maxlength="11" oninput="validateNumericInput(this)" required>
+                            </div>
+                        </div>
+
+                        <button type="button" class="submit-btn full-btn active-submit" onclick="validateStep1AndNext()">Next</button>
+                    </div>
+
+                    <!-- STEP 2: PASSWORD -->
+                    <div id="createStep2" style="display: none;">
+                        <div class="form-group password-group">
+                            <label>Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="regPassword" placeholder="Enter your password" minlength="8" required>
+                                <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('regPassword', this)"></i>
+                            </div>
+                            <small class="input-hint">At least 8 characters</small>
+                        </div>
+
+                        <div class="form-group password-group">
+                            <label>Confirm Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="regConfirmPassword" placeholder="Re-enter your password" minlength="8" required>
+                                <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('regConfirmPassword', this)"></i>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn-secondary" onclick="goToStep(1)">Back</button>
+                            <button type="button" class="submit-btn active-submit" onclick="validateStep2AndNext()">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: REVIEW & CONFIRM -->
+                    <div id="createStep3" style="display: none;">
+                        <div class="review-box">
+                            <!-- DETAILS SECTION -->
+                            <div class="review-section-header">
+                                <span>DETAILS</span>
+                                <a href="#" class="edit-link" onclick="goToStep(1); return false;">Edit</a>
+                            </div>
+                            <div class="review-grid">
+                                <div class="review-field">
+                                    <span class="review-label">Name</span>
+                                    <span class="review-val" id="revFullName">-</span>
+                                </div>
+                                <div class="review-field">
+                                    <span class="review-label">Student ID</span>
+                                    <span class="review-val" id="revStudentId">-</span>
+                                </div>
+                            </div>
+                            <div class="review-field">
+                                <span class="review-label">Contact number</span>
+                                <span class="review-val" id="revContact">-</span>
+                            </div>
+
+                            <hr class="review-divider">
+
+                            <!-- PASSWORD SECTION -->
+                            <div class="review-section-header">
+                                <span>PASSWORD</span>
+                                <a href="#" class="edit-link" onclick="goToStep(2); return false;">Edit</a>
+                            </div>
+                            <div class="review-field">
+                                <span class="review-label">Password</span>
+                                <span class="review-val">••••••••</span>
+                            </div>
+                        </div>
+
+                        <!-- TERMS & CONDITIONS CHECKBOX -->
+                        <div class="terms-checkbox-group">
+                            <input type="checkbox" id="termsCheckbox" required>
+                            <label for="termsCheckbox">I agree to the <a href="#" onclick="openTermsModal(event)">Terms and Conditions</a></label>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn-secondary" onclick="goToStep(2)">Back</button>
+                            <button type="submit" class="submit-btn active-submit" id="btnFinalSubmit">Create Account</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- VIEW 2: SIGN IN -->
+                <div id="formSignIn" class="form-view" style="display: none;">
+                    <div class="welcome-back">WELCOME BACK</div>
+                    <h3 class="form-heading">Sign In</h3>
+
+                    <div class="form-group">
+                        <label>ID Number</label>
+                        <input type="text" id="signInId" placeholder="12345678" maxlength="8" oninput="validateNumericInput(this)" required>
+                    </div>
+
+                    <div class="form-group password-group">
+                        <label>Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="signInPassword" placeholder="Enter your password" required>
+                            <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('signInPassword', this)"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn full-btn active-submit">Sign In</button>
+                </div>
+
+                <!-- VIEW 3: ACCOUNT CREATED SUCCESS VIEW -->
+                <div id="viewAccountCreated" class="form-view" style="display: none;">
+                    <div class="success-icon-container">
+                        <div class="success-circle">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+                    <h3 class="success-title">Account created!</h3>
+
+                    <div class="success-summary-box">
+                        <div class="success-field">
+                            <span class="success-label">Name</span>
+                            <span class="success-val" id="successFullName">-</span>
+                        </div>
+                        <div class="success-field">
+                            <span class="success-label">Student ID</span>
+                            <span class="success-val" id="successStudentId">-</span>
+                        </div>
+                    </div>
+
+                    <p class="success-subtext">Your account is ready. Continue to sign in.</p>
+
+                    <button type="button" class="submit-btn full-btn active-submit" onclick="switchAuthTab('signin')">Continue to Sign In</button>
+                </div>
+
+            </form>
+
+            <!-- Card Footer Switch Text -->
+            <div class="card-footer-text" id="cardFooterText">
+                <span id="footerPrompt">Already have an account?</span> 
+                <a href="#" id="footerActionLink" onclick="toggleAuthModeFromFooter(event)">Sign in</a>
+            </div>
+
+            <!-- University Footer -->
+            <div class="university-footer">
+                Student Affairs Office — University of Cebu
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TERMS AND CONDITIONS MODAL -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-card">
+            <h3>Terms and Conditions</h3>
+            <p class="modal-subtitle">Webventory borrowing agreement</p>
+            
+            <div class="modal-body">
+                Borrowed items are non-transferable and must be handled responsibly. Students must return every item on or before the return schedule set by the Working Scholar. All components must be complete and in the same condition in which they were released. Lost, damaged, incomplete, or overdue items may result in an accountability case. Account information is used only to process and document SAO transactions.
+            </div>
+
+            <button type="button" class="modal-btn-primary" onclick="acceptTerms()">Accept Terms</button>
+            <button type="button" class="modal-btn-secondary" onclick="closeTermsModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- FLOATING VIEW SWITCHER -->
+    <div class="view-switcher-panel">
+        <span class="switcher-label">Switch view</span>
+        <button class="switcher-btn active-switcher" onclick="setAppView('student')">Student</button>
+        <button class="switcher-btn" onclick="setAppView('working-scholar')">Working Scholar</button>
+        <button class="switcher-btn" onclick="setAppView('admin')">Admin</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
