@@ -1,3 +1,19 @@
+// Backend roles use underscores, the role switcher uses a hyphen
+const ROLE_TO_BACKEND = {
+    'student': 'student',
+    'working-scholar': 'working_scholar',
+    'admin': 'admin'
+};
+
+// Where each role lands after login (paths are relative to login_page/)
+const ROLE_HOME = {
+    'student': '../templates/student/student_dashboard.html',
+    'working_scholar': '../templates/working_scholar/working_scholar_dashboard.html',
+    'admin': '../templates/admin/admin_dashboard.html'
+};
+
+const API_BASE = '../../../backend/api';
+
 let currentRole = 'student'; 
 let authMode = 'create';     
 let currentStep = 1;
@@ -209,20 +225,49 @@ function acceptTerms() {
     closeTermsModal();
 }
 
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
+
     if (authMode === 'create') {
         if (!document.getElementById('termsCheckbox').checked) {
             alert('Please agree to the Terms and Conditions to complete your registration.');
             return;
         }
-        showAccountCreatedSuccess();
-    } else {
-        const idVal = document.getElementById('signInId').value.trim();
-        if (idVal.length !== 8) {
-            alert('ID Number must be exactly 8 digits.');
+        showAccountCreatedSuccess();   // real sign-up API comes later
+        return;
+    }
+
+    const idVal = document.getElementById('signInId').value.trim();
+    const password = document.getElementById('signInPassword').value;
+
+    if (idVal.length !== 8) {
+        alert('ID Number must be exactly 8 digits.');
+        return;
+    }
+
+    try {
+        const res = await fetch(API_BASE + '/login.php', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_number: idVal, password: password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || 'Login failed.');
             return;
         }
-        alert('Signed in successfully as ' + currentRole.toUpperCase() + '!');
+
+        // The account's real role must match the tab the user picked
+        if (data.user.role !== ROLE_TO_BACKEND[currentRole]) {
+            await fetch(API_BASE + '/logout.php', { method: 'POST', credentials: 'same-origin' });
+            alert('This account is not a ' + currentRole.replace('-', ' ') + ' account.');
+            return;
+        }
+
+        window.location.href = ROLE_HOME[data.user.role];
+    } catch (err) {
+        alert('Cannot reach the server. Is XAMPP (Apache + MySQL) running?');
     }
 }
