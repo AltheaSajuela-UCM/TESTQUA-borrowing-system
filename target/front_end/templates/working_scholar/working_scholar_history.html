@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webventory: Working Scholar Portal - Account Settings</title>
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
+    <title>Webventory: Working Scholar Portal - History</title>
+    <link rel="stylesheet" href="../../static/css/working_scholar_style/history/working_scholar_history_body.css">
 </head>
 <body>
 
@@ -30,7 +30,7 @@
             <a href="working_scholar_inventory.html" class="menu-item"><span class="icon">📋</span> Inventory</a>
             <a href="working_scholar_borrowed_items.html" class="menu-item"><span class="icon">📦</span> Borrowed Items</a>
             <a href="working_scholar_return_processing.html" class="menu-item"><span class="icon">🔄</span> Return Processing</a>
-            <a href="working_scholar_history.html" class="menu-item"><span class="icon">⏱️</span> History</a>
+            <a href="working_scholar_history.html" class="menu-item active"><span class="icon">⏱️</span> History</a>
         </div>
         <div class="sidebar-footer">
             <button class="logout-btn">
@@ -72,7 +72,7 @@
             <!-- Profile Dropdown Container -->
             <div class="dropdown-container">
                 <div class="profile-section" onclick="toggleProfileDropdown()">
-                    <div class="avatar" id="header-avatar">AR</div>
+                    <div class="avatar">WS</div>
                     <span>Profile</span>
                 </div>
                 <div id="profile-dropdown" class="dropdown-menu profile-menu">
@@ -89,52 +89,50 @@
         <!-- Page Top Bar -->
         <div class="page-top-bar">
             <div>
-                <h2>Account Settings</h2>
-                <p>Review and maintain your profile and contact information.</p>
-            </div>
-            <div id="action-buttons-container">
-                <button id="edit-toggle-btn" class="btn btn-primary" onclick="toggleEditMode()">Edit Account Settings</button>
+                <h2>History</h2>
+                <p>System activity log — filtered view</p>
             </div>
         </div>
 
-        <!-- Account Profile Card -->
-        <div class="settings-card">
-            <div class="profile-header">
-                <div class="profile-avatar-large" id="card-avatar">AR</div>
-                <div class="profile-info-text">
-                    <h3 id="display-name">Ana Reyes</h3>
-                    <span id="display-role">Working Scholar</span>
-                </div>
+        <!-- Filters Bar -->
+        <div class="filters-bar">
+            <div class="filter-group select-group">
+                <select id="type-filter" onchange="applyFilters()">
+                    <option value="All">All</option>
+                    <option value="Borrow Request">Borrow Request</option>
+                </select>
             </div>
+            <div class="filter-group date-group">
+                <input type="date" id="date-filter" onchange="applyFilters()">
+            </div>
+            <div class="filter-group search-group">
+                <input type="text" id="search-filter" placeholder="Search..." oninput="applyFilters()">
+            </div>
+        </div>
 
-            <hr class="card-divider">
-
-            <form id="account-form" onsubmit="saveAccountSettings(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="full-name">Full Name</label>
-                        <input type="text" id="full-name" value="Ana Reyes" disabled required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ws-id">Working Scholar ID</label>
-                        <input type="text" id="ws-id" value="80000001" disabled required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="mobile-number">Mobile Number</label>
-                    <input type="text" id="mobile-number" value="09175550101" disabled required>
-                </div>
-
-                <div class="form-group">
-                    <label for="program-year">Program and Year</label>
-                    <input type="text" id="program-year" value="" placeholder="" disabled>
-                </div>
-            </form>
+        <!-- History Table Section -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Type</th>
+                            <th>Student</th>
+                            <th>Item</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </main>
 
-    <script src="../../static/script/working_scholar_script/account_setting/working_scholar_account_setting_all_in_one.js"></script>
+    <script src="../../static/script/working_scholar_script/history/working_scholar_history_all_in_one.js"></script>
+    <script src="../../static/script/auth.js?v=1"></script>
 </body>
 </html>

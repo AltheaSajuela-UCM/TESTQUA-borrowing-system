@@ -1,6 +1,6 @@
 // Clean initial state (empty array ready for backend integration)
-let cancellationRequestsData = [];
-let activeCancellationIndex = null;
+let cancelationRequestsData = [];
+let activeCancelationIndex = null;
 let notifications = [];
 
 // Toggle Sidebar Navigation Drawer

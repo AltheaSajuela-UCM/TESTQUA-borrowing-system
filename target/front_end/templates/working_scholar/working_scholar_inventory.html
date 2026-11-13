@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webventory: Working Scholar Portal - History</title>
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/history/working_scholar_history_body.css">
+    <title>Webventory: Working Scholar Portal - Inventory</title>
+    <link rel="stylesheet" href="../../static/css/working_scholar_style/inventory/working_scholar_inventory_body.css">
 </head>
 <body>
 
@@ -27,10 +27,10 @@
             <a href="working_scholar_dashboard.html" class="menu-item"><span class="icon">田</span> Dashboard</a>
             <a href="working_scholar_pending_requests.html" class="menu-item"><span class="icon">📥</span> Pending Requests</a>
             <a href="working_scholar_cancelation_requests.html" class="menu-item"><span class="icon">❌</span> Cancellation Requests</a>
-            <a href="working_scholar_inventory.html" class="menu-item"><span class="icon">📋</span> Inventory</a>
+            <a href="working_scholar_inventory.html" class="menu-item active"><span class="icon">📋</span> Inventory</a>
             <a href="working_scholar_borrowed_items.html" class="menu-item"><span class="icon">📦</span> Borrowed Items</a>
             <a href="working_scholar_return_processing.html" class="menu-item"><span class="icon">🔄</span> Return Processing</a>
-            <a href="working_scholar_history.html" class="menu-item active"><span class="icon">⏱️</span> History</a>
+            <a href="working_scholar_history.html" class="menu-item"><span class="icon">⏱️</span> History</a>
         </div>
         <div class="sidebar-footer">
             <button class="logout-btn">
@@ -89,38 +89,30 @@
         <!-- Page Top Bar -->
         <div class="page-top-bar">
             <div>
-                <h2>History</h2>
-                <p>System activity log — filtered view</p>
+                <h2>Inventory</h2>
+                <p>Manage item availability and status</p>
             </div>
         </div>
 
-        <!-- Filters Bar -->
-        <div class="filters-bar">
-            <div class="filter-group select-group">
-                <select id="type-filter" onchange="applyFilters()">
-                    <option value="All">All</option>
-                    <option value="Borrow Request">Borrow Request</option>
-                </select>
-            </div>
-            <div class="filter-group date-group">
-                <input type="date" id="date-filter" onchange="applyFilters()">
-            </div>
-            <div class="filter-group search-group">
-                <input type="text" id="search-filter" placeholder="Search..." oninput="applyFilters()">
-            </div>
+        <!-- Category Tabs -->
+        <div class="content-tabs">
+            <button class="content-tab-btn active" onclick="switchCategory('Academic', event)">Academic</button>
+            <button class="content-tab-btn" onclick="switchCategory('Non-Academic', event)">Non-Academic</button>
         </div>
 
-        <!-- History Table Section -->
+        <!-- Inventory Table Section -->
         <div class="table-container">
             <div class="table-responsive">
-                <table id="history-table">
+                <table>
                     <thead>
                         <tr>
-                            <th>Date & Time</th>
-                            <th>Type</th>
-                            <th>Student</th>
-                            <th>Item</th>
-                            <th>Action</th>
+                            <th>Code</th>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Stock</th>
+                            <th>Condition</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
@@ -132,6 +124,32 @@
 
     </main>
 
-    <script src="../../static/script/working_scholar_script/history/working_scholar_history_all_in_one.js"></script>
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="status-modal" class="modal-card">
+            <h3>Update Availability</h3>
+            <p class="modal-subtext" id="modal-item-subtitle">—</p>
+            
+            <div class="form-group">
+                <label>New Status</label>
+                <select id="new-status-select">
+                    <option value="Available">Available</option>
+                    <option value="Borrowed">Borrowed</option>
+                    <option value="Under Maintenance">Under Maintenance</option>
+                    <option value="Damaged">Damaged</option>
+                    <option value="Missing">Missing</option>
+                    <option value="Unavailable">Unavailable</option>
+                </select>
+            </div>
+
+            <div class="modal-footer-split">
+                <button class="btn btn-primary" onclick="saveItemStatus()">Save Status</button>
+                <button class="btn btn-light" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../static/script/working_scholar_script/inventory/working_scholar_inventory_all_in_one.js"></script>
+    <script src="../../static/script/auth.js?v=1"></script>
 </body>
 </html>
