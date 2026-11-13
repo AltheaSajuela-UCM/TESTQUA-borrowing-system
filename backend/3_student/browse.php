@@ -5,21 +5,28 @@ $user = require_role('student');
 // GET  : list items that can be borrowed (?category=Academic&q=calc)
 // POST : request an item  {item_id, expected_return_date}  -> status 'pending'
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $sql    = 'SELECT id, item_code, name, category, stock, item_condition
-               FROM inventories WHERE is_available = 1 AND stock > 0';
+    // Returns every item with a computed status ('available' or 'borrowed'),
+    // so the catalog can show borrowed items too.
+    $sql    = 'SELECT * FROM inventories WHERE 1=1';
     $params = [];
     if (!empty($_GET['category'])) {
         $sql .= ' AND category = ?';
         $params[] = $_GET['category'];
     }
     if (!empty($_GET['q'])) {
-        $sql .= ' AND name LIKE ?';
+        $sql .= ' AND (name LIKE ? OR item_code LIKE ?)';
+        $params[] = '%' . $_GET['q'] . '%';
         $params[] = '%' . $_GET['q'] . '%';
     }
     $sql .= ' ORDER BY name';
     $stmt = db()->prepare($sql);
     $stmt->execute($params);
-    respond(['items' => $stmt->fetchAll()]);
+    $items = $stmt->fetchAll();
+    foreach ($items as &$it) {
+        $it['status'] = ($it['is_available'] && $it['stock'] > 0) ? 'available' : 'borrowed';
+    }
+    unset($it);
+    respond(['items' => $items]);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
