@@ -12,6 +12,7 @@ function profile_payload(array $user, array $labels): array
 {
     return [
         'account_type'  => $labels[$user['role']][0],
+        'username'      => $user['username'],
         'full_name'     => $user['full_name'],
         'identifier_id' => $user['id_number'],
         'role'          => $user['role'],
@@ -27,6 +28,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body   = json_body();
     $mobile = array_key_exists('mobile_number', $body) ? trim((string) $body['mobile_number']) : null;
+    $username = array_key_exists('username', $body) ? trim((string) $body['username']) : null;
+
+    if ($username !== null) {
+        if ($user['role'] !== 'student') {
+            respond(['error' => 'Only student accounts can update a username'], 403);
+        }
+        if (!preg_match('/^[A-Za-z0-9._-]{3,50}$/', $username)) {
+            respond(['error' => 'Username must be 3-50 characters using letters, numbers, dots, underscores or hyphens'], 400);
+        }
+
+        $stmt = db()->prepare('SELECT id FROM users WHERE username = ? AND id <> ?');
+        $stmt->execute([$username, $user['id']]);
+        if ($stmt->fetchColumn()) {
+            respond(['error' => 'That username is already taken'], 409);
+        }
+
+        try {
+            db()->prepare('UPDATE users SET username = ? WHERE id = ?')
+                ->execute([$username, $user['id']]);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                respond(['error' => 'That username is already taken'], 409);
+            }
+            throw $e;
+        }
+    }
 
     if ($mobile !== null) {
         if ($mobile !== '' && !preg_match('/^[0-9+\-\s]{7,20}$/', $mobile)) {

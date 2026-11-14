@@ -85,7 +85,7 @@
             <div class="user-header">
                 <div class="user-avatar-large">JS</div>
                 <div class="user-info">
-                    <h2>Juan Santos Dela Cruz</h2>
+                    <h2 id="profile-full-name">Juan Santos Dela Cruz</h2>
                     <span class="user-role">Student</span>
                 </div>
             </div>
@@ -94,6 +94,10 @@
 
             <!-- Profile Form Fields -->
             <form id="settings-form" class="form-grid">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]{3,50}" autocomplete="username" required disabled>
+                </div>
                 <div class="form-group">
                     <label for="full-name">Full Name</label>
                     <input type="text" id="full-name" value="Juan Santos Dela Cruz" disabled>
@@ -104,7 +108,7 @@
                 </div>
                 <div class="form-group">
                     <label for="mobile-number">Mobile Number</label>
-                    <input type="text" id="mobile-number" value="09171234567" disabled>
+                    <input type="tel" id="mobile-number" inputmode="tel" autocomplete="tel" maxlength="20" value="09171234567" disabled>
                 </div>
                 <div class="form-group">
                     <label for="campus">Campus</label>
@@ -115,6 +119,7 @@
                     <input type="text" id="academic-level" value="College" disabled>
                 </div>
             </form>
+            <p id="settings-message" class="settings-message" role="status" aria-live="polite"></p>
         </div>
     </main>
 

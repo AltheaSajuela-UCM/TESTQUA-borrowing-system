@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Sidebar Toggle Logic
     const menuBtn = document.getElementById("menu-btn");
     const closeSidebarBtn = document.getElementById("close-sidebar-btn");
     const sidebar = document.getElementById("sidebar");
@@ -20,42 +19,105 @@ document.addEventListener("DOMContentLoaded", () => {
         overlay.addEventListener("click", closeSidebar);
     }
 
-    // 2. Profile Dropdown Toggle Logic
     const profileMenuBtn = document.getElementById("profile-menu-btn");
     const profileDropdown = document.getElementById("profile-dropdown");
 
-    profileMenuBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        profileDropdown.classList.toggle("hidden");
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener("click", () => {
-        if (!profileDropdown.classList.contains("hidden")) {
-            profileDropdown.classList.add("hidden");
-        }
-    });
-
-    // 3. Edit Account Settings Toggle Logic
-    const editBtn = document.getElementById("edit-btn");
-    const formInputs = document.querySelectorAll("#settings-form input");
-    let isEditing = false;
-
-    editBtn.addEventListener("click", () => {
-        isEditing = !isEditing;
-        
-        formInputs.forEach(input => {
-            input.disabled = !isEditing;
+    if (profileMenuBtn && profileDropdown) {
+        profileMenuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle("hidden");
         });
 
-        if (isEditing) {
-            editBtn.textContent = "Save Changes";
-            editBtn.style.backgroundColor = "#198754"; // Success green state
-            formInputs[0].focus();
-        } else {
-            editBtn.textContent = "Edit Account Settings";
-            editBtn.style.backgroundColor = "#0d6efd"; // Back to blue primary
-            // Here you can add logic to save the updated data via API fetch
+        document.addEventListener("click", () => {
+            if (!profileDropdown.classList.contains("hidden")) {
+                profileDropdown.classList.add("hidden");
+            }
+        });
+    }
+
+    const editBtn = document.getElementById("edit-btn");
+    const form = document.getElementById("settings-form");
+    const usernameInput = document.getElementById("username");
+    const mobileInput = document.getElementById("mobile-number");
+    const message = document.getElementById("settings-message");
+    const editableInputs = [usernameInput, mobileInput];
+    const apiUrl = "../../../../backend/api/profile.php";
+    let isEditing = false;
+
+    function showMessage(text, isError) {
+        message.textContent = text;
+        message.classList.toggle("error", isError);
+    }
+
+    function setProfile(profile) {
+        usernameInput.value = profile.username || "";
+        document.getElementById("full-name").value = profile.full_name || "";
+        document.getElementById("student-id").value = profile.identifier_id || "";
+        mobileInput.value = profile.mobile_number || "";
+
+        const name = profile.full_name || "";
+        document.getElementById("profile-full-name").textContent = name;
+        document.querySelectorAll(".user-avatar-large, .avatar-initials").forEach(avatar => {
+            avatar.textContent = name.split(/\s+/).filter(Boolean).slice(0, 2)
+                .map(part => part.charAt(0)).join("").toUpperCase();
+        });
+    }
+
+    async function loadProfile() {
+        try {
+            const response = await fetch(apiUrl, { credentials: "same-origin" });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Unable to load your profile.");
+            setProfile(data);
+        } catch (error) {
+            showMessage(error.message || "Unable to load your profile.", true);
         }
-    });
+    }
+
+    async function saveProfile() {
+        if (!form.reportValidity()) return;
+
+        editBtn.disabled = true;
+        showMessage("Saving changes...", false);
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: usernameInput.value.trim(),
+                    mobile_number: mobileInput.value.trim()
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Unable to save your profile.");
+
+            setProfile(data.profile);
+            isEditing = false;
+            editableInputs.forEach(input => { input.disabled = true; });
+            editBtn.textContent = "Edit Account Settings";
+            showMessage("Your profile has been updated.", false);
+        } catch (error) {
+            showMessage(error.message || "Unable to save your profile.", true);
+        } finally {
+            editBtn.disabled = false;
+        }
+    }
+
+    if (editBtn && form && usernameInput && mobileInput && message) {
+        editBtn.addEventListener("click", () => {
+            if (isEditing) {
+                saveProfile();
+                return;
+            }
+
+            isEditing = true;
+            editableInputs.forEach(input => { input.disabled = false; });
+            editBtn.textContent = "Save Changes";
+            showMessage("", false);
+            usernameInput.focus();
+        });
+
+        loadProfile();
+    }
 });

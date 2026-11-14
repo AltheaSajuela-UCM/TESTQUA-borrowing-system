@@ -230,6 +230,17 @@ body {
     border-color: #e9ecef;
 }
 
+.settings-message {
+    min-height: 20px;
+    margin-top: 16px;
+    color: #198754;
+    font-size: 14px;
+}
+
+.settings-message.error {
+    color: #dc3545;
+}
+
 /* Sidebar Drawer Styles */
 .sidebar {
     position: fixed;
