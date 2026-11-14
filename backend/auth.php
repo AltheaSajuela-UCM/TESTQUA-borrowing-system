@@ -40,7 +40,7 @@ function current_user(): ?array
         return null;
     }
     $stmt = db()->prepare(
-        'SELECT id, id_number, username, full_name, role, mobile_number FROM users WHERE id = ?'
+        'SELECT id, id_number, full_name, role, mobile_number FROM users WHERE id = ?'
     );
     $stmt->execute([$_SESSION['user_id']]);
     return $stmt->fetch() ?: null;
