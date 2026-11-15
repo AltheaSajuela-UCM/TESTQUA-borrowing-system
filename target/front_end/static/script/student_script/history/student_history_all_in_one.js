@@ -179,41 +179,46 @@ function applyFilters() {
     renderTable(filtered);
 }
 
-// Export functions placeholders
-function exportTableToPDF() {
-    alert("Exporting Borrowing History to PDF...");
-}
+// Export (real PDF / CSV from the backend; respects the status filter and search box)
+async function exportHistory(format) {
+    const params = new URLSearchParams({ format: format });
+    const status = document.getElementById('status-filter').value;
+    const q = document.getElementById('search-filter').value.trim();
+    if (status && status !== 'All') params.set('status', status);
+    if (q) params.set('q', q);
 
-function exportTableToCSV() {
-    let csv = [];
-    let rows = document.querySelectorAll("#history-table tr");
-    
-    for (let i = 0; i < rows.length; i++) {
-        let row = [], cols = rows[i].querySelectorAll("td, th");
-        for (let j = 0; j < cols.length; j++) {
-            row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+    try {
+        const res = await fetch(STUDENT_API + 'export.php?' + params.toString(), { credentials: 'same-origin' });
+        if (!res.ok) {
+            let msg = 'Export failed (' + res.status + ')';
+            try { msg = (await res.json()).error || msg; } catch (e) { /* not JSON */ }
+            alert(msg);
+            return;
         }
-        csv.push(row.join(","));
+        const blob = await res.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'my_borrowing_history.' + format;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    } catch (err) {
+        alert('Could not reach the server.');
     }
-
-    let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-    let downloadLink = document.createElement("a");
-    downloadLink.download = "student_borrowing_history.csv";
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
 }
 
-// Initialize on page load with empty state
-window.onload = () => {
-    renderTable(borrowingHistoryData);
-};
+function exportTableToPDF() { exportHistory('pdf'); }
+function exportTableToCSV() { exportHistory('csv'); }
 
 // ==========================================
 // Load real data
 // ==========================================
+function historyLabel(b) {
+    if (b.status === 'returned') return (b.return_condition || 'Good') === 'Good' ? 'Completed' : 'Returned';
+    return b.status.charAt(0).toUpperCase() + b.status.slice(1);
+}
+
 async function loadHistory() {
     const tbody = document.getElementById('table-body');
     try {
@@ -226,7 +231,7 @@ async function loadHistory() {
             category: esc(b.category),
             dateBorrowed: dateOnly(b.status === 'returned' ? (b.processed_at || b.requested_at) : b.requested_at),
             dateReturned: dateOnly(b.returned_at),
-            status: b.status.charAt(0).toUpperCase() + b.status.slice(1)
+            status: historyLabel(b)
         }));
         applyFilters();
     } catch (err) {
@@ -250,3 +255,7 @@ async function loadNotifs() {
 
 loadHistory();
 loadNotifs();
+
+// "Open Notifications Page" in the bell dropdown
+const openNotifBtn = document.querySelector('.btn-open-notif');
+if (openNotifBtn) openNotifBtn.onclick = () => { window.location.href = 'student_notification.html'; };

@@ -3,7 +3,7 @@
 // (no schema change needed: the notifications table has no user_id).
 // GET -> { owner, notifications: [{id, message, time, alert, icon}] }
 // ids are numeric and stable: transaction id * 10 + kind
-//   1 pending, 2 approved, 3 overdue, 4 rejected, 5 returned
+//   1 pending, 2 approved, 3 overdue, 4 rejected, 5 returned, 6 due soon (within 24 hours)
 require_once __DIR__ . '/../auth.php';
 $user = require_role('student');
 require_method('GET');
@@ -12,7 +12,8 @@ $stmt = db()->prepare(
     "SELECT t.id, t.status, t.requested_at, t.processed_at, t.expected_return_date,
             t.returned_at, t.reject_reason, t.return_condition,
             i.name AS item_name,
-            COALESCE(t.expected_return_date < NOW(), 0) AS is_overdue
+            COALESCE(t.expected_return_date < NOW(), 0) AS is_overdue,
+            COALESCE(t.expected_return_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 24 HOUR), 0) AS is_due_soon
      FROM transactions t
      JOIN inventories i ON i.id = t.inventory_id
      WHERE t.user_id = ?
@@ -47,6 +48,13 @@ foreach ($stmt->fetchAll() as $t) {
                     'id' => $id * 10 + 3, 'alert' => true, 'icon' => '⚠️',
                     'message' => "$name is overdue. Return it to the SAO Office immediately.",
                     'time' => $t['expected_return_date'],
+                ];
+            }
+            if ((int) $t['is_due_soon'] === 1) {
+                $out[] = [
+                    'id' => $id * 10 + 6, 'alert' => false, 'icon' => '⏰',
+                    'message' => "$name is due on " . date('M j, Y g:i A', strtotime($t['expected_return_date'])) . '. Please return it on time.',
+                    'time' => date('Y-m-d H:i:s'),
                 ];
             }
             break;
