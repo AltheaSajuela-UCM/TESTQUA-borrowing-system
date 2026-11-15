@@ -167,25 +167,25 @@
 
         <!-- 2. Welcome Banner -->
         <section class="banner-welcome">
-            <h2>Welcome, Student!</h2>
-            <p>Monday, September 21, 2026</p>
+            <h2 id="welcomeName">Welcome, Student!</h2>
+            <p id="todayDate">Monday, September 21, 2026</p>
         </section>
 
         <!-- 3. Stat Summary Cards -->
         <section class="stats-grid">
             <div class="card stat-card">
                 <span class="stat-label">ACTIVE BORROWINGS</span>
-                <span class="stat-value text-blue">0</span>
+                <span class="stat-value text-blue" id="statActive">0</span>
             </div>
 
             <div class="card stat-card">
                 <span class="stat-label">OVERDUE ITEMS</span>
-                <span class="stat-value text-red">0</span>
+                <span class="stat-value text-red" id="statOverdue">0</span>
             </div>
 
             <div class="card stat-card">
                 <span class="stat-label">AVAILABLE ITEMS</span>
-                <span class="stat-value text-dark">0</span>
+                <span class="stat-value text-dark" id="statAvailable">0</span>
                 <span class="stat-subtext">in catalog</span>
             </div>
         </section>
@@ -202,7 +202,7 @@
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="activeBorrowingsBody">
                     <tr>
                         <td colspan="4" class="empty-state">
                             No active borrowings yet. Choose a category above to get started.
@@ -215,6 +215,7 @@
         <!-- 5. Recent Notifications Container -->
         <section class="card notifications-card">
             <h3 class="card-title">Recent Notifications</h3>
+            <div id="recentNotifications">
             <div class="notification-item">
                 <span class="notif-icon">🔔</span>
                 <div>
@@ -222,6 +223,7 @@
                     <span class="notif-time">Just now</span>
                 </div>
             </div>
+        </div>
         </section>
     </div>
 

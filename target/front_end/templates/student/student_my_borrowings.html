@@ -29,7 +29,7 @@
       <div class="dropdown-wrapper">
         <button id="notif-btn" class="icon-btn">
           <i class="fa-regular fa-bell"></i>
-          <span id="notif-badge" class="badge">2</span>
+          <span id="notif-badge" class="badge" style="display:none">0</span>
         </button>
 
         <!-- Notification Popover Card -->
@@ -124,48 +124,8 @@
               <th class="text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td class="font-medium">Basic Calculator</td>
-              <td class="text-muted">AC-002</td>
-              <td>2026-11-11</td>
-              <td class="font-medium">Set by WS</td>
-              <td><span class="status-badge status-pending">Pending</span></td>
-              <td class="text-right actions-cell">
-                <button onclick="openModal('Basic Calculator', 'AC-002', '2026-11-11', 'Set by WS', 'Pending')"
-                  class="action-btn">View</button>
-                <button onclick="openReceipt('Basic Calculator', 'AC-002', '2026-11-11')"
-                  class="action-btn">Receipt</button>
-                <button onclick="cancelRequest(this)" class="action-btn cancel-btn">Cancel Request</button>
-              </td>
-            </tr>
-            <tr>
-              <td class="font-medium">Basic Calculator</td>
-              <td class="text-muted">AC-002</td>
-              <td>2026-10-31</td>
-              <td class="font-medium">Set by WS</td>
-              <td><span class="status-badge status-pending">Pending</span></td>
-              <td class="text-right actions-cell">
-                <button onclick="openModal('Basic Calculator', 'AC-002', '2026-10-31', 'Set by WS', 'Pending')"
-                  class="action-btn">View</button>
-                <button onclick="openReceipt('Basic Calculator', 'AC-002', '2026-10-31')"
-                  class="action-btn">Receipt</button>
-                <button onclick="cancelRequest(this)" class="action-btn cancel-btn">Cancel Request</button>
-              </td>
-            </tr>
-            <tr>
-              <td class="font-medium">Scientific Calculator</td>
-              <td class="text-muted">AC-001</td>
-              <td>2026-08-20</td>
-              <td class="font-medium">2026-08-23</td>
-              <td><span class="status-badge status-borrowed">Borrowed</span></td>
-              <td class="text-right actions-cell">
-                <button onclick="openModal('Scientific Calculator', 'AC-001', '2026-08-20', '2026-08-23', 'Borrowed')"
-                  class="action-btn">View</button>
-                <button onclick="openReceipt('Scientific Calculator', 'AC-001', '2026-08-20')"
-                  class="action-btn">Receipt</button>
-              </td>
-            </tr>
+          <tbody id="borrowings-body">
+            <tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:24px;font-size:13px;">Loading...</td></tr>
           </tbody>
         </table>
       </div>

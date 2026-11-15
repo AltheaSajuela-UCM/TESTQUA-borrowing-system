@@ -1,6 +1,52 @@
-// Clean initial state (empty arrays ready for backend integration)
+// ==========================================
+// Backend helpers (student portal)
+// ==========================================
+const STUDENT_API = '../../../../backend/3_student/';
+const LOGIN_PAGE = '../../login_page/index.html';
+
+function esc(v) {
+    return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, (c) => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+function txCode(id) { return 'TXN-' + String(id).padStart(5, '0'); }
+function dateOnly(s) { return s ? String(s).slice(0, 10) : ''; }
+function prettyTime(s) {
+    if (!s) return '';
+    const d = new Date(String(s).replace(' ', 'T'));
+    return isNaN(d) ? String(s) : d.toLocaleString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+}
+
+// Calls a backend/3_student endpoint. Sends the user to login if the session is gone.
+async function studentApi(file, options) {
+    const res = await fetch(STUDENT_API + file, Object.assign({ credentials: 'same-origin' }, options || {}));
+    if (res.status === 401 || res.status === 403) {
+        window.location.replace(LOGIN_PAGE);
+        throw new Error('auth');
+    }
+    let data = {};
+    try { data = await res.json(); } catch (e) { /* non-JSON response */ }
+    if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+    return data;
+}
+
+// Notifications are built from transactions, so "read" is remembered in this browser.
+function loadReadIds(owner) {
+    try { return JSON.parse(localStorage.getItem('webventory_read_notifs_' + owner) || '[]'); }
+    catch (e) { return []; }
+}
+function saveReadId(owner, id) {
+    try {
+        const ids = loadReadIds(owner);
+        if (!ids.includes(id)) { ids.push(id); localStorage.setItem('webventory_read_notifs_' + owner, JSON.stringify(ids)); }
+    } catch (e) { /* storage unavailable */ }
+}
+
 let borrowingHistoryData = [];
 let notifications = [];
+let notifOwner = '';
 
 // Toggle Sidebar Navigation Drawer
 function toggleSidebar() {
@@ -64,6 +110,7 @@ function switchNotifTab(tabName) {
 
 // Mark notification as read
 function markAsRead(id) {
+    saveReadId(notifOwner, id);
     notifications = notifications.filter(n => n.id !== id);
     if (notifications.length === 0) {
         document.getElementById('notif-dot').style.display = 'none';
@@ -163,3 +210,43 @@ function exportTableToCSV() {
 window.onload = () => {
     renderTable(borrowingHistoryData);
 };
+
+// ==========================================
+// Load real data
+// ==========================================
+async function loadHistory() {
+    const tbody = document.getElementById('table-body');
+    try {
+        const data = await studentApi('my_borrowings.php');
+        // History = transactions that are finished: returned, rejected or cancelled.
+        const past = (data.borrowings || []).filter(b => ['returned', 'rejected', 'cancelled'].includes(b.status));
+        borrowingHistoryData = past.map(b => ({
+            transactionId: txCode(b.id),
+            item: esc(b.item_name),
+            category: esc(b.category),
+            dateBorrowed: dateOnly(b.status === 'returned' ? (b.processed_at || b.requested_at) : b.requested_at),
+            dateReturned: dateOnly(b.returned_at),
+            status: b.status.charAt(0).toUpperCase() + b.status.slice(1)
+        }));
+        applyFilters();
+    } catch (err) {
+        if (err.message !== 'auth') {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #b91c1c; padding: 32px; font-size: 13px;">Could not load history: ${esc(err.message)}</td></tr>`;
+        }
+    }
+}
+
+async function loadNotifs() {
+    try {
+        const data = await studentApi('notifications.php');
+        notifOwner = data.owner;
+        const read = loadReadIds(notifOwner);
+        notifications = (data.notifications || [])
+            .filter(n => !read.includes(n.id))
+            .map(n => ({ id: n.id, text: esc(n.message), type: 'unread', isAlert: !!n.alert }));
+        document.getElementById('notif-dot').style.display = notifications.length ? '' : 'none';
+    } catch (err) { /* keep the empty list */ }
+}
+
+loadHistory();
+loadNotifs();

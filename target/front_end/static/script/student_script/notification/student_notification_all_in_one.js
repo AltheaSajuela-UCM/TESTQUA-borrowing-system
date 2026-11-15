@@ -1,5 +1,51 @@
-// Clean initial state (empty arrays ready for backend integration)
+// ==========================================
+// Backend helpers (student portal)
+// ==========================================
+const STUDENT_API = '../../../../backend/3_student/';
+const LOGIN_PAGE = '../../login_page/index.html';
+
+function esc(v) {
+    return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, (c) => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+function txCode(id) { return 'TXN-' + String(id).padStart(5, '0'); }
+function dateOnly(s) { return s ? String(s).slice(0, 10) : ''; }
+function prettyTime(s) {
+    if (!s) return '';
+    const d = new Date(String(s).replace(' ', 'T'));
+    return isNaN(d) ? String(s) : d.toLocaleString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+}
+
+// Calls a backend/3_student endpoint. Sends the user to login if the session is gone.
+async function studentApi(file, options) {
+    const res = await fetch(STUDENT_API + file, Object.assign({ credentials: 'same-origin' }, options || {}));
+    if (res.status === 401 || res.status === 403) {
+        window.location.replace(LOGIN_PAGE);
+        throw new Error('auth');
+    }
+    let data = {};
+    try { data = await res.json(); } catch (e) { /* non-JSON response */ }
+    if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+    return data;
+}
+
+// Notifications are built from transactions, so "read" is remembered in this browser.
+function loadReadIds(owner) {
+    try { return JSON.parse(localStorage.getItem('webventory_read_notifs_' + owner) || '[]'); }
+    catch (e) { return []; }
+}
+function saveReadId(owner, id) {
+    try {
+        const ids = loadReadIds(owner);
+        if (!ids.includes(id)) { ids.push(id); localStorage.setItem('webventory_read_notifs_' + owner, JSON.stringify(ids)); }
+    } catch (e) { /* storage unavailable */ }
+}
+
 let notifications = [];
+let notifOwner = '';
 let currentFilter = 'all';
 
 // Toggle Sidebar Navigation Drawer
@@ -106,6 +152,7 @@ function renderPageNotifications() {
 
 // Mark notification as read
 function markAsRead(id) {
+    saveReadId(notifOwner, id);
     notifications = notifications.filter(n => n.id !== id);
     if (notifications.length === 0) {
         document.getElementById('notif-dot').style.display = 'none';
@@ -121,7 +168,28 @@ window.onclick = function(event) {
     }
 };
 
-// Initialize on page load with empty state
-window.onload = () => {
+// Load real notifications on page load
+async function loadNotifs() {
+    try {
+        const data = await studentApi('notifications.php');
+        notifOwner = data.owner;
+        const read = loadReadIds(notifOwner);
+        notifications = (data.notifications || [])
+            .filter(n => !read.includes(n.id))
+            .map(n => ({
+                id: n.id,
+                message: esc(n.message),
+                time: esc(prettyTime(n.time)),
+                icon: esc(n.icon || '🔔'),
+                type: 'unread',
+                isAlert: !!n.alert
+            }));
+        document.getElementById('notif-dot').style.display = notifications.length ? '' : 'none';
+    } catch (err) { /* keep the empty list */ }
+}
+
+window.onload = async () => {
+    renderPageNotifications();
+    await loadNotifs();
     renderPageNotifications();
 };
