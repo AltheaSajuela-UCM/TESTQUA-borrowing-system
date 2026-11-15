@@ -200,7 +200,7 @@ function renderBorrowings() {
         <td class="text-right actions-cell">
           <button class="action-btn" data-action="view" data-id="${b.id}">View</button>
           <button class="action-btn" data-action="receipt" data-id="${b.id}">Receipt</button>
-          ${b.status === 'pending' ? `<button class="action-btn cancel-btn" data-action="cancel" data-id="${b.id}">Cancel Request</button>` : ''}
+          ${b.status === 'pending' ? (Number(b.cancel_requested) ? `<span class="text-muted">Cancellation requested</span>` : `<button class="action-btn cancel-btn" data-action="cancel" data-id="${b.id}">Cancel Request</button>`) : ''}
         </td>
       </tr>`;
   }).join('');
@@ -268,11 +268,12 @@ function openReceipt(b) {
 async function cancelRequest(b) {
   if (!confirm('Are you sure you want to cancel this borrow request?')) return;
   try {
-    await studentApi('my_borrowings.php', {
+    const result = await studentApi('my_borrowings.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transaction_id: b.id, action: 'cancel' })
     });
+    alert(result.message || 'Cancellation request sent.');
     await Promise.all([loadBorrowings(), loadNotifications()]);
   } catch (err) {
     if (err.message !== 'auth') alert('Could not cancel: ' + err.message);

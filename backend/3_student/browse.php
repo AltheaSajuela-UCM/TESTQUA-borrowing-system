@@ -1,79 +1,67 @@
 <?php
-require_once __DIR__ . '/../auth.php';
+// Browse Academic / Non-Academic items, Search & Filter, View Item Details, Submit Borrow Request.
+// GET  ?category=Academic&q=calc     -> {items:[... + requires_waiver, requires_id_surrender, can_borrow, status], eligibility}
+// POST {item_id, expected_return_date, waiver_accepted?}   -> status 'pending'  (waiver_accepted is required when the item needs one)
+require_once __DIR__ . '/../helpers.php';
 $user = require_role('student');
+$pdo  = db();
 
-// GET  : list items that can be borrowed (?category=Academic&q=calc)
-// POST : request an item  {item_id, expected_return_date}  -> status 'pending'
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Returns every item with a computed status ('available' or 'borrowed'),
-    // so the catalog can show borrowed items too.
-    $sql    = 'SELECT * FROM inventories WHERE 1=1';
-    $params = [];
-    if (!empty($_GET['category'])) {
-        $sql .= ' AND category = ?';
-        $params[] = $_GET['category'];
+    $sql = 'SELECT ' . ITEM_SELECT . ' ' . ITEM_FROM . ' WHERE 1=1';
+    $p = [];
+    if (!empty($_GET['category'])) { $sql .= ' AND i.category = ?'; $p[] = $_GET['category']; }
+    $q = $_GET['q'] ?? $_GET['search'] ?? '';
+    if ($q !== '') {
+        $sql .= ' AND (i.name LIKE ? OR i.item_code LIKE ? OR i.description LIKE ?)';
+        array_push($p, "%$q%", "%$q%", "%$q%");
     }
-    if (!empty($_GET['q'])) {
-        $sql .= ' AND (name LIKE ? OR item_code LIKE ?)';
-        $params[] = '%' . $_GET['q'] . '%';
-        $params[] = '%' . $_GET['q'] . '%';
-    }
-    $sql .= ' ORDER BY name';
-    $stmt = db()->prepare($sql);
-    $stmt->execute($params);
-    $items = $stmt->fetchAll();
-    foreach ($items as &$it) {
-        $it['status'] = ($it['is_available'] && $it['stock'] > 0) ? 'available' : 'borrowed';
-    }
-    unset($it);
-    respond(['items' => $items]);
+    $stmt = $pdo->prepare($sql . ' ORDER BY i.name');
+    $stmt->execute($p);
+    respond([
+        'items'       => array_map('decorate_item', $stmt->fetchAll()),
+        'eligibility' => student_eligibility($pdo, (int) $user['id']),   // {allowed, reason} -> banner on the page
+    ]);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $body   = json_body();
-    $itemId = (int) ($body['item_id'] ?? 0);
-    $date   = date_create((string) ($body['expected_return_date'] ?? ''));
+    $b      = json_body();
+    $itemId = (int) ($b['item_id'] ?? 0);
+    $date   = date_create((string) ($b['expected_return_date'] ?? ''));
+    if ($itemId < 1 || !$date)       respond(['error' => 'item_id and a valid expected_return_date are required'], 400);
+    if ($date <= new DateTime('now')) respond(['error' => 'Return date must be in the future'], 400);
 
-    if ($itemId < 1 || !$date) {
-        respond(['error' => 'item_id and a valid expected_return_date are required'], 400);
-    }
-    if ($date < new DateTime('now')) {
-        respond(['error' => 'Return date must be in the future'], 400);
-    }
-
-    // Eligibility: a student with an overdue item cannot request anything new.
-    $overdue = db()->prepare(
-        "SELECT 1 FROM transactions
-         WHERE user_id = ? AND status = 'active' AND expected_return_date < NOW() LIMIT 1"
-    );
-    $overdue->execute([$user['id']]);
-    if ($overdue->fetchColumn()) {
-        respond(['error' => 'You have an overdue item. Return it before borrowing again.'], 409);
-    }
-
-    $stmt = db()->prepare('SELECT * FROM inventories WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT ' . ITEM_SELECT . ' ' . ITEM_FROM . ' WHERE i.id = ?');
     $stmt->execute([$itemId]);
     $item = $stmt->fetch();
-    if (!$item || !$item['is_available'] || $item['stock'] < 1) {
-        respond(['error' => 'Item is unavailable'], 409);
+    if (!$item || !decorate_item($item)['can_borrow']) respond(['error' => 'Item is unavailable'], 409);
+
+    // Eligibility & campus validation: overdue items, open cases, flagged/disabled account, category limit
+    $elig = student_eligibility($pdo, (int) $user['id'], $item['category']);
+    if (!$elig['allowed']) respond(['error' => $elig['reason'], 'eligibility' => $elig], 409);
+
+    // Digital waiver & terms acknowledgement
+    if ($item['requires_waiver'] && empty($b['waiver_accepted'])) {
+        respond(['error' => 'Please read and accept the waiver to borrow this item', 'requires_waiver' => true], 422);
     }
 
-    $dup = db()->prepare(
-        "SELECT 1 FROM transactions
-         WHERE user_id = ? AND inventory_id = ? AND status IN ('pending','active')"
-    );
+    $dup = $pdo->prepare("SELECT 1 FROM transactions WHERE user_id = ? AND inventory_id = ? AND status IN ('pending','active')");
     $dup->execute([$user['id'], $itemId]);
-    if ($dup->fetchColumn()) {
-        respond(['error' => 'You already have a pending or active request for this item'], 409);
-    }
+    if ($dup->fetchColumn()) respond(['error' => 'You already have a pending or active request for this item'], 409);
 
-    // Stock is only reduced when a working scholar approves the request.
-    db()->prepare(
-        "INSERT INTO transactions (user_id, inventory_id, status, expected_return_date)
-         VALUES (?, ?, 'pending', ?)"
-    )->execute([$user['id'], $itemId, $date->format('Y-m-d H:i:s')]);
+    // Stock is only reduced when a Working Scholar approves the request.
+    $pdo->prepare("INSERT INTO transactions (user_id, inventory_id, status, expected_return_date, waiver_accepted_at)
+                   VALUES (?, ?, 'pending', ?, ?)")
+        ->execute([$user['id'], $itemId, $date->format('Y-m-d H:i:s'), $item['requires_waiver'] ? date('Y-m-d H:i:s') : null]);
+    $txId = (int) $pdo->lastInsertId();
 
-    respond(['success' => true, 'transaction_id' => (int) db()->lastInsertId(), 'status' => 'pending'], 201);
+    log_audit($user, 'Submitted Request', 'Transaction', tx_code($txId), 'Requested ' . $item['name'],
+              ['type' => 'Borrow Request', 'student' => $user['full_name'], 'item' => $item['name']]);
+    notify_role('working_scholar', $user['full_name'] . ' requested ' . $item['name'] . '.', 'info', $txId);
+
+    respond([
+        'success' => true, 'transaction_id' => $txId, 'transaction_code' => tx_code($txId), 'status' => 'pending',
+        'requires_id_surrender' => (bool) $item['requires_id_surrender'],   // tell the student to bring their ID
+    ], 201);
 }
 
 respond(['error' => 'Method not allowed'], 405);

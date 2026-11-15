@@ -264,6 +264,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Please choose an expected return date.');
                 return;
             }
+            // Digital waiver & terms acknowledgement (only for items that require one)
+            let waiverAccepted = false;
+            if (selectedItem.requires_waiver == 1) {
+                waiverAccepted = confirm(
+                    'BORROWER WAIVER\n\nI will take care of this item and return it on the agreed date. ' +
+                    'I accept responsibility for any loss or damage and agree to the SAO borrowing terms.\n\n' +
+                    'Press OK to accept and submit your request.');
+                if (!waiverAccepted) return;
+            }
             detailActionBtn.disabled = true;
             try {
                 const res = await fetch(API_URL, {
@@ -272,12 +281,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         item_id: selectedItem.id,
-                        expected_return_date: returnDateInput.value
+                        expected_return_date: returnDateInput.value,
+                        waiver_accepted: waiverAccepted
                     })
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    alert('Borrow request submitted. A working scholar will review it.');
+                    alert('Borrow request submitted. A working scholar will review it.' +
+                          (data.requires_id_surrender ? '\n\nRemember to bring your school ID: it is held while you borrow this item.' : ''));
                     await loadItems();
                     showCatalog();
                 } else {

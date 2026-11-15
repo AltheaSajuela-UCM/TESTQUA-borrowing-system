@@ -233,7 +233,31 @@ async function handleFormSubmit(e) {
             alert('Please agree to the Terms and Conditions to complete your registration.');
             return;
         }
-        showAccountCreatedSuccess();   // real sign-up API comes later
+        try {
+            const res = await fetch(API_BASE + '/sign_up.php', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    role: 'student',
+                    first_name: document.getElementById('regFirstName').value.trim(),
+                    middle_name: document.getElementById('regMiddleName').value.trim(),
+                    last_name: document.getElementById('regLastName').value.trim(),
+                    id_number: document.getElementById('regStudentId').value.trim(),
+                    mobile_number: document.getElementById('regContact').value.trim(),
+                    password: document.getElementById('regPassword').value,
+                    terms_accepted: true
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.error || 'Registration failed.');
+                return;
+            }
+            showAccountCreatedSuccess();
+        } catch (err) {
+            alert('Cannot reach the server. Is XAMPP (Apache + MySQL) running?');
+        }
         return;
     }
 
