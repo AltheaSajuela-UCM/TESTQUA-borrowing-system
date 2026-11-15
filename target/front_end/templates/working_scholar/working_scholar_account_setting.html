@@ -1,13 +1,14 @@
+
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Working Scholar Portal</title>
-    
-    <!-- CSS FILES (Aligned with your dashboard style structure) -->
+
+    <!-- CSS FILES -->
     <link rel="stylesheet" href="../../static/css/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
-    
+
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -28,15 +29,29 @@
             </div>
             <button id="close-sidebar-btn" class="close-btn">Close</button>
         </div>
-        
+
         <nav class="sidebar-nav">
-            <a href="working_scholar_dashboard.html" class="nav-item"><i class="fa-solid fa-table-cells-large"></i> Dashboard</a>
-            <a href="working_scholar_dashboard.html#pending-requests" class="nav-item"><i class="fa-solid fa-clock"></i> Pending Requests</a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item"><i class="fa-solid fa-ban"></i> Cancellation Requests</a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Borrowed Items</a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item"><i class="fa-solid fa-rotate-left"></i> Return Processing</a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item"><i class="fa-solid fa-history"></i> History</a>
+            <a href="working_scholar_dashboard.html" class="nav-item">
+                <i class="fa-solid fa-table-cells-large"></i> Dashboard
+            </a>
+            <a href="working_scholar_dashboard.html#pending-requests" class="nav-item">
+                <i class="fa-solid fa-clock"></i> Pending Requests
+            </a>
+            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+                <i class="fa-solid fa-ban"></i> Cancellation Requests
+            </a>
+            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+                <i class="fa-solid fa-boxes-stacked"></i> Inventory
+            </a>
+            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+                <i class="fa-solid fa-clipboard-list"></i> Borrowed Items
+            </a>
+            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+                <i class="fa-solid fa-rotate-left"></i> Return Processing
+            </a>
+            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+                <i class="fa-solid fa-history"></i> History
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -54,24 +69,25 @@
             </button>
             <span class="portal-title">Webventory: Working Scholar Portal</span>
         </div>
+
         <div class="nav-right">
             <button class="notif-btn" aria-label="Notifications">
                 <i class="fa-regular fa-bell"></i>
             </button>
-            
+
             <!-- Profile Dropdown Container -->
             <div class="profile-dropdown-container">
                 <button id="profile-menu-btn" class="profile-btn">
-                    <span class="avatar-initials" th:text="${userInitials}">AR</span>
+                    <span class="avatar-initials">WS</span>
                     <span class="profile-text">Profile</span>
                     <i class="fa-solid fa-chevron-down chevron-icon"></i>
                 </button>
-                
+
                 <!-- Dropdown Menu -->
                 <div id="profile-dropdown" class="dropdown-menu hidden">
-                       <a href="#" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <span class="icon">↪</span> Logout
-                       </a>
+                    <a href="#" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                        <span class="icon">↪</span> Logout
+                    </a>
                 </div>
             </div>
         </div>
@@ -87,42 +103,51 @@
             <button id="edit-btn" class="btn-primary">Edit Account Settings</button>
         </div>
 
-        <!-- Settings Card -->
+        <!-- SETTINGS CARD -->
         <div class="card">
             <div class="user-header">
-                <div class="user-avatar-large" th:text="${userInitials}">AR</div>
+                <div class="user-avatar-large">WS</div>
                 <div class="user-info">
-                    <h2 th:text="${fullName}">Ana Reyes</h2>
+                    <h2>Working Scholar</h2>
                     <span class="user-role">Working Scholar</span>
                 </div>
             </div>
 
             <hr class="divider">
 
-            <!-- Profile Form Fields (Thymeleaf bound) -->
-            <form id="settings-form" class="form-grid" th:action="@{/working-scholar/update-profile}" method="POST">
+            <!-- PROFILE FORM FIELDS -->
+            <form id="settings-form" class="form-grid">
                 <div class="form-group">
                     <label for="full-name">Full Name</label>
-                    <input type="text" id="full-name" name="fullName" th:value="${fullName}" value="Ana Reyes" disabled>
+                    <input type="text" id="full-name" name="fullName" value="" disabled>
                 </div>
+
                 <div class="form-group">
                     <label for="scholar-id">Working Scholar ID</label>
-                    <input type="text" id="scholar-id" name="scholarId" th:value="${scholarId}" value="00000001" disabled>
+                    <input type="text" id="scholar-id" name="scholarId" value="" disabled>
                 </div>
+
                 <div class="form-group full-width">
                     <label for="mobile-number">Mobile Number</label>
-                    <input type="text" id="mobile-number" name="mobileNumber" th:value="${mobileNumber}" value="09175550101" disabled>
+                    <input type="text" id="mobile-number" name="mobileNumber" value="" placeholder="Enter mobile number" disabled>
                 </div>
+
                 <div class="form-group full-width">
                     <label for="program-year">Program and Year</label>
-                    <input type="text" id="program-year" name="programYear" th:value="${programYear}" value="" placeholder="Enter program and year" disabled>
+                    <input type="text" id="program-year" name="programYear" value="" placeholder="Program and Year" disabled>
+                </div>
+
+                <div class="form-group full-width">
+                     <label for="academic-level">Academic Level</label>
+                    <input type="text" id="academic-level" name="academicLevel"value="" placeholder="Enter academic level" disabled>
                 </div>
             </form>
         </div>
     </main>
 
-    <!-- SCRIPT FILE -->
-    <script src="../../static/script/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
+    <!-- SCRIPT FILES -->
+    <script src="../../static/script/working_scholar_script/account_setting/working_scholar_all_in_one.js"></script>
     <script src="../../static/script/auth.js?v=1"></script>
+
 </body>
 </html>
