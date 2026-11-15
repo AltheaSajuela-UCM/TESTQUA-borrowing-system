@@ -41,6 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         respond(['error' => 'Return date must be in the future'], 400);
     }
 
+    // Eligibility: a student with an overdue item cannot request anything new.
+    $overdue = db()->prepare(
+        "SELECT 1 FROM transactions
+         WHERE user_id = ? AND status = 'active' AND expected_return_date < NOW() LIMIT 1"
+    );
+    $overdue->execute([$user['id']]);
+    if ($overdue->fetchColumn()) {
+        respond(['error' => 'You have an overdue item. Return it before borrowing again.'], 409);
+    }
+
     $stmt = db()->prepare('SELECT * FROM inventories WHERE id = ?');
     $stmt->execute([$itemId]);
     $item = $stmt->fetch();
