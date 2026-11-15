@@ -37,10 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const editBtn = document.getElementById("edit-btn");
     const form = document.getElementById("settings-form");
-    const fullNameInput = document.getElementById("full-name");
+    const usernameInput = document.getElementById("username");
     const mobileInput = document.getElementById("mobile-number");
     const message = document.getElementById("settings-message");
-    const editableInputs = [fullNameInput, mobileInput];
+    const editableInputs = [usernameInput, mobileInput];
     const apiUrl = "../../../../backend/api/profile.php";
     let isEditing = false;
 
@@ -50,7 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setProfile(profile) {
-        fullNameInput.value = profile.full_name || "";
+        usernameInput.value = profile.username || "";
+        document.getElementById("full-name").value = profile.full_name || "";
         document.getElementById("student-id").value = profile.identifier_id || "";
         mobileInput.value = profile.mobile_number || "";
 
@@ -84,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 credentials: "same-origin",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    full_name: fullNameInput.value.trim(),
+                    username: usernameInput.value.trim(),
                     mobile_number: mobileInput.value.trim()
                 })
             });
@@ -103,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    if (editBtn && form && fullNameInput && mobileInput && message) {
+    if (editBtn && form && usernameInput && mobileInput && message) {
         editBtn.addEventListener("click", () => {
             if (isEditing) {
                 saveProfile();
@@ -114,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
             editableInputs.forEach(input => { input.disabled = false; });
             editBtn.textContent = "Save Changes";
             showMessage("", false);
-            fullNameInput.focus();
+            usernameInput.focus();
         });
 
         loadProfile();

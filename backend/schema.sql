@@ -5,6 +5,7 @@ USE webventory;
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_number VARCHAR(50) NOT NULL UNIQUE,
+    username VARCHAR(50) NULL UNIQUE,
     full_name VARCHAR(255) NOT NULL,
     role ENUM('admin','working_scholar','student') NOT NULL,
     mobile_number VARCHAR(20) NULL,
