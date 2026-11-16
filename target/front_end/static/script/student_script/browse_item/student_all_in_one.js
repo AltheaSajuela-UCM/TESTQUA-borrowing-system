@@ -100,13 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeCategory = 'academic';
     let selectedItem = null;
 
-    const requestedCategory = new 
-    URLSearchParams(window.location.search).get('category');
-    if (requestedCategory === 'academic' || requestedCategory === 'non-academic') {
-        activeCategory = requestedCategory;
-        categoryBtns.forEach(b => b.classList.toggle('active', b.dataset.category === activeCategory));
-    }
-
     function esc(value) {
         const d = document.createElement('div');
         d.textContent = value == null ? '' : value;
