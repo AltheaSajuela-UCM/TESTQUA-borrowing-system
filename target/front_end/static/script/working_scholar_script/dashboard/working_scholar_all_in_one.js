@@ -107,7 +107,7 @@ document.querySelectorAll('.mark-read-btn').forEach((btn) => {
 // ====================================
 const wsGuideSteps = [
     {
-        title: "Welcome, Ana!",
+        title: "Welcome, NONE!",
         desc: "You will use the Working Scholar Portal to process requests, release inventory, record returns, and assist students."
     },
     {

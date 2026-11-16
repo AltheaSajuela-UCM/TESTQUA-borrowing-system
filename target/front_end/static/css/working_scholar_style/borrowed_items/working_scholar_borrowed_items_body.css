@@ -179,30 +179,6 @@ tr.row-overdue:hover td { background-color: #fee2e2; }
 .badge-status.overdue { background-color: #fee2e2; color: #991b1b; }
 .badge-status.due-soon { background-color: #fef3c7; color: #b45309; }
 
-/* Return Processing Workspace */
-.back-link-btn { background: none; border: none; color: #2563eb; font-size: 12px; font-weight: 500; cursor: pointer; text-align: left; width: fit-content; }
-.back-link-btn:hover { text-decoration: underline; }
-.view-title { font-size: 20px; font-weight: 700; color: #0f172a; margin-top: -10px; }
-
-.return-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-.return-card h4 { font-size: 13px; font-weight: 600; color: #64748b; }
-
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-group label { font-size: 12px; font-weight: 500; color: #475569; }
-.form-group input, .form-group select, .form-group textarea { padding: 8px 12px; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: #1e293b; outline: none; }
-.form-group textarea { resize: vertical; min-height: 80px; }
-
-.input-btn-group { display: flex; gap: 8px; }
-.input-btn-group input { flex: 1; }
-
-.item-header-box { display: flex; gap: 12px; align-items: center; }
-.item-icon-box { width: 40px; height: 40px; background-color: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.item-header-box h3 { font-size: 14px; font-weight: 700; color: #0f172a; }
-.item-header-box p { font-size: 11px; color: #64748b; }
-
-/* Feedback Screen */
-.feedback-screen { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 48px 24px; text-align: center; align-items: center; justify-content: center; }
-
 /* Buttons */
 .btn { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; transition: background 0.15s; }
 .btn-primary { background-color: #2563eb; color: #ffffff; }
@@ -211,4 +187,3 @@ tr.row-overdue:hover td { background-color: #fee2e2; }
 .btn-danger-sm:hover { background-color: #dc2626; }
 .btn-light { background-color: #ffffff; border: 1px solid #cbd5e1; color: #334155; }
 .btn-light:hover { background-color: #f8fafc; }
-.btn-block { width: 100%; padding: 10px; font-size: 13px; }

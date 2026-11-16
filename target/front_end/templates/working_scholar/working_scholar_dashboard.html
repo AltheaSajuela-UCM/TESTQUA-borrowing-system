@@ -5,9 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- CSS FILES -->
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/dashboard/working_scholar_dashboard_global.css">
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/dashboard/working_scholar_dashboard_header.css">
+    <!-- CSS FILE -->
     <link rel="stylesheet" href="../../static/css/working_scholar_style/dashboard/working_scholar_dashboard_body.css">
 
     <!-- TITLE! -->
@@ -48,11 +46,14 @@
             <a href="working_scholar_borrowed_items.html" class="menu-link">
                 <span class="icon">📋</span> Borrowed Items
             </a>
-            <a href="#overview" class="menu-link">
+            <a href="working_scholar_return_processing.html" class="menu-link">
                 <span class="icon">↩</span> Return Processing
             </a>
             <a href="working_scholar_history.html" class="menu-link">
                 <span class="icon">⏱</span> History
+            </a>
+            <a href="working_scholar_notification.html" class="menu-link">
+                <span class="icon">BELL</span> Notification
             </a>
         </nav>
 
@@ -83,16 +84,8 @@
                         <button class="tab-btn" data-tab="alerts">Alerts</button>
                     </div>
 
-                    <div class="notif-list">
-                        <div class="notif-card is-unread" data-type="normal">
-                            <p>A new borrowing request is waiting for review.</p>
-                            <button class="mark-read-btn">Mark as read</button>
-                        </div>
-
-                        <div class="notif-card is-alert is-unread" data-type="alert">
-                            <p>An overdue reminder needs to be sent.</p>
-                            <button class="mark-read-btn">Mark as read</button>
-                        </div>
+                    <div class="notif-list" id="notif-list-container">
+                        <div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">NONE</div>
                     </div>
 
                     <div class="notif-footer">
@@ -104,8 +97,8 @@
             <!-- USER PROFILE DROPDOWN CONTAINER -->
             <div class="dropdown-wrapper" id="profileDropdownWrapper">
                 <div class="user-profile" id="profileBtn" style="cursor: pointer;">
-                    <div class="profile-avatar">WS</div>
-                    <span class="profile-text">Profile</span>
+                    <div class="profile-avatar" id="profile-avatar-initials">—</div>
+                    <span class="profile-text" id="profile-name-label">NONE</span>
                 </div>
 
                 <!-- Profile Popup -->
@@ -130,7 +123,7 @@
             </div>
             <div class="task-actions">
                 <button class="btn-secondary" id="viewGuideBtn">View WS Guide</button>
-                <a href="#pending-requests" class="btn-primary" style="text-decoration:none;">Process Requests</a>
+                <a href="working_scholar_pending_requests.html" class="btn-primary" style="text-decoration:none;">Process Requests</a>
             </div>
         </section>
 
@@ -138,7 +131,7 @@
         <section class="card">
             <div class="card-header">
                 <h3>Pending Requests</h3>
-                <a href="#pending-requests" class="view-all-link">View all →</a>
+                <a href="working_scholar_pending_requests.html" class="view-all-link">View all →</a>
             </div>
             <table class="requests-table">
                 <thead>
@@ -150,32 +143,32 @@
                     </tr>
                 </thead>
                 <tbody id="pending-requests">
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: #777;">No pending requests found.</td>
-                        </tr>
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #777;">NONE</td>
+                    </tr>
                 </tbody>
             </table>
         </section>
 
         <!-- WELCOME BANNER -->
         <section class="welcome-banner">
-            <h2>Welcome, Ana!</h2>
-            <p>Monday, September 21, 2026</p>
+            <h2 id="welcome-user-heading">Welcome, NONE!</h2>
+            <p id="welcome-date-p">NONE</p>
         </section>
 
         <!-- METRICS GRID -->
         <section class="metrics-grid" id="overview">
             <div class="metric-card">
                 <span class="metric-label">PENDING REQUESTS</span>
-                <span class="metric-value orange" th:text="${pendingCount}">0</span>
+                <span class="metric-value orange">0</span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">BORROWED ITEMS</span>
-                <span class="metric-value blue" th:text="${borrowedCount}">0</span>
+                <span class="metric-value blue">0</span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">OVERDUE</span>
-                <span class="metric-value red" th:text="${overdueCount}">0</span>
+                <span class="metric-value red">0</span>
             </div>
             <div class="metric-card">
                 <span class="metric-label">AVAILABLE ITEMS</span>
@@ -187,9 +180,9 @@
         <section class="quick-actions">
             <h3>Quick Actions</h3>
             <div class="actions-buttons">
-                <a href="#pending-requests" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Process Requests</a>
-                <a href="#overview" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Record Return</a>
-                <a href="#overview" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View Inventory</a>
+                <a href="working_scholar_pending_requests.html" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Process Requests</a>
+                <a href="working_scholar_return_processing.html" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Record Return</a>
+                <a href="working_scholar_inventory.html" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View Inventory</a>
             </div>
         </section>
 
@@ -201,11 +194,10 @@
             <div class="alerts-list">
                 <div class="alert-item">
                     <div>
-                        <strong>-</strong>
+                        <strong>NONE</strong>
                         <p class="alert-sub">No active overdue alerts</p>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -219,7 +211,7 @@
                 <button class="guide-exit-btn" id="guideExitBtn">Exit</button>
             </div>
             
-            <h2 class="guide-title" id="guideTitle">Welcome, Ana!</h2>
+            <h2 class="guide-title" id="guideTitle">Welcome, NONE!</h2>
             <p class="guide-desc" id="guideDesc">You will use the Working Scholar Portal to process requests, release inventory, record returns, and assist students.</p>
 
             <div class="guide-footer">
@@ -229,7 +221,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT FILE -->
+    <!-- SCRIPT FILES -->
     <script src="../../static/script/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
     <script src="../../static/script/working_scholar_script/dashboard/working_scholar_dashboard_live.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
