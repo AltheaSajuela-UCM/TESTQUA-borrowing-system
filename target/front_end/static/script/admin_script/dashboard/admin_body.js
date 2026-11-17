@@ -14,7 +14,20 @@
         }
     }
 
+    // Welcome banner: today's date and the logged-in admin's first name (both were typed into the HTML)
+    function setBanner(d) {
+        var p = document.querySelector('.welcome-text p');
+        if (p) {
+            p.textContent = new Date().toLocaleDateString('en-US',
+                { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        var name = d.user && d.user.full_name ? String(d.user.full_name).trim().split(/\s+/)[0] : '';
+        var h = document.querySelector('.welcome-text h2');
+        if (h && name) h.textContent = 'Welcome, ' + name + '!';
+    }
+
     function render(d) {
+        setBanner(d);
         var s = d.stats || {};
         setStat('TOTAL USERS', s.total_users);
         setStat('TOTAL ITEMS', s.total_items);
