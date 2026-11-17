@@ -127,11 +127,68 @@
             </div>
         </div>
 
+        <!-- VIEW 2: Return Processing Workspace -->
+        <div id="view-return-processing" class="view-section">
+            <button class="back-link-btn" onclick="showListView()">← Back</button>
+            <h2 class="view-title">Return Processing</h2>
+
+            <div class="return-card">
+                <h4>Find Transaction</h4>
+                <div class="form-group">
+                    <label>Transaction ID / Student ID / Item Code</label>
+                    <div class="input-btn-group">
+                        <input type="text" id="find-tx-input" value="TXN-221690">
+                        <button class="btn btn-primary" onclick="alert('Transaction searched')">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="return-card">
+                <div class="item-header-box">
+                    <div class="item-icon-box">🎲</div>
+                    <div>
+                        <h3 id="return-item-name">Basic Calculator</h3>
+                        <p id="return-item-meta">AC-002 · Juan Santos Dela Cruz · TXN-221690</p>
+                    </div>
+                    <span class="badge-status borrowed" style="margin-left: auto;">Borrowed</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Return Time (current)</label>
+                    <input type="text" id="return-time-val" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Return Condition</label>
+                    <select id="return-condition-select">
+                        <option value="Good">Good</option>
+                        <option value="Fair">Fair</option>
+                        <option value="Damaged">Damaged</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Late Return Notes</label>
+                    <textarea id="late-notes" placeholder="Reason for late return..."></textarea>
+                </div>
+
+                <button class="btn btn-light" style="width: fit-content;" onclick="alert('Student ID verified')">Confirm student ID return</button>
+
+                <button class="btn btn-primary btn-block" style="margin-top: 8px;" onclick="completeReturn()">Complete Return</button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: Return Success Feedback Screen -->
+        <div id="view-return-success" class="view-section feedback-screen">
+            <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Item Returned</h2>
+            <p id="success-msg" style="font-size: 13px; color: #64748b; margin-bottom: 24px;">Transaction TXN-221690 was completed at 11/13/2026, 2:59:33 AM. Condition recorded as Good.</p>
+            <button class="btn btn-primary" onclick="showListView()">Back to Borrowed Items</button>
+        </div>
+
     </main>
 
-    <script src="../../static/script/api.js"></script>
-    <script src="../../static/script/auth.js?v=2"></script>
-    <script src="../../static/script/working_scholar_script/common.js"></script>
     <script src="../../static/script/working_scholar_script/borrowed_items/working_scholar_borrowed_items_all_in_one.js"></script>
+    <script src="../../static/script/auth.js?v=2"></script>
 </body>
 </html>

@@ -1,35 +1,74 @@
-// Working Scholar - History (wired to 2_working_scholar/history.php)
-// Needs api.js, auth.js and common.js loaded BEFORE this file.
-// Sidebar, dropdowns and notifications now come from common.js.
-
+// Clean initial state (empty array ready for backend integration)
 let historyData = [];
+let notifications = [];
 
-async function loadHistory() {
-    try {
-        const d = await WS.api('2_working_scholar/history.php');
-        historyData = (d.history || []).map(r => ({
-            dateTime: fmtDate(r.date_time),
-            type: r.type,
-            student: r.student,
-            item: r.item,
-            action: r.action
-        }));
-        applyFilters();
-    } catch (err) {
-        if (err.message === 'auth') return;
-        document.getElementById('table-body').innerHTML =
-            '<tr><td colspan="5" style="text-align:center;color:#dc2626;padding:32px;font-size:13px;">' + esc(err.message) + '</td></tr>';
+// Toggle Sidebar Navigation Drawer
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+    document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+
+// Toggle Profile Dropdown
+function toggleProfileDropdown() {
+    closeAllDropdowns();
+    document.getElementById('profile-dropdown').classList.toggle('show');
+}
+
+// Toggle Notification Dropdown
+function toggleNotificationDropdown() {
+    closeAllDropdowns();
+    document.getElementById('notification-dropdown').classList.toggle('show');
+    renderNotifications('all');
+}
+
+function closeAllDropdowns() {
+    document.getElementById('profile-dropdown').classList.remove('show');
+    document.getElementById('notification-dropdown').classList.remove('show');
+}
+
+function renderNotifications(filter) {
+    const container = document.getElementById('notif-list-container');
+    container.innerHTML = '';
+
+    let filtered = notifications;
+    if (filter === 'unread') filtered = notifications.filter(n => n.type === 'unread');
+    else if (filter === 'alerts') filtered = notifications.filter(n => n.isAlert);
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
+        return;
     }
+
+    filtered.forEach(notif => {
+        const card = document.createElement('div');
+        card.className = `notif-card ${notif.isAlert ? 'alert-card' : ''}`;
+        card.innerHTML = `
+            <div>${notif.text}</div>
+            <button class="mark-read-btn" onclick="markAsRead(${notif.id})">Mark as read</button>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function switchNotifTab(tabName) {
+    document.querySelectorAll('.notif-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderNotifications(tabName);
+}
+
+function markAsRead(id) {
+    notifications = notifications.filter(n => n.id !== id);
+    if (notifications.length === 0) document.getElementById('notif-dot').style.display = 'none';
+    renderNotifications('all');
 }
 
 // Render History Table Data (Handles empty state gracefully)
 function renderTable(data) {
     const tbody = document.getElementById('table-body');
-    if (!tbody) return;
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:32px;font-size:13px;">No history records found</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">No history records found</td></tr>`;
         return;
     }
 
@@ -38,23 +77,24 @@ function renderTable(data) {
         const actionClass = actionStr.toLowerCase() === 'rejected' ? 'action-rejected' : '';
 
         const tr = document.createElement('tr');
-        tr.innerHTML =
-            '<td>' + esc(row.dateTime || '—') + '</td>' +
-            '<td><span class="badge-type">' + esc(row.type || 'Borrow Request') + '</span></td>' +
-            '<td><strong>' + esc(row.student || '—') + '</strong></td>' +
-            '<td>' + esc(row.item || '—') + '</td>' +
-            '<td><span class="' + actionClass + '">' + esc(actionStr) + '</span></td>';
+        tr.innerHTML = `
+            <td>${row.dateTime || '—'}</td>
+            <td><span class="badge-type">${row.type || 'Borrow Request'}</span></td>
+            <td><strong>${row.student || '—'}</strong></td>
+            <td>${row.item || '—'}</td>
+            <td><span class="${actionClass}">${actionStr}</span></td>
+        `;
         tbody.appendChild(tr);
     });
 }
 
-// Filter Functionality (done in the browser on the rows already loaded)
+// Filter Functionality
 function applyFilters() {
     const typeVal = document.getElementById('type-filter').value;
     const dateVal = document.getElementById('date-filter').value;
     const searchVal = document.getElementById('search-filter').value.toLowerCase();
 
-    const filtered = historyData.filter(row => {
+    let filtered = historyData.filter(row => {
         const matchesType = (typeVal === 'All' || row.type === typeVal);
         const matchesDate = (!dateVal || (row.dateTime || '').includes(dateVal));
         const matchesSearch = (
@@ -70,4 +110,14 @@ function applyFilters() {
     renderTable(filtered);
 }
 
-document.addEventListener('DOMContentLoaded', loadHistory);
+// Close dropdowns when clicking outside
+window.onclick = function(event) {
+    if (!event.target.closest('.dropdown-container')) {
+        closeAllDropdowns();
+    }
+};
+
+// Initialize on page load with clean empty states
+window.onload = () => {
+    renderTable(historyData);
+};
