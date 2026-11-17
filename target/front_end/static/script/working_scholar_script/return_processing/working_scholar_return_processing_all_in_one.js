@@ -1,151 +1,138 @@
-// Standalone Return Processing JavaScript logic
-let notifications = [];
+// Working Scholar - Return Processing (wired to 2_working_scholar/borrowing.php)
+// Needs api.js, auth.js and ws_common.js loaded BEFORE this file.
 
-// Sidebar Navigation
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    if (sidebar) sidebar.classList.toggle('show');
-    if (overlay) overlay.classList.toggle('show');
+let activeTx = null;       // the active borrowing being returned
+let idReturned = false;    // working scholar confirmed the student's ID was handed back
+
+function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    const t = document.getElementById(viewId);
+    if (t) t.classList.add('active');
 }
 
-// Dropdowns
-function toggleProfileDropdown() {
-    closeAllDropdowns();
-    const dropdown = document.getElementById('profile-dropdown');
-    if (dropdown) dropdown.classList.toggle('show');
+function showError(msg) {
+    const el = document.getElementById('return-error');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.display = msg ? 'block' : 'none';
 }
 
-function toggleNotificationDropdown() {
-    closeAllDropdowns();
-    const dropdown = document.getElementById('notification-dropdown');
-    if (dropdown) {
-        dropdown.classList.toggle('show');
-        renderNotifications('all');
-    }
-}
-
-function closeAllDropdowns() {
-    const p = document.getElementById('profile-dropdown');
-    const n = document.getElementById('notification-dropdown');
-    if (p) p.classList.remove('show');
-    if (n) n.classList.remove('show');
-}
-
-// Notifications handling
-function renderNotifications(filter) {
-    const container = document.getElementById('notif-list-container');
-    if (!container) return;
-    container.innerHTML = '';
-
-    let filtered = notifications;
-    if (filter === 'unread') filtered = notifications.filter(n => !n.isRead);
-    else if (filter === 'alerts') filtered = notifications.filter(n => n.isAlert);
-
-    if (filtered.length === 0) {
-        container.innerHTML = `
-            <div class="notif-card">
-                <div>A new borrowing request is waiting for review.</div>
-                <button class="mark-read-btn" onclick="markAsRead(1)">Mark as read</button>
-            </div>
-            <div class="notif-card alert-card">
-                <div>An overdue reminder needs to be sent.</div>
-                <button class="mark-read-btn" onclick="markAsRead(2)">Mark as read</button>
-            </div>
-        `;
-        return;
-    }
-
-    filtered.forEach(notif => {
-        const card = document.createElement('div');
-        card.className = `notif-card ${notif.isAlert ? 'alert-card' : ''}`;
-        card.innerHTML = `
-            <div>${notif.text}</div>
-            <button class="mark-read-btn" onclick="markAsRead(${notif.id})">Mark as read</button>
-        `;
-        container.appendChild(card);
+function showResults(rows) {
+    const box = document.getElementById('tx-results');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!rows) return;
+    rows.forEach(r => {
+        const b = document.createElement('button');
+        b.className = 'btn btn-light';
+        b.style.cssText = 'display:block;width:100%;text-align:left;margin-top:6px;';
+        b.textContent = r.transaction_code + ' · ' + r.item_name + ' · ' + r.borrower;
+        b.onclick = () => { showResults(null); selectTransaction(r); };
+        box.appendChild(b);
     });
 }
 
-function switchNotifTab(tabName, evt) {
-    document.querySelectorAll('.notif-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-    if (evt && evt.target) evt.target.classList.add('active');
-    renderNotifications(tabName);
-}
-
-function markAsRead(id) {
-    notifications = notifications.filter(n => n.id !== id);
-    renderNotifications('all');
-}
-
-// View switching
-function switchView(viewId) {
-    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-    const target = document.getElementById(viewId);
-    if (target) target.classList.add('active');
-}
-
-// Read URL parameters on page load
-function initReturnPage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tx = urlParams.get('tx') || 'TXN-103';
-
-    const txInput = document.getElementById('find-tx-input');
-    if (txInput) txInput.value = tx;
-
-    if (tx === 'TXN-103') {
-        document.getElementById('return-item-name').innerText = 'Chess';
-        document.getElementById('return-item-meta').innerText = 'NA-003 · Pedro Cruz · TXN-103';
-        const badge = document.getElementById('return-status-badge');
-        if (badge) {
-            badge.innerText = 'Overdue';
-            badge.className = 'badge-status overdue';
-        }
-    } else {
-        document.getElementById('return-item-name').innerText = 'Basic Calculator';
-        document.getElementById('return-item-meta').innerText = `AC-002 · Student · ${tx}`;
-        const badge = document.getElementById('return-status-badge');
-        if (badge) {
-            badge.innerText = 'Borrowed';
-            badge.className = 'badge-status borrowed';
-        }
-    }
-
-    // Dynamic return timestamp
-    const now = new Date();
-    const timeEl = document.getElementById('return-time-val');
-    if (timeEl) timeEl.value = now.toLocaleString();
-}
-
-function searchTransaction() {
-    const tx = document.getElementById('find-tx-input').value.trim();
-    if (!tx) {
-        alert('Please enter a transaction ID.');
+function selectTransaction(r) {
+    showError('');
+    activeTx = null;
+    const card = document.getElementById('return-form-card');
+    if (r.status !== 'active') {
+        if (card) card.style.display = 'none';
+        showError(r.transaction_code + ' is ' + (r.display_status || r.status).toLowerCase() + ' - only borrowed items can be returned.');
         return;
     }
-    document.getElementById('return-item-meta').innerText = `AC-002 · Student · ${tx}`;
-    alert(`Searching transaction details for ${tx}...`);
+    activeTx = r;
+    idReturned = false;
+
+    document.getElementById('return-item-name').innerText = r.item_name;
+    document.getElementById('return-item-meta').innerText =
+        r.item_code + ' · ' + r.borrower + ' · ' + r.transaction_code;
+    const badge = document.getElementById('return-status-badge');
+    if (badge) {
+        const overdue = Number(r.is_overdue) === 1;
+        badge.innerText = overdue ? 'Overdue' : 'Borrowed';
+        badge.className = 'badge-status ' + (overdue ? 'overdue' : 'borrowed');
+    }
+    document.getElementById('return-time-val').value = new Date().toLocaleString();
+    document.getElementById('return-condition-select').value = 'Good';
+    document.getElementById('late-notes').value = '';
+
+    // Only items that kept the student's ID need the "ID handed back" confirmation.
+    const idBtn = document.getElementById('confirm-id-btn');
+    if (idBtn) {
+        idBtn.style.display = Number(r.id_surrendered) === 1 ? 'inline-block' : 'none';
+        idBtn.innerText = 'Confirm student ID return';
+    }
+    if (card) card.style.display = 'block';
 }
 
-function completeReturn() {
+async function searchTransaction() {
+    const q = document.getElementById('find-tx-input').value.trim();
+    showError('');
+    showResults(null);
+    if (!q) { showError('Enter a transaction ID, student ID or item code.'); return; }
+    try {
+        const d = await WS.api('2_working_scholar/borrowing.php?status=active&q=' + encodeURIComponent(q));
+        const rows = d.borrowings || [];
+        if (rows.length === 0) {
+            document.getElementById('return-form-card').style.display = 'none';
+            showError('No borrowed item matches "' + q + '".');
+        } else if (rows.length === 1) {
+            selectTransaction(rows[0]);
+        } else {
+            document.getElementById('return-form-card').style.display = 'none';
+            showResults(rows);   // several active borrowings (e.g. a student ID): let the user pick
+        }
+    } catch (err) {
+        if (err.message !== 'auth') showError(err.message);
+    }
+}
+
+function confirmIdReturn() {
+    idReturned = !idReturned;
+    document.getElementById('confirm-id-btn').innerText =
+        idReturned ? 'Student ID returned ✓' : 'Confirm student ID return';
+}
+
+async function completeReturn() {
+    if (!activeTx) return;
+    showError('');
+    const btn = document.getElementById('complete-return-btn');
     const condition = document.getElementById('return-condition-select').value;
-    const timeVal = document.getElementById('return-time-val').value;
-    const txId = document.getElementById('find-tx-input').value;
-
-    const msg = document.getElementById('success-msg');
-    if (msg) {
-        msg.innerText = `Transaction ${txId} was completed at ${timeVal}. Condition recorded as ${condition}.`;
+    if (btn) btn.disabled = true;
+    try {
+        const res = await WS.api('2_working_scholar/borrowing.php', {
+            method: 'POST',
+            body: {
+                action: 'return',
+                transaction_id: Number(activeTx.id),
+                return_condition: condition,
+                late_notes: document.getElementById('late-notes').value.trim(),
+                id_returned: idReturned
+            }
+        });
+        document.getElementById('success-msg').innerText =
+            'Transaction ' + activeTx.transaction_code + ' was completed at ' +
+            document.getElementById('return-time-val').value + '. Condition recorded as ' + condition + '.' +
+            (res.case_id ? ' Accountability case ' + res.case_id + ' was opened.' : '');
+        switchView('view-return-success');
+    } catch (err) {
+        if (err.message !== 'auth') showError(err.message);
+    } finally {
+        if (btn) btn.disabled = false;
     }
-
-    switchView('view-return-success');
 }
 
-window.onclick = function(event) {
-    if (!event.target.closest('.dropdown-container')) {
-        closeAllDropdowns();
+document.addEventListener('DOMContentLoaded', async () => {
+    const tx = new URLSearchParams(window.location.search).get('tx');
+    if (!tx) return;
+    document.getElementById('find-tx-input').value = tx;
+    const n = parseInt((tx.match(/\d+/) || [])[0], 10);
+    if (!n) return searchTransaction();
+    try {
+        const d = await WS.api('2_working_scholar/borrowing.php?id=' + n);
+        selectTransaction(d.borrowing);
+    } catch (err) {
+        if (err.message !== 'auth') showError(err.message);
     }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    initReturnPage();
 });
