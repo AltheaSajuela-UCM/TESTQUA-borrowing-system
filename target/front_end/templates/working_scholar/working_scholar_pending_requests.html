@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webventory: Working Scholar Portal - Borrowed Items & Returns</title>
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/borrowed_items/working_scholar_borrowed_items_body.css">
+    <title>Webventory: Working Scholar Portal - Pending Requests</title>
+    <link rel="stylesheet" href="../../static/css/working_scholar_style/pending_requests/working_scholar_pending_requests_body.css">
 </head>
 <body>
 
@@ -25,10 +25,10 @@
         </div>
         <div class="sidebar-menu">
             <a href="working_scholar_dashboard.html" class="menu-item"><span class="icon">田</span> Dashboard</a>
-            <a href="working_scholar_pending_requests.html" class="menu-item"><span class="icon">📥</span> Pending Requests</a>
+            <a href="working_scholar_pending_requests.html" class="menu-item active"><span class="icon">📥</span> Pending Requests</a>
             <a href="working_scholar_cancelation_requests.html" class="menu-item"><span class="icon">❌</span> Cancellation Requests</a>
             <a href="working_scholar_inventory.html" class="menu-item"><span class="icon">📋</span> Inventory</a>
-            <a href="working_scholar_borrowed_items.html" class="menu-item active"><span class="icon">📦</span> Borrowed Items</a>
+            <a href="working_scholar_borrowed_items.html" class="menu-item"><span class="icon">📦</span> Borrowed Items</a>
             <a href="working_scholar_return_processing.html" class="menu-item"><span class="icon">🔄</span> Return Processing</a>
             <a href="working_scholar_history.html" class="menu-item"><span class="icon">⏱️</span> History</a>
         </div>
@@ -86,34 +86,37 @@
     <!-- Main Content -->
     <main class="main-content">
 
-        <!-- VIEW: Borrowed Items List View -->
-        <div id="view-borrowed-list" class="view-section active">
+        <!-- VIEW: Pending list -->
+        <div id="view-requests-list" class="view-section active">
             <div class="page-top-bar">
-                <div>
-                    <h2>Borrowed Items</h2>
-                    <p>Active borrow monitoring</p>
+                <h2>Pending Requests</h2>
+                <p id="pending-subtitle">Loading requests...</p>
+            </div>
+
+            <div class="filters-bar">
+                <div class="filter-group search-group">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"></path></svg>
+                    <input type="text" id="search-filter" placeholder="Search by transaction, student or item..." oninput="applyFilters()">
                 </div>
-                <button class="btn btn-light" onclick="exportTableToCSV()">Export CSV</button>
+                <div class="filter-group select-group">
+                    <select id="category-filter" onchange="applyFilters()">
+                        <option value="All">All Categories</option>
+                        <option value="Academic">Academic</option>
+                        <option value="Non-Academic">Non-Academic</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Filter Tabs -->
-            <div class="content-tabs">
-                <button class="content-tab-btn active" onclick="switchFilter('All', event)">All</button>
-                <button class="content-tab-btn" onclick="switchFilter('Borrowed', event)">Borrowed</button>
-                <button class="content-tab-btn" onclick="switchFilter('Overdue', event)">Overdue</button>
-                <button class="content-tab-btn" onclick="switchFilter('Due Soon', event)">Due Soon</button>
-            </div>
-
-            <!-- Table Section -->
             <div class="table-container">
                 <div class="table-responsive">
-                    <table id="borrowed-table">
+                    <table>
                         <thead>
                             <tr>
+                                <th>Transaction</th>
+                                <th>Student</th>
                                 <th>Item</th>
-                                <th>Borrower</th>
-                                <th>Date Borrowed</th>
-                                <th>Due Date</th>
+                                <th>Category</th>
+                                <th>Requested</th>
                                 <th>Status</th>
                                 <th style="text-align: right;">Action</th>
                             </tr>
@@ -126,9 +129,151 @@
             </div>
         </div>
 
+        <!-- VIEW: Process request -->
+        <div id="view-process-request" class="view-section">
+            <button class="back-link-btn" onclick="showListView()">&larr; Back to Pending Requests</button>
+            <h2 class="view-title">Process Request</h2>
+
+            <div class="process-grid">
+                <!-- Left: student + request -->
+                <div class="process-card">
+                    <h4>Student Verification</h4>
+                    <div class="form-group">
+                        <label for="verify-student-id">Student ID</label>
+                        <div class="input-btn-group">
+                            <input type="text" id="verify-student-id" placeholder="Enter student ID">
+                            <button class="btn btn-light" type="button">Verify</button>
+                        </div>
+                    </div>
+                    <div class="verified-student-box" id="verified-student-info">
+                        <div class="student-box-top">
+                            <div>
+                                <h3 id="student-name-val">-</h3>
+                                <p id="student-id-meta">ID: -</p>
+                                <p id="student-mobile-meta">Mobile: -</p>
+                            </div>
+                            <span class="badge-allowed">Allowed</span>
+                        </div>
+                    </div>
+
+                    <hr class="card-divider">
+
+                    <h4>Request Details</h4>
+                    <div class="item-header-box">
+                        <div class="item-icon-box">📦</div>
+                        <div>
+                            <h3 id="item-title-val">-</h3>
+                            <p id="item-meta-val">-</p>
+                        </div>
+                    </div>
+                    <div class="transaction-info-box">
+                        <div>Transaction: <strong id="tx-id-val">-</strong></div>
+                        <div>Submitted: <strong id="tx-submitted-val">-</strong></div>
+                    </div>
+                </div>
+
+                <!-- Right: decision -->
+                <div class="process-card">
+                    <div class="decision-section">
+                        <span class="section-label">Are the submitted details complete?</span>
+                        <div class="decision-buttons">
+                            <button id="btn-decision-yes" class="btn-toggle" onclick="setDecision('yes')">Yes, complete</button>
+                            <button id="btn-decision-no" class="btn-toggle" onclick="setDecision('no')">No, incomplete</button>
+                        </div>
+                    </div>
+
+                    <!-- Complete: release the item -->
+                    <div id="form-complete-details" class="decision-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="release-time-input">Release time</label>
+                            <input type="text" id="release-time-input" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="expected-return-input">Expected return date and time</label>
+                            <input type="datetime-local" id="expected-return-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-condition">Item condition on release</label>
+                            <select id="item-condition">
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Damaged">Damaged</option>
+                            </select>
+                        </div>
+                        <p class="office-hours-note">Office hours: Mon-Fri 8:00-11:30 AM and 1:00-5:00 PM. Saturday is for Academic items only. Closed on Sundays.</p>
+                        <button class="btn btn-primary btn-block" onclick="openAcceptModal()">Accept &amp; Release Item</button>
+                    </div>
+
+                    <!-- Incomplete: reject -->
+                    <div id="form-incomplete-details" class="decision-form" style="display: none;">
+                        <div class="alert-inline-red">Incomplete submissions are rejected. The student is notified with your reason.</div>
+                        <button class="btn btn-danger btn-block" onclick="openRejectModal()">Reject Submission</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: Accepted -->
+        <div id="view-accept-success" class="view-section">
+            <div class="process-card feedback-screen">
+                <div class="feedback-icon success">✓</div>
+                <h2>Item Released</h2>
+                <p>The request was approved and the student has been notified to claim the item at the SAO Office.</p>
+                <div class="feedback-buttons">
+                    <button class="btn btn-primary" onclick="showListView()">Back to Pending Requests</button>
+                    <a href="working_scholar_borrowed_items.html" class="btn btn-light" style="text-decoration:none;">View Borrowed Items</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: Rejected -->
+        <div id="view-reject-success" class="view-section">
+            <div class="process-card feedback-screen">
+                <div class="feedback-icon danger">✕</div>
+                <h2>Submission Rejected</h2>
+                <p>The request was rejected and the student has been notified with your reason.</p>
+                <div class="feedback-buttons">
+                    <button class="btn btn-primary" onclick="showListView()">Back to Pending Requests</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <script src="../../static/script/working_scholar_script/borrowed_items/working_scholar_borrowed_items_all_in_one.js"></script>
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModals()"></div>
+
+    <div id="accept-modal" class="modal-card">
+        <h3>Confirm Release</h3>
+        <p class="modal-subtext">Please review the details before releasing the item.</p>
+        <div class="modal-summary-box">
+            <div>Student: <strong id="modal-accept-student">-</strong></div>
+            <div>Item: <strong id="modal-accept-item">-</strong></div>
+            <div>Release time: <strong id="modal-accept-release-time">-</strong></div>
+            <div>Expected return: <strong id="modal-accept-expected-return">-</strong></div>
+        </div>
+        <div class="modal-alert-green">The student will be notified to claim the item at the SAO Office.</div>
+        <div class="modal-footer-split">
+            <button class="btn btn-light" onclick="closeModals()">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmAcceptSubmission()">Confirm Release</button>
+        </div>
+    </div>
+
+    <div id="reject-modal" class="modal-card">
+        <h3>Reject Submission</h3>
+        <p class="modal-subtext">Tell the student why this request is being rejected.</p>
+        <div class="form-group">
+            <label for="reject-reason-input">Reason (required)</label>
+            <textarea id="reject-reason-input" placeholder="e.g. Missing details on the form"></textarea>
+        </div>
+        <div class="modal-footer-split">
+            <button class="btn btn-light" onclick="closeModals()">Cancel</button>
+            <button id="btn-confirm-reject" class="btn btn-danger-soft" disabled onclick="confirmRejectSubmission()">Confirm Reject</button>
+        </div>
+    </div>
+
+    <script src="../../static/script/api.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
+    <script src="../../static/script/working_scholar_script/pending_requests/working_scholar_pending_requests_all_in_one.js"></script>
 </body>
 </html>

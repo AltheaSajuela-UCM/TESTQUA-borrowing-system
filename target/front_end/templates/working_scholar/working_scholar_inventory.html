@@ -31,6 +31,7 @@
             <a href="working_scholar_borrowed_items.html" class="menu-item"><span class="icon">📦</span> Borrowed Items</a>
             <a href="working_scholar_return_processing.html" class="menu-item"><span class="icon">🔄</span> Return Processing</a>
             <a href="working_scholar_history.html" class="menu-item"><span class="icon">⏱️</span> History</a>
+            <a href="working_scholar_notification.html" class="menu-item"><span class="icon">🔔</span> Notifications</a>
         </div>
         <div class="sidebar-footer">
             <button class="logout-btn">
@@ -59,9 +60,9 @@
                 </button>
                 <div id="notification-dropdown" class="dropdown-menu notification-menu">
                     <div class="notif-tabs">
-                        <button class="tab-btn active" onclick="switchNotifTab('all')">All</button>
-                        <button class="tab-btn" onclick="switchNotifTab('unread')">Unread</button>
-                        <button class="tab-btn" onclick="switchNotifTab('alerts')">Alerts</button>
+                        <button class="tab-btn active" onclick="switchNotifTab('all', event)">All</button>
+                        <button class="tab-btn" onclick="switchNotifTab('unread', event)">Unread</button>
+                        <button class="tab-btn" onclick="switchNotifTab('alerts', event)">Alerts</button>
                     </div>
                     <div class="notif-list" id="notif-list-container">
                         <!-- Populated by JS -->
@@ -149,6 +150,7 @@
         </div>
     </div>
 
+    <script src="../../static/script/api.js"></script>
     <script src="../../static/script/working_scholar_script/inventory/working_scholar_inventory_all_in_one.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
 </body>

@@ -1,26 +1,33 @@
-// Clean initial state (empty array ready for backend integration)
+// Working Scholar Inventory: live data from backend/2_working_scholar/catalog.php
+// and the header notification bell from backend/api/notifications.php.
+// Requires ../../api.js (Webventory.api / Webventory.esc) to be loaded first.
 let inventoryData = [];
 let currentCategory = 'Academic';
-let activeItemIndex = null;
+let activeItemId = null;
 let notifications = [];
+let notifFilter = 'all';
 
-// Toggle Sidebar Navigation Drawer
+const esc = (v) => Webventory.esc(v);
+
+// ------------------------------------------------------------ layout toggles
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('show');
     document.getElementById('sidebar-overlay').classList.toggle('show');
 }
 
-// Toggle Profile Dropdown
 function toggleProfileDropdown() {
     closeAllDropdowns();
     document.getElementById('profile-dropdown').classList.toggle('show');
 }
 
-// Toggle Notification Dropdown
 function toggleNotificationDropdown() {
+    const menu = document.getElementById('notification-dropdown');
+    const wasOpen = menu.classList.contains('show');
     closeAllDropdowns();
-    document.getElementById('notification-dropdown').classList.toggle('show');
-    renderNotifications('all');
+    if (!wasOpen) {
+        menu.classList.add('show');
+        loadNotifications();
+    }
 }
 
 function closeAllDropdowns() {
@@ -28,43 +35,82 @@ function closeAllDropdowns() {
     document.getElementById('notification-dropdown').classList.remove('show');
 }
 
-function renderNotifications(filter) {
+// ------------------------------------------------------------ notifications
+async function loadNotifications() {
+    try {
+        const data = await Webventory.api('api/notifications.php?filter=' + encodeURIComponent(notifFilter) + '&limit=20');
+        notifications = data.notifications || [];
+        updateBell(data.unread_count || 0);
+    } catch (err) {
+        if (err.message !== 'auth') notifications = [];
+    }
+    renderNotifications();
+}
+
+function updateBell(unread) {
+    const dot = document.getElementById('notif-dot');
+    if (dot) dot.style.display = unread > 0 ? 'block' : 'none';
+}
+
+function renderNotifications() {
     const container = document.getElementById('notif-list-container');
-    container.innerHTML = '';
+    if (!container) return;
 
-    let filtered = notifications;
-    if (filter === 'unread') filtered = notifications.filter(n => n.type === 'unread');
-    else if (filter === 'alerts') filtered = notifications.filter(n => n.isAlert);
-
-    if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
+    if (notifications.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>';
         return;
     }
 
-    filtered.forEach(notif => {
-        const card = document.createElement('div');
-        card.className = `notif-card ${notif.isAlert ? 'alert-card' : ''}`;
-        card.innerHTML = `
-            <div>${notif.text}</div>
-            <button class="mark-read-btn" onclick="markAsRead(${notif.id})">Mark as read</button>
-        `;
-        container.appendChild(card);
-    });
+    container.innerHTML = notifications.map(n => `
+        <div class="notif-card ${n.alert ? 'alert-card' : ''}" style="${n.is_read ? 'opacity:.6;' : ''}">
+            <div>${esc(n.message)}</div>
+            ${n.is_read ? '' : `<button class="mark-read-btn" onclick="markAsRead(${n.id})">Mark as read</button>`}
+        </div>`).join('');
 }
 
-function switchNotifTab(tabName) {
+function switchNotifTab(tabName, evt) {
+    notifFilter = tabName;
     document.querySelectorAll('.notif-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderNotifications(tabName);
+    if (evt && evt.target) evt.target.classList.add('active');
+    loadNotifications();
 }
 
-function markAsRead(id) {
-    notifications = notifications.filter(n => n.id !== id);
-    if (notifications.length === 0) document.getElementById('notif-dot').style.display = 'none';
-    renderNotifications('all');
+async function markAsRead(id) {
+    try {
+        await Webventory.api('api/notifications.php', { method: 'POST', body: { action: 'read', id: id } });
+    } catch (err) { /* keep the list as is */ }
+    loadNotifications();
 }
 
-// Switch Category Tab
+// ------------------------------------------------------------ profile badge
+async function loadProfile() {
+    try {
+        const me = await Webventory.api('api/profile.php');
+        const avatar = document.querySelector('.profile-section .avatar');
+        if (avatar && me.full_name) {
+            avatar.textContent = me.full_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        }
+    } catch (err) { /* cosmetic only */ }
+}
+
+// ------------------------------------------------------------ inventory
+async function loadInventory() {
+    try {
+        const data = await Webventory.api('2_working_scholar/catalog.php');
+        inventoryData = data.items || [];
+    } catch (err) {
+        inventoryData = [];
+        if (err.message !== 'auth') showTableMessage('Could not load inventory: ' + err.message);
+        return;
+    }
+    renderTable();
+}
+
+function showTableMessage(msg) {
+    document.getElementById('table-body').innerHTML =
+        `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">${esc(msg)}</td></tr>`;
+}
+
 function switchCategory(category, evt) {
     currentCategory = category;
     document.querySelectorAll('.content-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -72,74 +118,85 @@ function switchCategory(category, evt) {
     renderTable();
 }
 
-// Render Table Data (Handles empty state gracefully)
+// What the badge shows: the manual availability status wins; otherwise "Borrowed" when no stock is left.
+function statusLabel(item) {
+    if (item.availability_status && item.availability_status !== 'Available') return item.availability_status;
+    return item.can_borrow ? 'Available' : 'Borrowed';
+}
+
 function renderTable() {
     const tbody = document.getElementById('table-body');
-    tbody.innerHTML = '';
+    const rows = inventoryData.filter(item => item.category === currentCategory);
 
-    const filtered = inventoryData.filter(item => item.category === currentCategory);
-
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">No inventory items found</td></tr>`;
+    if (rows.length === 0) {
+        showTableMessage('No inventory items found');
         return;
     }
 
-    filtered.forEach((item, index) => {
-        const statusLower = (item.status || 'available').toLowerCase();
+    tbody.innerHTML = rows.map(item => {
+        const label = statusLabel(item);
+        const low = label.toLowerCase();
         let badgeClass = 'available';
-        if (statusLower.includes('borrowed')) badgeClass = 'borrowed';
-        else if (statusLower.includes('maintenance') || statusLower.includes('damaged') || statusLower.includes('missing')) badgeClass = 'maintenance';
+        if (low === 'borrowed') badgeClass = 'borrowed';
+        else if (low !== 'available') badgeClass = 'maintenance';
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${item.code || '—'}</td>
-            <td><strong>${item.name || '—'}</strong></td>
-            <td>${item.category || '—'}</td>
-            <td>${item.stock || 0}</td>
-            <td>${item.condition || 'Good'}</td>
-            <td><span class="badge-status ${badgeClass}">${item.status || 'Available'}</span></td>
+        return `<tr>
+            <td>${esc(item.item_code || '—')}</td>
+            <td><strong>${esc(item.name || '—')}</strong></td>
+            <td>${esc(item.category || '—')}</td>
+            <td>${esc(item.stock != null ? item.stock : 0)}</td>
+            <td>${esc(item.item_condition || 'Good')}</td>
+            <td><span class="badge-status ${badgeClass}">${esc(label)}</span></td>
             <td style="text-align: right;">
-                <button class="btn btn-light" onclick="openStatusModal(${index})">Edit Status</button>
+                <button class="btn btn-light" onclick="openStatusModal(${Number(item.id)})">Edit Status</button>
             </td>
-        `;
-        tbody.appendChild(tr);
-    });
+        </tr>`;
+    }).join('');
 }
 
-// Modal Controls
-function openStatusModal(index) {
-    activeItemIndex = index;
-    const item = inventoryData[index] || { name: "Scientific Calculator", code: "AC-001", status: "Borrowed" };
+// ------------------------------------------------------------ status modal
+function openStatusModal(id) {
+    const item = inventoryData.find(i => Number(i.id) === id);
+    if (!item) return;
+    activeItemId = id;
 
-    document.getElementById('modal-item-subtitle').innerText = `${item.name} · ${item.code}`;
-    document.getElementById('new-status-select').value = item.status || 'Available';
+    document.getElementById('modal-item-subtitle').innerText = `${item.name} · ${item.item_code}`;
+    document.getElementById('new-status-select').value = item.availability_status || 'Available';
 
     document.getElementById('modal-overlay').classList.add('show');
     document.getElementById('status-modal').classList.add('show');
 }
 
 function closeModal() {
+    activeItemId = null;
     document.getElementById('modal-overlay').classList.remove('show');
     document.getElementById('status-modal').classList.remove('show');
 }
 
-function saveItemStatus() {
-    if (activeItemIndex !== null) {
-        const newStatus = document.getElementById('new-status-select').value;
-        inventoryData[activeItemIndex].status = newStatus;
+async function saveItemStatus() {
+    if (activeItemId === null) return closeModal();
+    const status = document.getElementById('new-status-select').value;
+    try {
+        await Webventory.api('2_working_scholar/catalog.php', {
+            method: 'POST',
+            body: { id: activeItemId, availability_status: status }
+        });
+        closeModal();
+        await loadInventory();
+    } catch (err) {
+        if (err.message !== 'auth') alert('Could not update status: ' + err.message);
     }
-    closeModal();
-    renderTable();
 }
 
 // Close dropdowns when clicking outside
-window.onclick = function(event) {
-    if (!event.target.closest('.dropdown-container')) {
-        closeAllDropdowns();
-    }
+window.onclick = function (event) {
+    if (!event.target.closest('.dropdown-container')) closeAllDropdowns();
 };
 
-// Initialize on page load with clean empty states
 window.onload = () => {
-    renderTable();
+    loadInventory();
+    loadProfile();
+    loadNotifications();
+    setInterval(loadInventory, 30000);
+    setInterval(loadNotifications, 30000);
 };

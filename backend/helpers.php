@@ -8,7 +8,7 @@ require_once __DIR__ . '/auth.php';
 //   'admin_access_code'        => 'SAO-ADMIN-2026',  // required to self-register an admin; empty = disabled
 //   'ws_requires_activation'   => true,              // new working scholars stay inactive until an admin activates them
 //   'recovery_dev_mode'        => true,              // returns the 6-digit code in the API response (no SMS/email gateway yet)
-//   'ws_can_edit_status'       => false,             // modules list says the WS inventory view is read-only
+//   'ws_can_edit_status'       => true,              // default on; set false to make the WS inventory view read-only
 function app_setting(string $key, $default = null)
 {
     static $cfg = null;
@@ -22,7 +22,7 @@ function app_setting(string $key, $default = null)
 
 const ALLOWED_CAMPUSES        = ['UC-Main', 'UC-Pri', 'UC-Banilad', 'UC-LM', 'UC-PT'];
 const ALLOWED_ACADEMIC_LEVELS = ['Senior High', 'College', 'Graduate School'];
-const AVAILABILITY_STATUSES   = ['Available', 'Under Maintenance', 'Unavailable'];
+const AVAILABILITY_STATUSES   = ['Available', 'Borrowed', 'Under Maintenance', 'Damaged', 'Missing', 'Unavailable'];
 const DUE_SOON_HOURS          = 24;
 
 // ---------------------------------------------------------------- codes

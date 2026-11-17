@@ -5,13 +5,13 @@ $user = require_role('working_scholar');
 // View Inventory (modules list: read-only for Working Scholars).
 // GET ?category=Academic&search=calc
 //
-// The storyboard's WS inventory page also shows an "Edit Status" button. To enable it, add
-//   'ws_can_edit_status' => true,
-// to backend/config.php, then:  POST {id, availability_status: Available|Under Maintenance|Unavailable}
+// The WS inventory page has an "Edit Status" button, so editing is ON by default:
+//   POST {id, availability_status: Available|Borrowed|Under Maintenance|Damaged|Missing|Unavailable}
+// To make the view read-only again, add  'ws_can_edit_status' => false  to backend/config.php.
 $pdo = db();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!app_setting('ws_can_edit_status', false)) {
+    if (!app_setting('ws_can_edit_status', true)) {
         respond(['success' => false, 'error' => 'Inventory is read-only for Working Scholars'], 403);
     }
     $b = json_body();

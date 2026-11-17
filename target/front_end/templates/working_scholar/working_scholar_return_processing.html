@@ -117,20 +117,22 @@
                 <div class="form-group">
                     <label>Transaction ID / Student ID / Item Code</label>
                     <div class="input-btn-group">
-                        <input type="text" id="find-tx-input" value="TXN-103">
+                        <input type="text" id="find-tx-input" placeholder="e.g. TXN-00103, student ID or item code" onkeydown="if(event.key==='Enter')searchTransaction()">
                         <button class="btn btn-primary" onclick="searchTransaction()">Search</button>
                     </div>
                 </div>
+                <div id="tx-results"></div>
+                <div id="return-error" style="display:none;color:#dc2626;font-size:13px;margin-top:8px;"></div>
             </div>
 
-            <div class="return-card">
+            <div class="return-card" id="return-form-card" style="display:none;">
                 <div class="item-header-box">
                     <div class="item-icon-box">🎲</div>
                     <div style="flex:1;">
-                        <h3 id="return-item-name">Chess</h3>
-                        <p id="return-item-meta">NA-003 · Pedro Cruz · TXN-103</p>
+                        <h3 id="return-item-name">—</h3>
+                        <p id="return-item-meta">—</p>
                     </div>
-                    <span id="return-status-badge" class="badge-status overdue">Overdue</span>
+                    <span id="return-status-badge" class="badge-status borrowed">Borrowed</span>
                 </div>
 
                 <div class="form-group">
@@ -142,7 +144,6 @@
                     <label>Return Condition</label>
                     <select id="return-condition-select">
                         <option value="Good">Good</option>
-                        <option value="Fair">Fair</option>
                         <option value="Damaged">Damaged</option>
                         <option value="Lost">Lost</option>
                     </select>
@@ -153,23 +154,24 @@
                     <textarea id="late-notes" placeholder="Reason for late return..."></textarea>
                 </div>
 
-                <button class="btn btn-light" style="width: fit-content;" onclick="alert('Student ID return verified.')">Confirm student ID return</button>
+                <button id="confirm-id-btn" class="btn btn-light" style="width: fit-content; display: none;" onclick="confirmIdReturn()">Confirm student ID return</button>
 
-                <button class="btn btn-primary-soft btn-block" style="margin-top: 8px;" onclick="completeReturn()">Complete Return</button>
+                <button id="complete-return-btn" class="btn btn-primary-soft btn-block" style="margin-top: 8px;" onclick="completeReturn()">Complete Return</button>
             </div>
         </div>
 
         <!-- VIEW 2: Return Success Feedback Screen -->
         <div id="view-return-success" class="view-section feedback-screen">
             <h2>Item Returned</h2>
-            <p id="success-msg">Transaction TXN-103 was completed at 11/17/2026, 4:27:32 AM. Condition recorded as Good.</p>
+            <p id="success-msg"></p>
             <a href="working_scholar_borrowed_items.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">Back to Borrowed Items</a>
         </div>
 
     </main>
 
-    <script src="../../static/script/working_scholar_script/return_processing/working_scholar_return_processing_all_in_one.js"></script>
     <script src="../../static/script/api.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
+    <script src="../../static/script/working_scholar_script/common.js"></script>
+    <script src="../../static/script/working_scholar_script/return_processing/working_scholar_return_processing_all_in_one.js"></script>
 </body>
 </html>
