@@ -63,31 +63,37 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>First Name</label>
-                                <input type="text" id="regFirstName" placeholder="Juan" required>
+                                <input type="text" id="regFirstName" placeholder="e.g. Juan" required>
                             </div>
                             <div class="form-group">
                                 <label>Middle Name</label>
-                                <input type="text" id="regMiddleName" placeholder="Santos (optional)">
+                                <input type="text" id="regMiddleName" placeholder="e.g. Santos (optional)">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Last Name</label>
-                                <input type="text" id="regLastName" placeholder="Dela Cruz" required>
+                                <input type="text" id="regLastName" placeholder="e.g. Dela Cruz" required>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Student ID</label>
-                                <input type="text" id="regStudentId" placeholder="12345678" maxlength="8" oninput="validateNumericInput(this)" required>
+                                <input type="text" id="regStudentId" placeholder="e.g. 12345678" maxlength="8" oninput="validateNumericInput(this)" required>
                                 <small class="input-hint">8-digit ID number</small>
                             </div>
                             <div class="form-group">
                                 <label>Contact Number</label>
-                                <input type="text" id="regContact" placeholder="09000000000" maxlength="11" oninput="validateNumericInput(this)" required>
+                                <input type="text" id="regContact" placeholder="e.g. 09123456789" maxlength="11" oninput="validateNumericInput(this)" required>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="regEmail" placeholder="e.g. student@uc.edu.ph" required>
+                            <small class="input-hint">University or personal email</small>
                         </div>
 
                         <button type="button" class="submit-btn full-btn active-submit" onclick="validateStep1AndNext()">Next</button>
@@ -98,7 +104,7 @@
                         <div class="form-group password-group">
                             <label>Password</label>
                             <div class="password-wrapper">
-                                <input type="password" id="regPassword" placeholder="Enter your password" minlength="8" required>
+                                <input type="password" id="regPassword" placeholder="e.g. at least 8 characters" minlength="8" required>
                                 <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('regPassword', this)"></i>
                             </div>
                             <small class="input-hint">At least 8 characters</small>
@@ -107,7 +113,7 @@
                         <div class="form-group password-group">
                             <label>Confirm Password</label>
                             <div class="password-wrapper">
-                                <input type="password" id="regConfirmPassword" placeholder="Re-enter your password" minlength="8" required>
+                                <input type="password" id="regConfirmPassword" placeholder="e.g. re-enter password" minlength="8" required>
                                 <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('regConfirmPassword', this)"></i>
                             </div>
                         </div>
@@ -137,6 +143,10 @@
                                 </div>
                             </div>
                             <div class="review-field">
+                                <span class="review-label">Email Address</span>
+                                <span class="review-val" id="revEmail">-</span>
+                            </div>
+                            <div class="review-field" style="margin-top: 8px;">
                                 <span class="review-label">Contact number</span>
                                 <span class="review-val" id="revContact">-</span>
                             </div>
@@ -175,15 +185,19 @@
 
                     <div class="form-group">
                         <label>ID Number</label>
-                        <input type="text" id="signInId" placeholder="12345678" maxlength="8" oninput="validateNumericInput(this)" required>
+                        <input type="text" id="signInId" placeholder="e.g. 12345678" maxlength="8" oninput="validateNumericInput(this)" required>
                     </div>
 
                     <div class="form-group password-group">
                         <label>Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="signInPassword" placeholder="Enter your password" required>
+                            <input type="password" id="signInPassword" placeholder="e.g. enter your password" required>
                             <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('signInPassword', this)"></i>
                         </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 14px;">
+                        <a href="#" onclick="openForgotPasswordModal(event)" style="font-size: 11px; color: #2563eb; text-decoration: none; font-weight: 600;">Forgot Password?</a>
                     </div>
 
                     <button type="submit" class="submit-btn full-btn active-submit">Sign In</button>
@@ -245,6 +259,43 @@
         </div>
     </div>
 
+    <!-- FORGOT PASSWORD MODAL -->
+    <div class="modal-overlay" id="forgotPasswordModal">
+        <div class="modal-card">
+            <h3>Reset Password</h3>
+            <p class="modal-subtitle">Enter your ID and registered Email for verification</p>
+            
+            <div class="form-group" style="margin-bottom: 8px; text-align: left;">
+                <label style="font-size: 11px; font-weight: 500; color: #334155;">ID Number</label>
+                <input type="text" id="resetIdNumber" placeholder="e.g. 12345678" maxlength="8" oninput="validateNumericInput(this)" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 8px; text-align: left;">
+                <label style="font-size: 11px; font-weight: 500; color: #334155;">Email Address</label>
+                <input type="email" id="resetEmail" placeholder="e.g. student@uc.edu.ph" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+            </div>
+
+            <div class="form-group password-group" style="margin-bottom: 8px; text-align: left;">
+                <label style="font-size: 11px; font-weight: 500; color: #334155;">New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="resetNewPassword" placeholder="e.g. at least 8 characters" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+                    <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('resetNewPassword', this)"></i>
+                </div>
+            </div>
+
+            <div class="form-group password-group" style="margin-bottom: 14px; text-align: left;">
+                <label style="font-size: 11px; font-weight: 500; color: #334155;">Confirm New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="resetConfirmPassword" placeholder="e.g. re-enter new password" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+                    <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('resetConfirmPassword', this)"></i>
+                </div>
+            </div>
+
+            <button type="button" class="modal-btn-primary" onclick="submitForgotPassword()">Update Password</button>
+            <button type="button" class="modal-btn-secondary" onclick="closeForgotPasswordModal()">Cancel</button>
+        </div>
+    </div>
+
     <!-- FLOATING VIEW SWITCHER -->
     <div class="view-switcher-panel">
         <span class="switcher-label">Switch view</span>
@@ -253,6 +304,6 @@
         <button class="switcher-btn" onclick="setAppView('admin')">Admin</button>
     </div>
 
-       <script src="script.js?v=2"></script>
+    <script src="script.js?v=2"></script>
 </body>
 </html>

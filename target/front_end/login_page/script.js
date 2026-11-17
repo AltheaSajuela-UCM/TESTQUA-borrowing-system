@@ -94,6 +94,7 @@ function validateStep1AndNext() {
     const lastName = document.getElementById('regLastName').value.trim();
     const studentId = document.getElementById('regStudentId').value.trim();
     const contact = document.getElementById('regContact').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
 
     if (!firstName) {
         alert('Please enter your First Name.');
@@ -108,7 +109,11 @@ function validateStep1AndNext() {
         return;
     }
     if (contact.length < 10) {
-        alert('Please enter a valid Contact Number (e.g. 09000000000).');
+        alert('Please enter a valid Contact Number.');
+        return;
+    }
+    if (!email || !email.includes('@')) {
+        alert('Please enter a valid Email Address.');
         return;
     }
 
@@ -170,6 +175,7 @@ function goToStep(stepNumber) {
         document.getElementById('revFullName').textContent = full;
         document.getElementById('revStudentId').textContent = document.getElementById('regStudentId').value;
         document.getElementById('revContact').textContent = document.getElementById('regContact').value;
+        document.getElementById('revEmail').textContent = document.getElementById('regEmail').value;
     }
 }
 
@@ -225,6 +231,69 @@ function acceptTerms() {
     closeTermsModal();
 }
 
+/* FORGOT PASSWORD MODAL FUNCTIONS */
+function openForgotPasswordModal(e) {
+    e.preventDefault();
+    document.getElementById('resetIdNumber').value = '';
+    document.getElementById('resetEmail').value = '';
+    document.getElementById('resetNewPassword').value = '';
+    document.getElementById('resetConfirmPassword').value = '';
+    document.getElementById('forgotPasswordModal').style.display = 'flex';
+}
+
+function closeForgotPasswordModal() {
+    document.getElementById('forgotPasswordModal').style.display = 'none';
+}
+
+async function submitForgotPassword() {
+    const idVal = document.getElementById('resetIdNumber').value.trim();
+    const emailVal = document.getElementById('resetEmail').value.trim();
+    const newPass = document.getElementById('resetNewPassword').value;
+    const confirmPass = document.getElementById('resetConfirmPassword').value;
+
+    if (idVal.length !== 8) {
+        alert('Please enter a valid 8-digit ID number.');
+        return;
+    }
+    if (!emailVal || !emailVal.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+    if (newPass.length < 8) {
+        alert('New password must be at least 8 characters long.');
+        return;
+    }
+    if (newPass !== confirmPass) {
+        alert('New passwords do not match. Please try again.');
+        return;
+    }
+
+    try {
+        const res = await fetch(API_BASE + '/reset_password.php', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                id_number: idVal, 
+                email: emailVal, 
+                new_password: newPass 
+            })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || 'Failed to reset password. Verify your ID and Email.');
+            return;
+        }
+
+        alert('Password successfully updated! You can now sign in with your new password.');
+        closeForgotPasswordModal();
+        switchAuthTab('signin');
+    } catch (err) {
+        alert('Cannot reach the backend server to reset password.');
+    }
+}
+
 async function handleFormSubmit(e) {
     e.preventDefault();
 
@@ -245,6 +314,7 @@ async function handleFormSubmit(e) {
                     last_name: document.getElementById('regLastName').value.trim(),
                     id_number: document.getElementById('regStudentId').value.trim(),
                     mobile_number: document.getElementById('regContact').value.trim(),
+                    email: document.getElementById('regEmail').value.trim(),
                     password: document.getElementById('regPassword').value,
                     terms_accepted: true
                 })
