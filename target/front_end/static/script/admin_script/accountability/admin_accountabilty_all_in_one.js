@@ -1,84 +1,139 @@
-// Clean initial state (empty arrays ready for backend data / user interaction)
+// Admin > Accountability: wired to backend/1_admin/accountability.php (list, view, resolve, remind student)
+// and backend/api/notifications.php (bell). Page markup is unchanged.
+// Put this file at: target/front_end/static/script/admin_script/accountability/admin_accountabilty_all_in_one.js
+const BASE = '../../../../backend/';
+
+async function api(path, opts) {
+    opts = opts || {};
+    const init = { method: opts.method || 'GET', credentials: 'same-origin', headers: {} };
+    if (opts.body !== undefined) {
+        init.headers['Content-Type'] = 'application/json';
+        init.body = JSON.stringify(opts.body);
+    }
+    const res = await fetch(BASE + path, init);
+    let data = {};
+    try { data = await res.json(); } catch (e) { /* non-JSON */ }
+    if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+    return data;
+}
+
+function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 let accountabilityCases = [];
 let notifications = [];
+let currentNotifTab = 'all';
+let resolvingCaseId = null;
 
-// Toggle Sidebar Navigation Drawer
+// ---------------------------------------------------------------- sidebar + dropdowns
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('show');
     document.getElementById('sidebar-overlay').classList.toggle('show');
 }
 
-// Toggle Profile Dropdown
 function toggleProfileDropdown() {
     closeAllDropdowns();
     document.getElementById('profile-dropdown').classList.toggle('show');
 }
 
-// Toggle Notification Dropdown
 function toggleNotificationDropdown() {
     closeAllDropdowns();
     document.getElementById('notification-dropdown').classList.toggle('show');
-    renderNotifications('all');
+    loadNotifications();
 }
 
-// Close All Dropdowns
 function closeAllDropdowns() {
     document.getElementById('profile-dropdown').classList.remove('show');
     document.getElementById('notification-dropdown').classList.remove('show');
 }
 
-// Render Notifications based on tab
-function renderNotifications(filter) {
-    const container = document.getElementById('notif-list-container');
-    container.innerHTML = '';
-
-    let filtered = notifications;
-    if (filter === 'unread') {
-        filtered = notifications.filter(n => n.type === 'unread');
-    } else if (filter === 'alerts') {
-        filtered = notifications.filter(n => n.isAlert);
-    }
-
-    if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
-        return;
-    }
-
-    filtered.forEach(notif => {
-        const card = document.createElement('div');
-        card.className = `notif-card ${notif.isAlert ? 'alert-card' : ''}`;
-        card.innerHTML = `
-            <div>${notif.text}</div>
-            <button class="mark-read-btn" onclick="markAsRead(${notif.id})">Mark as read</button>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// Switch Notification Tab
-function switchNotifTab(tabName) {
-    document.querySelectorAll('.notif-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderNotifications(tabName);
-}
-
-// Mark notification as read
-function markAsRead(id) {
-    notifications = notifications.filter(n => n.id !== id);
-    if (notifications.length === 0) {
-        document.getElementById('notif-dot').style.display = 'none';
-    }
-    renderNotifications('all');
-}
-
-// Close dropdowns when clicking outside
-window.onclick = function(event) {
+window.onclick = function (event) {
     if (!event.target.closest('.dropdown-container')) {
         closeAllDropdowns();
     }
 };
 
-// Render Table Data (Handles empty state gracefully)
+// ---------------------------------------------------------------- notifications
+async function loadNotifications() {
+    try {
+        const data = await api('api/notifications.php?filter=' + currentNotifTab);
+        notifications = data.notifications || [];
+        renderNotifications(data.unread_count);
+    } catch (err) {
+        notifications = [];
+        renderNotifications(0);
+    }
+}
+
+function renderNotifications(unreadCount) {
+    const container = document.getElementById('notif-list-container');
+    container.innerHTML = '';
+
+    const dot = document.getElementById('notif-dot');
+    if (dot && unreadCount !== undefined) dot.style.display = unreadCount > 0 ? '' : 'none';
+
+    if (notifications.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
+        return;
+    }
+
+    notifications.forEach(notif => {
+        const card = document.createElement('div');
+        card.className = `notif-card ${notif.alert ? 'alert-card' : ''}`;
+        card.innerHTML = `
+            <div>${esc(notif.message)}</div>
+            ${notif.is_read
+                ? '<span style="font-size: 10px; color: #94a3b8;">Read</span>'
+                : `<button class="mark-read-btn" onclick="markAsRead(${Number(notif.id)})">Mark as read</button>`}
+        `;
+        container.appendChild(card);
+    });
+}
+
+function switchNotifTab(tabName) {
+    const order = ['all', 'unread', 'alerts'];
+    const buttons = document.querySelectorAll('.notif-tabs .tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (buttons[order.indexOf(tabName)]) buttons[order.indexOf(tabName)].classList.add('active');
+    currentNotifTab = tabName;
+    loadNotifications();
+}
+
+async function markAsRead(id) {
+    try {
+        await api('api/notifications.php', { method: 'POST', body: { action: 'read', id: id } });
+    } catch (err) { /* ignore */ }
+    loadNotifications();
+}
+
+// ---------------------------------------------------------------- cases table
+async function loadCases() {
+    try {
+        // status=all so resolved cases stay visible (the backend default is open cases only)
+        const data = await api('1_admin/accountability.php?status=all');
+        accountabilityCases = data.cases || [];
+    } catch (err) {
+        accountabilityCases = [];
+        document.getElementById('table-body').innerHTML =
+            `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">${esc(err.message)}</td></tr>`;
+        return;
+    }
+    renderTable(accountabilityCases);
+}
+
+function typeBadge(type) {
+    if (type === 'Lost') return '<span class="badge lost">Lost</span>';
+    if (type === 'Damaged') return '<span class="badge" style="background:#ffedd5;color:#c2410c;">Damaged</span>';
+    return `<span class="badge" style="background:#e0f2fe;color:#0369a1;">${esc(type)}</span>`;
+}
+
+function statusBadge(status) {
+    if (status === 'Open') return '<span class="badge open">Open</span>';
+    return `<span class="badge" style="background:#d1fae5;color:#047857;">${esc(status)}</span>`;
+}
+
 function renderTable(data) {
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = '';
@@ -89,49 +144,54 @@ function renderTable(data) {
     }
 
     data.forEach(row => {
+        const id = Number(row.id);
+        const isOpen = row.status === 'Open';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${row.caseId || '—'}</td>
-            <td>${row.student || '—'}</td>
-            <td>${row.item || '—'}</td>
-            <td><span class="badge lost">${row.type || 'Lost'}</span></td>
-            <td><span class="badge open">${row.status || 'Open'}</span></td>
-            <td>${row.date || '—'}</td>
+            <td>${esc(row.case_code) || '—'}</td>
+            <td>${esc(row.student) || '—'}</td>
+            <td>${esc(row.item) || '—'}</td>
+            <td>${typeBadge(row.type)}</td>
+            <td>${statusBadge(row.status)}</td>
+            <td>${esc(row.created_at) || '—'}</td>
             <td style="text-align: right; padding-right: 24px;">
-                <button class="btn-sm" onclick="openViewModal('${row.caseId}')">View</button>
-                <button class="btn-primary-sm" onclick="openResolveModal('${row.caseId}')" style="margin-left: 6px;">Resolve</button>
+                <button class="btn-sm" onclick="openViewModal(${id})">View</button>
+                ${isOpen ? `<button class="btn-sm" onclick="remindStudent(${id})" style="margin-left: 6px;">Remind</button>
+                <button class="btn-primary-sm" onclick="openResolveModal(${id})" style="margin-left: 6px;">Resolve</button>` : ''}
             </td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-// Modal Control Functions
-function openViewModal(caseId) {
-    // Find case data or fallback defaults
-    const caseData = accountabilityCases.find(c => c.caseId === caseId) || {
-        caseId: caseId,
-        student: "Pedro Cruz",
-        item: "Uno Cards",
-        type: "Lost",
-        status: "Open"
-    };
+// ---------------------------------------------------------------- modals
+function findCase(id) {
+    return accountabilityCases.find(c => Number(c.id) === Number(id));
+}
 
-    document.getElementById('view-modal-title').innerText = `${caseData.caseId} Details`;
-    document.getElementById('view-student').value = caseData.student;
-    document.getElementById('view-item').value = caseData.item;
-    document.getElementById('view-type').value = caseData.type;
-    document.getElementById('view-status').value = caseData.status;
+function openViewModal(id) {
+    const c = findCase(id);
+    if (!c) return;
+
+    document.getElementById('view-modal-title').innerText = `${c.case_code} Details`;
+    document.getElementById('view-student').value = c.student + (c.student_id ? ` (${c.student_id})` : '');
+    document.getElementById('view-item').value = c.item + (c.item_code ? ` (${c.item_code})` : '');
+    document.getElementById('view-type').value = c.type;
+    document.getElementById('view-status').value = c.status +
+        (c.status !== 'Open' && c.resolved_at ? ` on ${c.resolved_at}` : '');
 
     document.getElementById('modal-overlay').classList.add('show');
     document.getElementById('view-modal').classList.add('show');
 }
 
-function openResolveModal(caseId) {
-    document.getElementById('resolve-modal-title').innerText = `Resolve Case ${caseId}`;
+function openResolveModal(id) {
+    const c = findCase(id);
+    if (!c) return;
+    resolvingCaseId = Number(id);
+
+    document.getElementById('resolve-modal-title').innerText = `Resolve Case ${c.case_code}`;
     document.getElementById('resolve-notes').value = '';
     document.getElementById('check-replacement').checked = false;
-    document.getElementById('check-clear-flag').checked = false;
 
     document.getElementById('modal-overlay').classList.add('show');
     document.getElementById('resolve-modal').classList.add('show');
@@ -143,13 +203,51 @@ function closeModals() {
     document.getElementById('resolve-modal').classList.remove('show');
 }
 
-function submitResolve() {
-    // Add logic here to submit resolution to backend
-    alert("Case resolved successfully!");
-    closeModals();
+async function submitResolve() {
+    if (resolvingCaseId === null) return;
+    try {
+        await api('1_admin/accountability.php', {
+            method: 'POST',
+            body: {
+                action: 'resolve',
+                case_id: resolvingCaseId,
+                replacement_received: document.getElementById('check-replacement').checked,
+                notes: document.getElementById('resolve-notes').value.trim()
+            }
+        });
+        alert('Case resolved successfully!');
+        closeModals();
+        resolvingCaseId = null;
+        await loadCases();
+    } catch (err) {
+        alert(err.message);
+    }
 }
 
-// Initialize on page load with empty state
+async function remindStudent(id) {
+    const c = findCase(id);
+    if (!c || !confirm(`Send a reminder about ${c.case_code} to ${c.student}?`)) return;
+    try {
+        await api('1_admin/accountability.php', { method: 'POST', body: { action: 'remind', case_id: Number(id) } });
+        alert('Reminder sent.');
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+// ---------------------------------------------------------------- initial load
 window.onload = () => {
-    renderTable(accountabilityCases);
+    // "Clear student flag" has no switch of its own in the backend: the flag is lifted automatically once
+    // the student has no open cases left. Show that instead of a checkbox that would do nothing.
+    const flagBox = document.getElementById('check-clear-flag');
+    if (flagBox && flagBox.parentElement) {
+        flagBox.parentElement.style.display = 'none';
+        const note = document.createElement('p');
+        note.style.cssText = 'font-size:12px;color:#64748b;margin:6px 0 0;';
+        note.textContent = "The student's flag is lifted automatically once their last open case is resolved.";
+        flagBox.parentElement.after(note);
+    }
+
+    loadCases();
+    loadNotifications();
 };

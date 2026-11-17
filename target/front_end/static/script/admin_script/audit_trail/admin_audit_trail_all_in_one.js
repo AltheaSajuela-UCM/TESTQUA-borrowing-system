@@ -1,84 +1,166 @@
-// Clean initial state (empty arrays ready for backend data / user interaction)
+// Admin > Audit Trail: wired to backend/1_admin/audit_trail.php (list + search / date / action filters,
+// CSV export done by the server) and backend/api/notifications.php (bell). Page markup is unchanged.
+// Put this file at: target/front_end/static/script/admin_script/audit_trail/admin_audit_trail_all_in_one.js
+const BASE = '../../../../backend/';
+
+async function api(path, opts) {
+    opts = opts || {};
+    const init = { method: opts.method || 'GET', credentials: 'same-origin', headers: {} };
+    if (opts.body !== undefined) {
+        init.headers['Content-Type'] = 'application/json';
+        init.body = JSON.stringify(opts.body);
+    }
+    const res = await fetch(BASE + path, init);
+    let data = {};
+    try { data = await res.json(); } catch (e) { /* non-JSON */ }
+    if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+    return data;
+}
+
+function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 let auditData = [];
 let notifications = [];
+let currentNotifTab = 'all';
+let actionOptionsBuilt = false;
+let filterTimer = null;
 
-// Toggle Sidebar Navigation Drawer
+// ---------------------------------------------------------------- sidebar + dropdowns
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('show');
     document.getElementById('sidebar-overlay').classList.toggle('show');
 }
 
-// Toggle Profile Dropdown
 function toggleProfileDropdown() {
     closeAllDropdowns();
     document.getElementById('profile-dropdown').classList.toggle('show');
 }
 
-// Toggle Notification Dropdown
 function toggleNotificationDropdown() {
     closeAllDropdowns();
     document.getElementById('notification-dropdown').classList.toggle('show');
-    renderNotifications('all');
+    loadNotifications();
 }
 
-// Close All Dropdowns
 function closeAllDropdowns() {
     document.getElementById('profile-dropdown').classList.remove('show');
     document.getElementById('notification-dropdown').classList.remove('show');
 }
 
-// Render Notifications based on tab
-function renderNotifications(filter) {
-    const container = document.getElementById('notif-list-container');
-    container.innerHTML = '';
-
-    let filtered = notifications;
-    if (filter === 'unread') {
-        filtered = notifications.filter(n => n.type === 'unread');
-    } else if (filter === 'alerts') {
-        filtered = notifications.filter(n => n.isAlert);
-    }
-
-    if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
-        return;
-    }
-
-    filtered.forEach(notif => {
-        const card = document.createElement('div');
-        card.className = `notif-card ${notif.isAlert ? 'alert-card' : ''}`;
-        card.innerHTML = `
-            <div>${notif.text}</div>
-            <button class="mark-read-btn" onclick="markAsRead(${notif.id})">Mark as read</button>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// Switch Notification Tab
-function switchNotifTab(tabName) {
-    document.querySelectorAll('.notif-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderNotifications(tabName);
-}
-
-// Mark notification as read
-function markAsRead(id) {
-    notifications = notifications.filter(n => n.id !== id);
-    if (notifications.length === 0) {
-        document.getElementById('notif-dot').style.display = 'none';
-    }
-    renderNotifications('all');
-}
-
-// Close dropdowns when clicking outside
-window.onclick = function(event) {
+window.onclick = function (event) {
     if (!event.target.closest('.dropdown-container')) {
         closeAllDropdowns();
     }
 };
 
-// Render Table Data (Handles empty state gracefully)
+// ---------------------------------------------------------------- notifications
+async function loadNotifications() {
+    try {
+        const data = await api('api/notifications.php?filter=' + currentNotifTab);
+        notifications = data.notifications || [];
+        renderNotifications(data.unread_count);
+    } catch (err) {
+        notifications = [];
+        renderNotifications(0);
+    }
+}
+
+function renderNotifications(unreadCount) {
+    const container = document.getElementById('notif-list-container');
+    container.innerHTML = '';
+
+    const dot = document.getElementById('notif-dot');
+    if (dot && unreadCount !== undefined) dot.style.display = unreadCount > 0 ? '' : 'none';
+
+    if (notifications.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
+        return;
+    }
+
+    notifications.forEach(notif => {
+        const card = document.createElement('div');
+        card.className = `notif-card ${notif.alert ? 'alert-card' : ''}`;
+        card.innerHTML = `
+            <div>${esc(notif.message)}</div>
+            ${notif.is_read
+                ? '<span style="font-size: 10px; color: #94a3b8;">Read</span>'
+                : `<button class="mark-read-btn" onclick="markAsRead(${Number(notif.id)})">Mark as read</button>`}
+        `;
+        container.appendChild(card);
+    });
+}
+
+function switchNotifTab(tabName) {
+    const order = ['all', 'unread', 'alerts'];
+    const buttons = document.querySelectorAll('.notif-tabs .tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (buttons[order.indexOf(tabName)]) buttons[order.indexOf(tabName)].classList.add('active');
+    currentNotifTab = tabName;
+    loadNotifications();
+}
+
+async function markAsRead(id) {
+    try {
+        await api('api/notifications.php', { method: 'POST', body: { action: 'read', id: id } });
+    } catch (err) { /* ignore */ }
+    loadNotifications();
+}
+
+// ---------------------------------------------------------------- audit table
+// The date box takes dd/mm/yyyy (or yyyy-mm-dd). Anything else is ignored until it is a full date.
+function parseDate(txt) {
+    txt = (txt || '').trim();
+    const m = txt.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(txt)) return txt;
+    return '';
+}
+
+function filterParams() {
+    const p = new URLSearchParams();
+    const q = document.getElementById('search-filter').value.trim();
+    const date = parseDate(document.getElementById('date-filter').value);
+    const action = document.getElementById('action-filter').value;
+    if (q) p.set('q', q);
+    if (date) p.set('date', date);
+    if (action && action !== 'All Actions') p.set('action', action);
+    return p;
+}
+
+async function loadAudit() {
+    try {
+        const data = await api('1_admin/audit_trail.php?' + filterParams().toString());
+        auditData = data.audit || [];
+    } catch (err) {
+        auditData = [];
+        document.getElementById('table-body').innerHTML =
+            `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">${esc(err.message)}</td></tr>`;
+        return;
+    }
+    if (!actionOptionsBuilt) buildActionOptions();
+    renderTable(auditData);
+}
+
+// The dropdown used to list three made-up actions; build it from what the log really contains.
+function buildActionOptions() {
+    const select = document.getElementById('action-filter');
+    const actions = [...new Set(auditData.map(r => r.action).filter(Boolean))].sort();
+    select.innerHTML = '<option value="All Actions">All Actions</option>' +
+        actions.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
+    actionOptionsBuilt = true;
+}
+
+function roleBadge(role) {
+    const r = (role || '').toLowerCase();
+    if (r === 'admin') return '<span class="badge admin">Admin</span>';
+    if (r === 'working_scholar') return '<span class="badge ws">WS</span>';
+    if (r === 'student') return '<span class="badge student">Student</span>';
+    return '<span class="badge student">System</span>';
+}
+
 function renderTable(data) {
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = '';
@@ -89,71 +171,39 @@ function renderTable(data) {
     }
 
     data.forEach(row => {
-        let roleClass = 'student';
-        const roleStr = (row.role || '').toLowerCase();
-        if (roleStr === 'ws') roleClass = 'ws';
-        else if (roleStr === 'admin') roleClass = 'admin';
-
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${row.timestamp || '—'}</td>
-            <td><strong>${row.user || '—'}</strong></td>
-            <td><span class="badge ${roleClass}">${row.role || '—'}</span></td>
-            <td>${row.action || '—'}</td>
-            <td>${row.entity || '—'}</td>
-            <td>${row.id || '—'}</td>
-            <td>${row.details || '—'}</td>
+            <td>${esc(row.date_time) || '—'}</td>
+            <td><strong>${esc(row.user) || '—'}</strong></td>
+            <td>${roleBadge(row.role)}</td>
+            <td>${esc(row.action) || '—'}</td>
+            <td>${esc(row.entity) || '—'}</td>
+            <td>${esc(row.reference) || '—'}</td>
+            <td>${esc(row.details) || '—'}</td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-// Filter Functionality
+// Called by the filter boxes (oninput / onchange). Waits for a pause in typing before asking the server.
 function applyFilters() {
-    const searchVal = document.getElementById('search-filter').value.toLowerCase();
-    const dateVal = document.getElementById('date-filter').value.trim();
-    const actionVal = document.getElementById('action-filter').value;
-
-    let filtered = auditData.filter(row => {
-        const matchesAction = (actionVal === 'All Actions' || row.action === actionVal);
-        const matchesDate = (dateVal === '' || row.timestamp.includes(dateVal));
-        const matchesSearch = (
-            (row.user || '').toLowerCase().includes(searchVal) ||
-            (row.entity || '').toLowerCase().includes(searchVal) ||
-            (row.id || '').toLowerCase().includes(searchVal) ||
-            (row.details || '').toLowerCase().includes(searchVal) ||
-            (row.timestamp || '').toLowerCase().includes(searchVal)
-        );
-        return matchesAction && matchesDate && matchesSearch;
-    });
-
-    renderTable(filtered);
+    clearTimeout(filterTimer);
+    filterTimer = setTimeout(loadAudit, 300);
 }
 
-// Export Table to CSV function
+// The server builds the CSV from the same filters, so the file matches what you filtered.
 function exportTableToCSV() {
-    let csv = [];
-    let rows = document.querySelectorAll("#audit-table tr");
-    
-    for (let i = 0; i < rows.length; i++) {
-        let row = [], cols = rows[i].querySelectorAll("td, th");
-        for (let j = 0; j < cols.length; j++) {
-            row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
-        }
-        csv.push(row.join(","));
-    }
-
-    let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-    let downloadLink = document.createElement("a");
-    downloadLink.download = "webventory_audit_trail.csv";
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    const p = filterParams();
+    p.set('format', 'csv');
+    p.set('limit', '2000');
+    window.location.href = BASE + '1_admin/audit_trail.php?' + p.toString();
 }
 
-// Initialize on page load with empty state
+// ---------------------------------------------------------------- initial load
 window.onload = () => {
-    renderTable(auditData);
+    const dateBox = document.getElementById('date-filter');
+    dateBox.value = '';                         // the page shipped with a made-up date that hid every row
+    dateBox.placeholder = 'dd/mm/yyyy';
+    loadAudit();
+    loadNotifications();
 };

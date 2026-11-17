@@ -1,162 +1,320 @@
-// Clean initial state (empty arrays ready for backend data / user interaction)
-let reportData = [];
-let notifications = [];
+// Admin > Reports: wired to backend/1_admin/reports.php (inventory, borrowing, returns, overdue, damaged/lost
+// and the organization leaderboard) and backend/api/notifications.php (bell). Page markup is unchanged:
+// the table header follows each report, and a Leaderboard card is added next to the five existing ones.
+// Put this file at: target/front_end/static/script/admin_script/reports/admin_all_in_one.js
+const BASE = '../../../../backend/';
 
-// Toggle Sidebar Navigation Drawer
+async function api(path, opts) {
+    opts = opts || {};
+    const init = { method: opts.method || 'GET', credentials: 'same-origin', headers: {} };
+    if (opts.body !== undefined) {
+        init.headers['Content-Type'] = 'application/json';
+        init.body = JSON.stringify(opts.body);
+    }
+    const res = await fetch(BASE + path, init);
+    let data = {};
+    try { data = await res.json(); } catch (e) { /* non-JSON */ }
+    if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+    return data;
+}
+
+function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// card title -> report type understood by reports.php
+const REPORT_TYPES = {
+    'Inventory Report': 'inventory',
+    'Borrowing Report': 'borrowing',
+    'Returns Report': 'returns',
+    'Overdue Report': 'overdue',
+    'Damaged/Lost Report': 'damaged_lost',
+    'Organization Leaderboard': 'leaderboard'
+};
+
+// Which column the category / status dropdowns filter, and which status values exist, per report
+const STATUS_FILTERS = {
+    inventory:    { column: 'Availability', options: ['Available', 'Borrowed', 'Under Maintenance', 'Damaged', 'Missing', 'Unavailable'] },
+    borrowing:    { column: 'Status', options: ['Pending', 'Borrowed', 'Overdue', 'Completed', 'Returned', 'Rejected', 'Cancelled'] },
+    damaged_lost: { column: 'Status', options: ['Open', 'Resolved'] }
+};
+
+let currentType = 'inventory';
+let currentReport = null;            // last response: {title, headers, rows}
+let notifications = [];
+let currentNotifTab = 'all';
+let loadTimer = null;
+
+// ---------------------------------------------------------------- sidebar + dropdowns
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('show');
     document.getElementById('sidebar-overlay').classList.toggle('show');
 }
 
-// Toggle Profile Dropdown
 function toggleProfileDropdown() {
     closeAllDropdowns();
     document.getElementById('profile-dropdown').classList.toggle('show');
 }
 
-// Toggle Notification Dropdown
 function toggleNotificationDropdown() {
     closeAllDropdowns();
     document.getElementById('notification-dropdown').classList.toggle('show');
-    renderNotifications('all');
+    loadNotifications();
 }
 
-// Close All Dropdowns
 function closeAllDropdowns() {
     document.getElementById('profile-dropdown').classList.remove('show');
     document.getElementById('notification-dropdown').classList.remove('show');
 }
 
-// Render Notifications based on tab
-function renderNotifications(filter) {
-    const container = document.getElementById('notif-list-container');
-    container.innerHTML = '';
-
-    let filtered = notifications;
-    if (filter === 'unread') {
-        filtered = notifications.filter(n => n.type === 'unread');
-    } else if (filter === 'alerts') {
-        filtered = notifications.filter(n => n.isAlert);
-    }
-
-    if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
-        return;
-    }
-
-    filtered.forEach(notif => {
-        const card = document.createElement('div');
-        card.className = `notif-card ${notif.isAlert ? 'alert-card' : ''}`;
-        card.innerHTML = `
-            <div>${notif.text}</div>
-            <button class="mark-read-btn" onclick="markAsRead(${notif.id})">Mark as read</button>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// Switch Notification Tab
-function switchNotifTab(tabName) {
-    document.querySelectorAll('.notif-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderNotifications(tabName);
-}
-
-// Mark notification as read
-function markAsRead(id) {
-    notifications = notifications.filter(n => n.id !== id);
-    if (notifications.length === 0) {
-        document.getElementById('notif-dot').style.display = 'none';
-    }
-    renderNotifications('all');
-}
-
-// Close dropdowns when clicking outside
-window.onclick = function(event) {
+window.onclick = function (event) {
     if (!event.target.closest('.dropdown-container')) {
         closeAllDropdowns();
     }
 };
 
-// Render Table Data (Handles empty state gracefully)
-function renderTable(data) {
-    const tbody = document.getElementById('table-body');
-    tbody.innerHTML = '';
+// ---------------------------------------------------------------- notifications
+async function loadNotifications() {
+    try {
+        const data = await api('api/notifications.php?filter=' + currentNotifTab);
+        notifications = data.notifications || [];
+        renderNotifications(data.unread_count);
+    } catch (err) {
+        notifications = [];
+        renderNotifications(0);
+    }
+}
 
-    if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">No records found</td></tr>`;
+function renderNotifications(unreadCount) {
+    const container = document.getElementById('notif-list-container');
+    container.innerHTML = '';
+
+    const dot = document.getElementById('notif-dot');
+    if (dot && unreadCount !== undefined) dot.style.display = unreadCount > 0 ? '' : 'none';
+
+    if (notifications.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
         return;
     }
 
-    data.forEach(row => {
-        let badgeClass = 'pending';
-        const st = (row.status || '').toLowerCase();
-        if (st === 'borrowed') badgeClass = 'borrowed';
-        else if (st === 'overdue') badgeClass = 'overdue';
-        else if (st === 'completed') badgeClass = 'completed';
-        else if (st === 'rejected') badgeClass = 'rejected';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${row.id || '—'}</td>
-            <td>${row.student || '—'}</td>
-            <td>${row.item || '—'}</td>
-            <td>${row.borrowDate || '—'}</td>
-            <td>${row.returnDate || '—'}</td>
-            <td><span class="badge ${badgeClass}">${row.status || 'Unknown'}</span></td>
-            <td>${row.ws || '—'}</td>
+    notifications.forEach(notif => {
+        const card = document.createElement('div');
+        card.className = `notif-card ${notif.alert ? 'alert-card' : ''}`;
+        card.innerHTML = `
+            <div>${esc(notif.message)}</div>
+            ${notif.is_read
+                ? '<span style="font-size: 10px; color: #94a3b8;">Read</span>'
+                : `<button class="mark-read-btn" onclick="markAsRead(${Number(notif.id)})">Mark as read</button>`}
         `;
+        container.appendChild(card);
+    });
+}
+
+function switchNotifTab(tabName) {
+    const order = ['all', 'unread', 'alerts'];
+    const buttons = document.querySelectorAll('.notif-tabs .tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (buttons[order.indexOf(tabName)]) buttons[order.indexOf(tabName)].classList.add('active');
+    currentNotifTab = tabName;
+    loadNotifications();
+}
+
+async function markAsRead(id) {
+    try {
+        await api('api/notifications.php', { method: 'POST', body: { action: 'read', id: id } });
+    } catch (err) { /* ignore */ }
+    loadNotifications();
+}
+
+// ---------------------------------------------------------------- report loading
+// Date boxes take dd/mm/yyyy (or yyyy-mm-dd). Anything else is ignored until it is a full date.
+function parseDate(txt) {
+    txt = (txt || '').trim();
+    const m = txt.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(txt)) return txt;
+    return '';
+}
+
+function reportQuery(extra) {
+    const p = new URLSearchParams({ type: currentType });
+    const from = parseDate(document.getElementById('date-from').value);
+    const to = parseDate(document.getElementById('date-to').value);
+    if (from) p.set('from', from);
+    if (to) p.set('to', to);
+    Object.keys(extra || {}).forEach(k => p.set(k, extra[k]));
+    return p.toString();
+}
+
+async function loadReport() {
+    try {
+        currentReport = await api('1_admin/reports.php?' + reportQuery());
+    } catch (err) {
+        currentReport = null;
+        document.getElementById('table-body').innerHTML =
+            `<tr><td style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">${esc(err.message)}</td></tr>`;
+        return;
+    }
+    document.getElementById('preview-table-title').innerText = `${currentReport.title} Preview`;
+    renderTable();
+}
+
+// Category / Status dropdowns only apply to reports that have those columns
+function setupFilterControls() {
+    const cat = document.getElementById('category-filter');
+    const stat = document.getElementById('status-filter');
+    const hasCategory = currentReport === null || (currentReport.headers || []).includes('Category');
+    cat.disabled = !hasCategory;
+    if (!hasCategory) cat.value = 'All';
+
+    const sf = STATUS_FILTERS[currentType];
+    stat.disabled = !sf;
+    stat.innerHTML = '<option value="All">All Statuses</option>' +
+        (sf ? sf.options.map(o => `<option value="${o}">${o}</option>`).join('') : '');
+}
+
+function filteredRows() {
+    if (!currentReport) return [];
+    const headers = currentReport.headers || [];
+    let rows = currentReport.rows || [];
+
+    const catIdx = headers.indexOf('Category');
+    const catVal = document.getElementById('category-filter').value;
+    if (catIdx >= 0 && catVal !== 'All') rows = rows.filter(r => r[catIdx] === catVal);
+
+    const sf = STATUS_FILTERS[currentType];
+    const statVal = document.getElementById('status-filter').value;
+    if (sf && statVal !== 'All') {
+        const i = headers.indexOf(sf.column);
+        if (i >= 0) rows = rows.filter(r => r[i] === statVal);
+    }
+    return rows;
+}
+
+function badgeClassFor(value) {
+    const v = String(value).toLowerCase();
+    if (v === 'borrowed' || v === 'available') return 'borrowed';
+    if (v === 'overdue' || v === 'damaged' || v === 'missing') return 'overdue';
+    if (v === 'completed' || v === 'resolved') return 'completed';
+    if (v === 'rejected' || v === 'cancelled' || v === 'unavailable') return 'rejected';
+    return 'pending';
+}
+
+function renderTable() {
+    setupFilterControls();
+    const table = document.getElementById('report-table');
+    const thead = table.querySelector('thead');
+    const tbody = document.getElementById('table-body');
+    const headers = currentReport ? currentReport.headers || [] : [];
+
+    thead.innerHTML = '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+    tbody.innerHTML = '';
+
+    const rows = filteredRows();
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${Math.max(headers.length, 1)}" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">No records found</td></tr>`;
+        return;
+    }
+
+    const badgeCols = ['Status', 'Availability'].map(h => headers.indexOf(h)).filter(i => i >= 0);
+    rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = row.map((cell, i) => {
+            const text = (cell === null || cell === '' || cell === undefined) ? '—' : cell;
+            return badgeCols.includes(i)
+                ? `<td><span class="badge ${badgeClassFor(text)}">${esc(text)}</span></td>`
+                : `<td>${esc(text)}</td>`;
+        }).join('');
         tbody.appendChild(tr);
     });
 }
 
-// Handle Category Card Click Selection
+// ---------------------------------------------------------------- cards + filters
 function selectCard(cardElement, reportTitle) {
     document.querySelectorAll('.report-card').forEach(c => c.classList.remove('active'));
     cardElement.classList.add('active');
     document.getElementById('preview-table-title').innerText = `${reportTitle} Preview`;
-    
-    // Here you can fetch or filter data corresponding to the selected card category
+    currentType = REPORT_TYPES[reportTitle] || 'inventory';
+    currentReport = null;
+    document.getElementById('category-filter').value = 'All';
+    loadReport();
 }
 
-// Filter Functionality
+// Category / Status dropdown: filter the rows already loaded
 function applyFilters() {
-    const categoryVal = document.getElementById('category-filter').value;
-    const statusVal = document.getElementById('status-filter').value;
-
-    let filtered = reportData.filter(row => {
-        const matchesCategory = (categoryVal === 'All' || row.category === categoryVal);
-        const matchesStatus = (statusVal === 'All' || row.status === statusVal);
-        return matchesCategory && matchesStatus;
-    });
-
-    renderTable(filtered);
+    renderTable();
 }
 
-// Export Table to CSV function
+// Date boxes: ask the server again after a pause in typing
+function dateChanged() {
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(loadReport, 300);
+}
+
+// ---------------------------------------------------------------- export
+// CSV is built from the rows on screen, so it respects the Category / Status filters.
 function exportTableToCSV() {
-    let csv = [];
-    let rows = document.querySelectorAll("#report-table tr");
-    
-    for (let i = 0; i < rows.length; i++) {
-        let row = [], cols = rows[i].querySelectorAll("td, th");
-        for (let j = 0; j < cols.length; j++) {
-            row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
-        }
-        csv.push(row.join(","));
+    if (!currentReport) return;
+    const cell = v => {
+        let s = String(v == null ? '' : v);
+        if (/^[=+\-@]/.test(s)) s = "'" + s;           // stop spreadsheet formula injection
+        return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const lines = [currentReport.headers.map(cell).join(',')]
+        .concat(filteredRows().map(r => r.map(cell).join(',')));
+    const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.download = `${currentType}_report.csv`;
+    a.href = window.URL.createObjectURL(blob);
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// PDF is made by the server for the selected report and date range (it ignores the Category / Status filters).
+function exportTablePDF() {
+    window.location.href = BASE + '1_admin/reports.php?' + reportQuery({ format: 'pdf' });
+}
+
+// ---------------------------------------------------------------- initial load
+window.onload = async () => {
+    // The date boxes shipped with made-up dates (01/09/2026 - 21/09/2026) that would hide current data.
+    const from = document.getElementById('date-from');
+    const to = document.getElementById('date-to');
+    from.value = '';
+    to.value = '';
+    from.placeholder = 'From dd/mm/yyyy';
+    to.placeholder = 'To dd/mm/yyyy';
+    from.addEventListener('input', dateChanged);
+    to.addEventListener('input', dateChanged);
+
+    // Export PDF used to open the browser's print dialog; use the server's PDF instead.
+    const pdfBtn = document.querySelector('.action-buttons .btn');
+    if (pdfBtn) {
+        pdfBtn.removeAttribute('onclick');
+        pdfBtn.addEventListener('click', exportTablePDF);
     }
 
-    let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-    let downloadLink = document.createElement("a");
-    downloadLink.download = "webventory_reports.csv";
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-}
+    // Leaderboard report exists in the backend but had no card
+    const grid = document.querySelector('.cards-grid');
+    const lb = document.createElement('div');
+    lb.className = 'report-card';
+    lb.innerHTML = '<div class="card-icon">🏆</div><div class="card-title">Leaderboard</div>';
+    lb.addEventListener('click', () => selectCard(lb, 'Organization Leaderboard'));
+    grid.appendChild(lb);
 
-// Initialize on page load with empty state
-window.onload = () => {
-    renderTable(reportData);
+    // Category dropdown from the real categories
+    try {
+        const data = await api('1_admin/categories.php');
+        const names = (data.categories || []).map(c => c.name);
+        if (names.length) {
+            document.getElementById('category-filter').innerHTML =
+                '<option value="All">All Categories</option>' + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+        }
+    } catch (err) { /* keep the two default options */ }
+
+    loadReport();
+    loadNotifications();
 };
