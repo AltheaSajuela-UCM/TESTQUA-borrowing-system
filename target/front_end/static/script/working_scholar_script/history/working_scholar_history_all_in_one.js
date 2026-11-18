@@ -76,14 +76,15 @@ function renderTable(data) {
         const actionStr = row.action || '';
         const actionClass = actionStr.toLowerCase() === 'rejected' ? 'action-rejected' : '';
 
+                const esc = Webventory.esc;
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${row.dateTime || '—'}</td>
-            <td><span class="badge-type">${row.type || 'Borrow Request'}</span></td>
-            <td><strong>${row.student || '—'}</strong></td>
-            <td>${row.item || '—'}</td>
-            <td><span class="${actionClass}">${actionStr}</span></td>
-        `;
+            <td>${esc(row.dateTime || '—')}</td>
+            <td><span class="badge-type">${esc(row.type || 'Borrow Request')}</span></td>
+            <td><strong>${esc(row.student || '—')}</strong></td>
+            <td>${esc(row.item || '—')}</td>
+            <td><span class="${actionClass}">${esc(actionStr)}</span></td>
+        `;  
         tbody.appendChild(tr);
     });
 }
@@ -118,6 +119,24 @@ window.onclick = function(event) {
 };
 
 // Initialize on page load with clean empty states
-window.onload = () => {
-    renderTable(historyData);
-};
+// Load the activity log from the backend, then render it (filters work on this list)
+async function loadHistory() {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">Loading history…</td></tr>`;
+    try {
+        const data = await Webventory.api('2_working_scholar/history.php');
+        historyData = (data.history || []).map(r => ({
+            dateTime: r.date_time,
+            type: r.type,
+            student: r.student,
+            item: r.item,
+            action: r.action
+        }));
+        applyFilters();
+    } catch (err) {
+        if (err.message === 'auth') return;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #dc2626; padding: 32px; font-size: 13px;">Could not load history: ${Webventory.esc(err.message)}</td></tr>`;
+    }
+}
+
+window.onload = loadHistory;

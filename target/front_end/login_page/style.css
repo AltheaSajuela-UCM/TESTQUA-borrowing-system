@@ -563,3 +563,22 @@ body, html {
 
 .switcher-btn:hover { background: #475569; }
 .switcher-btn.active-switcher { background: #2563eb; font-weight: 600; }
+
+/* FORGOT PASSWORD */
+.recover-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.recover-tab {
+    flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;
+    background: #ffffff; color: #334155; font-size: 11.5px; font-weight: 600; cursor: pointer;
+}
+.recover-tab.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+.recover-label { font-size: 11px; font-weight: 500; color: #334155; }
+.recover-input {
+    width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1;
+    border-radius: 6px; font-size: 12px; outline: none;
+}
+.recover-info {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 10px 12px; font-size: 11px; color: #334155; line-height: 1.6;
+    margin-bottom: 12px; text-align: left;
+}
+.recover-error { display: none; color: #dc2626; font-size: 11px; margin-bottom: 10px; text-align: left; }

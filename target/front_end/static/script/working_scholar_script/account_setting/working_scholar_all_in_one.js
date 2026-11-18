@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 programYearInput.disabled = false;
                 academicLevelInput.disabled = false;
 
-                isEditing = false;
+                isEditing = true;
 
                 editBtn.textContent = "Save Changes";
                 editBtn.style.backgroundColor = "#198754";
@@ -140,10 +140,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     alert("Account settings updated successfully!");
 
-                    mobileInput.value =
-                        data.profile.mobile_number || "";
+                    fullNameInput.value = data.profile.full_name || "";
+                    scholarIdInput.value = data.profile.identifier_id || "";
+                    mobileInput.value = data.profile.mobile_number || "";
+                    programYearInput.value = data.profile.program_year || "";
+                    academicLevelInput.value = data.profile.academic_level || "";
 
-                    mobileInput.disabled = true;
+                    [fullNameInput, scholarIdInput, mobileInput, programYearInput, academicLevelInput]
+                        .forEach(input => { input.disabled = true; });
 
                     isEditing = false;
 
@@ -152,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 } catch (error) {
                     console.error("Profile update error:", error);
+                    editBtn.textContent = "Save Changes";
                     alert(error.message);
 
                     // Keep editing enabled so the user can correct the input

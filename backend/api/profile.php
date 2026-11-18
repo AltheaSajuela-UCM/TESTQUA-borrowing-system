@@ -1,6 +1,6 @@
-
 <?php
 require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/../helpers.php';   // ALLOWED_CAMPUSES / ALLOWED_ACADEMIC_LEVELS
 $user = require_login();
 
 $labels = [
@@ -16,6 +16,7 @@ function profile_payload(array $user, array $labels): array {
         'identifier_id' => $user['id_number'],
         'role' => $user['role'],
         'role_title' => $labels[$user['role']][1],
+        'email' => $user['email'] ?? null,
         'mobile_number' => $user['mobile_number'],
         'program_year' => $user['program_year'],
         'academic_level' => $user['academic_level'],
@@ -34,9 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mobile = trim((string) ($body['mobile_number'] ?? $user['mobile_number'] ?? ''));
     $programYear = trim((string) ($body['program_year'] ?? $user['program_year'] ?? ''));
     $academicLevel = trim((string) ($body['academic_level'] ?? $user['academic_level'] ?? ''));
+    $email = trim((string) ($body['email'] ?? $user['email'] ?? ''));
+    $campus = trim((string) ($body['campus'] ?? $user['campus'] ?? ''));
 
     if ($fullName === '' || $idNumber === '') {
-        respond(['error' => 'Full name and Working Scholar ID are required.'], 400);
+        respond(['error' => 'Full name and ID number are required.'], 400);
+    }
+
+    // Only validate what was actually changed, so older records still save.
+    if ($idNumber !== $user['id_number'] && !preg_match('/^\d{8}$/', $idNumber)) {
+        respond(['error' => 'ID number must be exactly 8 digits.'], 400);
+    }
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        respond(['error' => 'Invalid email address.'], 400);
+    }
+    if ($campus !== '' && $campus !== (string) ($user['campus'] ?? '') && !in_array($campus, ALLOWED_CAMPUSES, true)) {
+        respond(['error' => 'Unknown campus.'], 400);
+    }
+    if ($academicLevel !== '' && $academicLevel !== (string) ($user['academic_level'] ?? '')
+        && !in_array($academicLevel, ALLOWED_ACADEMIC_LEVELS, true)) {
+        respond(['error' => 'Unknown academic level.'], 400);
     }
 
     if ($mobile !== '' && !preg_match('/^[0-9+\-\s]{7,20}$/', $mobile)) {
@@ -51,6 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($check->fetch()) {
         respond(['error' => 'This Working Scholar ID is already being used.'], 400);
+    }
+
+    if ($email !== '') {
+        $emailCheck = db()->prepare('SELECT id FROM users WHERE LOWER(email) = LOWER(?) AND id != ?');
+        $emailCheck->execute([$email, $user['id']]);
+        if ($emailCheck->fetch()) {
+            respond(['error' => 'This email address is already being used.'], 400);
+        }
     }
 
     // Validate password change before saving profile information
@@ -73,7 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'UPDATE users
          SET full_name = ?,
              id_number = ?,
+             email = ?,
              mobile_number = ?,
+             campus = ?,
              program_year = ?,
              academic_level = ?
          WHERE id = ?'
@@ -82,7 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $update->execute([
         $fullName,
         $idNumber,
+        $email !== '' ? $email : null,
         $mobile !== '' ? $mobile : null,
+        $campus !== '' ? $campus : null,
         $programYear !== '' ? $programYear : null,
         $academicLevel !== '' ? $academicLevel : null,
         $user['id']

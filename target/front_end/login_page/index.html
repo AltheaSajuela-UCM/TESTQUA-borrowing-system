@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory - SAO Item Borrowing System</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -259,40 +260,66 @@
         </div>
     </div>
 
-    <!-- FORGOT PASSWORD MODAL -->
+    <!-- FORGOT PASSWORD MODAL: step 1 send code -> step 2 verify code -> step 3 new password -->
     <div class="modal-overlay" id="forgotPasswordModal">
         <div class="modal-card">
-            <h3>Reset Password</h3>
-            <p class="modal-subtitle">Enter your ID and registered Email for verification</p>
-            
-            <div class="form-group" style="margin-bottom: 8px; text-align: left;">
-                <label style="font-size: 11px; font-weight: 500; color: #334155;">ID Number</label>
-                <input type="text" id="resetIdNumber" placeholder="e.g. 12345678" maxlength="8" oninput="validateNumericInput(this)" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+            <h3>Reset your password</h3>
+
+            <!-- Step 1 -->
+            <div id="recoveryStep1">
+                <p class="modal-subtitle">Choose where you want to receive your verification code.</p>
+                <div class="recover-tabs">
+                    <button type="button" class="recover-tab active" id="recoverTabEmail" onclick="setRecoveryChannel('email')">Via email</button>
+                    <button type="button" class="recover-tab" id="recoverTabNumber" onclick="setRecoveryChannel('number')">Via number</button>
+                </div>
+                <div class="form-group" style="margin-bottom: 14px; text-align: left;">
+                    <label class="recover-label" id="recoveryContactLabel">Email Address</label>
+                    <input type="text" id="recoveryContact" class="recover-input" placeholder="name@uc.edu.ph">
+                </div>
+                <div class="recover-error" id="recoveryError1"></div>
+                <button type="button" class="modal-btn-primary" onclick="sendResetCode(false)">Send Reset Code</button>
+                <button type="button" class="modal-btn-secondary" onclick="closeForgotPasswordModal()">Close</button>
             </div>
 
-            <div class="form-group" style="margin-bottom: 8px; text-align: left;">
-                <label style="font-size: 11px; font-weight: 500; color: #334155;">Email Address</label>
-                <input type="email" id="resetEmail" placeholder="e.g. student@uc.edu.ph" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
-            </div>
-
-            <div class="form-group password-group" style="margin-bottom: 8px; text-align: left;">
-                <label style="font-size: 11px; font-weight: 500; color: #334155;">New Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="resetNewPassword" placeholder="e.g. at least 8 characters" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
-                    <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('resetNewPassword', this)"></i>
+            <!-- Step 2 -->
+            <div id="recoveryStep2" style="display: none;">
+                <p class="modal-subtitle" id="recoveryStep2Subtitle">Enter the code sent to you.</p>
+                <div class="recover-info">
+                    <div>Code sent to <strong id="recoverySentTo"></strong>.</div>
+                    <div id="recoveryDevCodeRow" style="display: none;">Prototype verification code: <strong id="recoveryDevCode" style="color: #2563eb;"></strong></div>
+                </div>
+                <div class="form-group" style="margin-bottom: 14px; text-align: left;">
+                    <label class="recover-label">Verification Code</label>
+                    <input type="text" id="recoveryCode" class="recover-input" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" oninput="validateNumericInput(this)">
+                </div>
+                <div class="recover-error" id="recoveryError2"></div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="modal-btn-secondary" style="flex: 1;" onclick="sendResetCode(true)">Resend Code</button>
+                    <button type="button" class="modal-btn-primary" style="flex: 2; margin-bottom: 0;" onclick="verifyResetCode()">Verify Code</button>
                 </div>
             </div>
 
-            <div class="form-group password-group" style="margin-bottom: 14px; text-align: left;">
-                <label style="font-size: 11px; font-weight: 500; color: #334155;">Confirm New Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="resetConfirmPassword" placeholder="e.g. re-enter new password" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
-                    <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('resetConfirmPassword', this)"></i>
+            <!-- Step 3 -->
+            <div id="recoveryStep3" style="display: none;">
+                <p class="modal-subtitle">Create a new password for your account.</p>
+                <div class="form-group password-group" style="margin-bottom: 8px; text-align: left;">
+                    <label class="recover-label">New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="resetNewPassword" class="recover-input" placeholder="At least 8 characters">
+                        <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('resetNewPassword', this)"></i>
+                    </div>
                 </div>
+                <div class="form-group password-group" style="margin-bottom: 14px; text-align: left;">
+                    <label class="recover-label">Confirm New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="resetConfirmPassword" class="recover-input" placeholder="Re-enter password">
+                        <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('resetConfirmPassword', this)"></i>
+                    </div>
+                </div>
+                <div class="recover-error" id="recoveryError3"></div>
+                <button type="button" class="modal-btn-primary" onclick="submitNewPassword()">Reset Password</button>
+                <button type="button" class="modal-btn-secondary" onclick="closeForgotPasswordModal()">Cancel</button>
             </div>
-
-            <button type="button" class="modal-btn-primary" onclick="submitForgotPassword()">Update Password</button>
-            <button type="button" class="modal-btn-secondary" onclick="closeForgotPasswordModal()">Cancel</button>
         </div>
     </div>
 

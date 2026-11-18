@@ -56,7 +56,7 @@
             <!-- Profile Dropdown Container -->
             <div class="profile-dropdown-container">
                 <button id="profile-menu-btn" class="profile-btn">
-                    <span class="avatar-initials">JD</span>
+                    <span class="avatar-initials" id="header-initials">--</span>
                     <span class="profile-text">Profile</span>
                     <i class="fa-solid fa-chevron-down chevron-icon"></i>
                 </button>
@@ -84,9 +84,9 @@
         <!-- Settings Card -->
         <div class="card">
             <div class="user-header">
-                <div class="user-avatar-large">JS</div>
+                <div class="user-avatar-large" id="avatar-large">--</div>
                 <div class="user-info">
-                    <h2>Juan Santos Dela Cruz</h2>
+                    <h2 id="user-name">Loading…</h2>
                     <span class="user-role">Student</span>
                 </div>
             </div>
@@ -94,28 +94,43 @@
             <hr class="divider">
 
             <!-- Profile Form Fields -->
-            <form id="settings-form" class="form-grid">
+            <form id="settings-form" class="form-grid" onsubmit="return false;">
                 <div class="form-group">
                     <label for="full-name">Full Name</label>
-                    <input type="text" id="full-name" value="Juan Santos Dela Cruz" disabled>
+                    <input type="text" id="full-name" value="" disabled>
                 </div>
                 <div class="form-group">
                     <label for="student-id">Student ID</label>
-                    <input type="text" id="student-id" value="20240001" disabled>
+                    <input type="text" id="student-id" value="" maxlength="8" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" value="" disabled>
                 </div>
                 <div class="form-group">
                     <label for="mobile-number">Mobile Number</label>
-                    <input type="text" id="mobile-number" value="09171234567" disabled>
+                    <input type="text" id="mobile-number" value="" disabled>
                 </div>
                 <div class="form-group">
                     <label for="campus">Campus</label>
-                    <input type="text" id="campus" value="UC-MAIN" disabled>
+                    <select id="campus" disabled>
+                        <option value="UC-Main">UC-Main</option>
+                        <option value="UC-Pri">UC-Pri</option>
+                        <option value="UC-Banilad">UC-Banilad</option>
+                        <option value="UC-LM">UC-LM</option>
+                        <option value="UC-PT">UC-PT</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="academic-level">Academic Level</label>
-                    <input type="text" id="academic-level" value="College" disabled>
+                    <select id="academic-level" disabled>
+                        <option value="Senior High">Senior High</option>
+                        <option value="College">College</option>
+                        <option value="Graduate School">Graduate School</option>
+                    </select>
                 </div>
             </form>
+            <p id="settings-message" style="display:none; margin-top:14px; font-size:13px;"></p>
         </div>
     </main>
 

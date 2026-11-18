@@ -231,13 +231,57 @@ function acceptTerms() {
     closeTermsModal();
 }
 
-/* FORGOT PASSWORD MODAL FUNCTIONS */
+/* FORGOT PASSWORD: step 1 send code -> step 2 verify -> step 3 new password
+   Uses backend/api/password_recovery.php (actions: request, verify, reset). */
+let recoveryChannel = 'email';
+let recoveryContact = '';
+
+async function recoveryCall(payload) {
+    const res = await fetch(API_BASE + '/password_recovery.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    let data = {};
+    try { data = await res.json(); }
+    catch (err) { throw new Error('The server sent an unexpected response. Please try again.'); }
+    if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+    return data;
+}
+
+function showRecoveryError(step, message) {
+    const box = document.getElementById('recoveryError' + step);
+    if (box) { box.textContent = message || ''; box.style.display = message ? 'block' : 'none'; }
+}
+
+function showRecoveryStep(step) {
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById('recoveryStep' + i).style.display = (i === step) ? 'block' : 'none';
+        showRecoveryError(i, '');
+    }
+}
+
+function setRecoveryChannel(channel) {
+    recoveryChannel = channel;
+    document.getElementById('recoverTabEmail').classList.toggle('active', channel === 'email');
+    document.getElementById('recoverTabNumber').classList.toggle('active', channel === 'number');
+    document.getElementById('recoveryContactLabel').textContent = channel === 'email' ? 'Email Address' : 'Contact Number';
+    const input = document.getElementById('recoveryContact');
+    input.placeholder = channel === 'email' ? 'name@uc.edu.ph' : '09XXXXXXXXX';
+    input.type = channel === 'email' ? 'email' : 'tel';
+    input.value = '';
+    showRecoveryError(1, '');
+}
+
 function openForgotPasswordModal(e) {
-    e.preventDefault();
-    document.getElementById('resetIdNumber').value = '';
-    document.getElementById('resetEmail').value = '';
+    if (e) e.preventDefault();
+    recoveryContact = '';
+    setRecoveryChannel('email');
+    document.getElementById('recoveryCode').value = '';
     document.getElementById('resetNewPassword').value = '';
     document.getElementById('resetConfirmPassword').value = '';
+    showRecoveryStep(1);
     document.getElementById('forgotPasswordModal').style.display = 'flex';
 }
 
@@ -245,55 +289,67 @@ function closeForgotPasswordModal() {
     document.getElementById('forgotPasswordModal').style.display = 'none';
 }
 
-async function submitForgotPassword() {
-    const idVal = document.getElementById('resetIdNumber').value.trim();
-    const emailVal = document.getElementById('resetEmail').value.trim();
-    const newPass = document.getElementById('resetNewPassword').value;
-    const confirmPass = document.getElementById('resetConfirmPassword').value;
-
-    if (idVal.length !== 8) {
-        alert('Please enter a valid 8-digit ID number.');
-        return;
-    }
-    if (!emailVal || !emailVal.includes('@')) {
-        alert('Please enter a valid email address.');
-        return;
-    }
-    if (newPass.length < 8) {
-        alert('New password must be at least 8 characters long.');
-        return;
-    }
-    if (newPass !== confirmPass) {
-        alert('New passwords do not match. Please try again.');
-        return;
-    }
+// Step 1 (also used by "Resend Code" on step 2)
+async function sendResetCode(isResend) {
+    const step = isResend ? 2 : 1;
+    if (!isResend) recoveryContact = document.getElementById('recoveryContact').value.trim();
+    showRecoveryError(step, '');
 
     try {
-        const res = await fetch(API_BASE + '/reset_password.php', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                id_number: idVal, 
-                email: emailVal, 
-                new_password: newPass 
-            })
-        });
-        const data = await res.json();
+        const data = await recoveryCall({ action: 'request', channel: recoveryChannel, contact: recoveryContact });
 
-        if (!res.ok) {
-            alert(data.error || 'Failed to reset password. Verify your ID and Email.');
-            return;
+        document.getElementById('recoveryStep2Subtitle').textContent =
+            recoveryChannel === 'email' ? 'Enter the code sent to your email.' : 'Enter the code sent to your contact number.';
+        document.getElementById('recoverySentTo').textContent = data.sent_to || recoveryContact;
+
+        // Only present when the server runs with 'recovery_dev_mode' => true
+        const devRow = document.getElementById('recoveryDevCodeRow');
+        if (data.dev_code) {
+            document.getElementById('recoveryDevCode').textContent = data.dev_code;
+            devRow.style.display = 'block';
+        } else {
+            devRow.style.display = 'none';
         }
 
+        document.getElementById('recoveryCode').value = '';
+        showRecoveryStep(2);
+    } catch (err) {
+        showRecoveryError(step, err.message);
+    }
+}
+
+// Step 2
+async function verifyResetCode() {
+    const code = document.getElementById('recoveryCode').value.trim();
+    showRecoveryError(2, '');
+    if (code.length !== 6) { showRecoveryError(2, 'Enter the 6-digit verification code.'); return; }
+
+    try {
+        await recoveryCall({ action: 'verify', code: code });
+        showRecoveryStep(3);
+    } catch (err) {
+        showRecoveryError(2, err.message);
+    }
+}
+
+// Step 3
+async function submitNewPassword() {
+    const newPass = document.getElementById('resetNewPassword').value;
+    const confirmPass = document.getElementById('resetConfirmPassword').value;
+    showRecoveryError(3, '');
+
+    if (newPass.length < 8) { showRecoveryError(3, 'New password must be at least 8 characters long.'); return; }
+    if (newPass !== confirmPass) { showRecoveryError(3, 'New passwords do not match. Please try again.'); return; }
+
+    try {
+        await recoveryCall({ action: 'reset', new_password: newPass });
         alert('Password successfully updated! You can now sign in with your new password.');
         closeForgotPasswordModal();
         switchAuthTab('signin');
     } catch (err) {
-        alert('Cannot reach the backend server to reset password.');
+        showRecoveryError(3, err.message);
     }
 }
-
 async function handleFormSubmit(e) {
     e.preventDefault();
 
