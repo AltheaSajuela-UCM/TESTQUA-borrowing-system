@@ -1,68 +1,9 @@
-// Clean initial state (empty array ready for backend integration)
+// Working Scholar > History: loads the activity log from backend/2_working_scholar/history.php.
+// Header, sidebar and notifications come from common.js
+// (load order: api.js -> auth.js -> common.js -> this file).
 let historyData = [];
-let notifications = [];
 
-// Toggle Sidebar Navigation Drawer
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('show');
-    document.getElementById('sidebar-overlay').classList.toggle('show');
-}
-
-// Toggle Profile Dropdown
-function toggleProfileDropdown() {
-    closeAllDropdowns();
-    document.getElementById('profile-dropdown').classList.toggle('show');
-}
-
-// Toggle Notification Dropdown
-function toggleNotificationDropdown() {
-    closeAllDropdowns();
-    document.getElementById('notification-dropdown').classList.toggle('show');
-    renderNotifications('all');
-}
-
-function closeAllDropdowns() {
-    document.getElementById('profile-dropdown').classList.remove('show');
-    document.getElementById('notification-dropdown').classList.remove('show');
-}
-
-function renderNotifications(filter) {
-    const container = document.getElementById('notif-list-container');
-    container.innerHTML = '';
-
-    let filtered = notifications;
-    if (filter === 'unread') filtered = notifications.filter(n => n.type === 'unread');
-    else if (filter === 'alerts') filtered = notifications.filter(n => n.isAlert);
-
-    if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">No notifications</div>`;
-        return;
-    }
-
-    filtered.forEach(notif => {
-        const card = document.createElement('div');
-        card.className = `notif-card ${notif.isAlert ? 'alert-card' : ''}`;
-        card.innerHTML = `
-            <div>${notif.text}</div>
-            <button class="mark-read-btn" onclick="markAsRead(${notif.id})">Mark as read</button>
-        `;
-        container.appendChild(card);
-    });
-}
-
-function switchNotifTab(tabName) {
-    document.querySelectorAll('.notif-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderNotifications(tabName);
-}
-
-function markAsRead(id) {
-    notifications = notifications.filter(n => n.id !== id);
-    if (notifications.length === 0) document.getElementById('notif-dot').style.display = 'none';
-    renderNotifications('all');
-}
-
-// Render History Table Data (Handles empty state gracefully)
+// Render the table (handles the empty state)
 function renderTable(data) {
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = '';
@@ -76,7 +17,6 @@ function renderTable(data) {
         const actionStr = row.action || '';
         const actionClass = actionStr.toLowerCase() === 'rejected' ? 'action-rejected' : '';
 
-                const esc = Webventory.esc;
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${esc(row.dateTime || '—')}</td>
@@ -84,18 +24,18 @@ function renderTable(data) {
             <td><strong>${esc(row.student || '—')}</strong></td>
             <td>${esc(row.item || '—')}</td>
             <td><span class="${actionClass}">${esc(actionStr)}</span></td>
-        `;  
+        `;
         tbody.appendChild(tr);
     });
 }
 
-// Filter Functionality
+// Type / date / search filters
 function applyFilters() {
     const typeVal = document.getElementById('type-filter').value;
     const dateVal = document.getElementById('date-filter').value;
     const searchVal = document.getElementById('search-filter').value.toLowerCase();
 
-    let filtered = historyData.filter(row => {
+    const filtered = historyData.filter(row => {
         const matchesType = (typeVal === 'All' || row.type === typeVal);
         const matchesDate = (!dateVal || (row.dateTime || '').includes(dateVal));
         const matchesSearch = (
@@ -111,20 +51,12 @@ function applyFilters() {
     renderTable(filtered);
 }
 
-// Close dropdowns when clicking outside
-window.onclick = function(event) {
-    if (!event.target.closest('.dropdown-container')) {
-        closeAllDropdowns();
-    }
-};
-
-// Initialize on page load with clean empty states
-// Load the activity log from the backend, then render it (filters work on this list)
+// Load the activity log from the backend
 async function loadHistory() {
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">Loading history…</td></tr>`;
     try {
-        const data = await Webventory.api('2_working_scholar/history.php');
+        const data = await WS.api('2_working_scholar/history.php');
         historyData = (data.history || []).map(r => ({
             dateTime: r.date_time,
             type: r.type,
@@ -134,9 +66,9 @@ async function loadHistory() {
         }));
         applyFilters();
     } catch (err) {
-        if (err.message === 'auth') return;
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #dc2626; padding: 32px; font-size: 13px;">Could not load history: ${Webventory.esc(err.message)}</td></tr>`;
+        if (err.message === 'auth') return;   // redirected to the login page
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #dc2626; padding: 32px; font-size: 13px;">Could not load history: ${esc(err.message)}</td></tr>`;
     }
 }
 
-window.onload = loadHistory;
+document.addEventListener('DOMContentLoaded', loadHistory);
