@@ -95,9 +95,14 @@
 
     <!-- MAIN DASHBOARD BODY -->
     <main class="dashboard-body">
-        <div class="page-header">
-            <h1>Manage Users</h1>
-            <p>Students and SAO Working Scholars</p>
+        <div class="page-top-bar" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <div class="page-header" style="margin-bottom: 0;">
+                <h1>Manage Users</h1>
+                <p>Students and SAO Working Scholars</p>
+            </div>
+            
+            <!-- ADD WORKING SCHOLAR BUTTON -->
+            <button id="addScholarBtn" class="btn-primary" style="display: none; background-color: #2563eb; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="openAddScholarModal()">Add Working Scholar</button>
         </div>
 
         <!-- Role Tabs Switcher -->
@@ -134,6 +139,37 @@
             <h3 id="modalTitle">User Details</h3>
             <div class="modal-body" id="modalBodyContent"></div>
             <button onclick="closeUserModal()" class="modal-close-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- CREATE WORKING SCHOLAR MODAL -->
+    <div id="addScholarModal" class="modal-backdrop hidden">
+        <div class="modal-card" style="width: 380px;">
+            <h3>Create Working Scholar Account</h3>
+            <form onsubmit="handleCreateScholar(event)">
+                <div class="modal-body" style="gap: 12px;">
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                        <label style="font-size: 11px; font-weight: 600; color: #334155;">Full Name</label>
+                        <input type="text" id="wsFullName" placeholder="e.g. Ana Reyes" required style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+                    </div>
+
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                        <label style="font-size: 11px; font-weight: 600; color: #334155;">Employee ID</label>
+                        <input type="text" id="wsEmployeeId" placeholder="e.g. 12345678" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+                        <small style="font-size: 10px; color: #64748b;">8-digit ID number</small>
+                    </div>
+
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                        <label style="font-size: 11px; font-weight: 600; color: #334155;">Temporary Password</label>
+                        <input type="password" id="wsPassword" placeholder="e.g. At least 8 characters" minlength="8" required style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                    <button type="submit" class="modal-close-btn" style="background-color: #2563eb;">Create Account</button>
+                    <button type="button" onclick="closeAddScholarModal()" style="width: 100%; background-color: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 8px; border-radius: 8px; font-weight: 500; font-size: 12px; cursor: pointer;">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 

@@ -1,4 +1,4 @@
-// Admin > Manage Users: wired to backend/1_admin/users.php (list, activate / deactivate, clear flag)
+// Admin > Manage Users: wired to backend/1_admin/users.php (list, activate / deactivate, clear flag, add WS)
 // and backend/api/notifications.php (bell). Page markup is unchanged.
 // Put this file at: target/front_end/static/script/admin_script/user/admin_all_in_one.js
 const BASE = '../../../../backend/';
@@ -55,10 +55,16 @@ function renderTable() {
     const tableBody = document.getElementById('userTableBody');
     const colId = document.getElementById('col-id');
     const colExtra = document.getElementById('col-extra');
+    const addScholarBtn = document.getElementById('addScholarBtn');
     const isStudents = currentRole === 'students';
 
     colId.textContent = isStudents ? 'Student ID' : 'Scholar ID';
     colExtra.textContent = isStudents ? 'Academic Level' : 'Assigned Dept';
+
+    // Show button only when viewing Working Scholars
+    if (addScholarBtn) {
+        addScholarBtn.style.display = isStudents ? 'none' : 'block';
+    }
 
     if (usersData.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="6" class="empty-state">${
@@ -89,6 +95,47 @@ function renderTable() {
             </td>
         </tr>`;
     }).join('');
+}
+
+/* ADD WORKING SCHOLAR MODAL HANDLERS */
+function openAddScholarModal() {
+    document.getElementById('wsFullName').value = '';
+    document.getElementById('wsEmployeeId').value = '';
+    document.getElementById('wsPassword').value = '';
+    document.getElementById('addScholarModal').classList.remove('hidden');
+}
+
+function closeAddScholarModal() {
+    document.getElementById('addScholarModal').classList.add('hidden');
+}
+
+async function handleCreateScholar(e) {
+    e.preventDefault();
+    const fullName = document.getElementById('wsFullName').value.trim();
+    const employeeId = document.getElementById('wsEmployeeId').value.trim();
+    const password = document.getElementById('wsPassword').value;
+
+    if (employeeId.length !== 8) {
+        alert('Employee ID must be exactly 8 digits.');
+        return;
+    }
+
+    try {
+        await api('1_admin/users.php', {
+            method: 'POST',
+            body: {
+                role: 'working_scholar',
+                full_name: fullName,
+                id_number: employeeId,
+                password: password
+            }
+        });
+        alert('Working Scholar account created successfully!');
+        closeAddScholarModal();
+        await loadUsers();
+    } catch (err) {
+        alert(err.message || 'Failed to create account.');
+    }
 }
 
 async function setActive(id, makeActive) {
