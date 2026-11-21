@@ -9,6 +9,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="../../static/css/student_style/my_borrowings/student_my_borrowings_global.css">
+  <style>
+      .under-menu-bar {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          margin-bottom: 14px;
+      }
+      .back-btn {
+          background-color: #2563eb;
+          color: #ffffff;
+          border: none;
+          padding: 8px 14px;
+          border-radius: 6px;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: background-color 0.15s ease;
+      }
+      .back-btn:hover {
+          background-color: #3b82f6;
+      }
+  </style>
 </head>
 
 <body>
@@ -101,6 +126,10 @@
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
+    <div class="under-menu-bar">
+      <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+    </div>
+
     <div class="page-header">
       <h1>My Borrowings</h1>
       <p>Active borrow transactions</p>
@@ -147,6 +176,15 @@
     </div>
   </div>
 
+  <script>
+      function goBack() {
+          if (window.history.length > 1) {
+              window.history.back();
+          } else {
+              window.location.href = 'student_dashboard.html';
+          }
+      }
+  </script>
   <!-- JavaScript -->
   <script src="../../static/script/student_script/my_borrowings/student_all_in_one.js"></script>
   <script src="../../static/script/auth.js?v=2"></script>

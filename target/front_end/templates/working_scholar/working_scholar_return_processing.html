@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Working Scholar Portal - Return Processing</title>
     <link rel="stylesheet" href="../../static/css/working_scholar_style/return_processing/working_scholar_return_processing.css">
+    <style>
+        .under-menu-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 14px;
+        }
+        .back-btn {
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.15s ease;
+        }
+        .back-btn:hover {
+            background-color: #3b82f6;
+        }
+    </style>
 </head>
 <body>
 
@@ -106,10 +131,12 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <div class="under-menu-bar">
+            <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+        </div>
 
         <!-- VIEW 1: Return Processing Form -->
         <div id="view-return-processing" class="view-section active">
-            <a href="working_scholar_borrowed_items.html" class="back-link-btn">← Back</a>
             <h2 class="view-title">Return Processing</h2>
 
             <div class="return-card">
@@ -169,6 +196,15 @@
 
     </main>
 
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'working_scholar_dashboard.html';
+            }
+        }
+    </script>
     <script src="../../static/script/api.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
     <script src="../../static/script/working_scholar_script/common.js"></script>

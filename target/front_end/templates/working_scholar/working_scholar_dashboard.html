@@ -7,6 +7,31 @@
 
     <!-- CSS FILE -->
     <link rel="stylesheet" href="../../static/css/working_scholar_style/dashboard/working_scholar_dashboard_body.css">
+    <style>
+        .under-menu-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 14px;
+        }
+        .back-btn {
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.15s ease;
+        }
+        .back-btn:hover {
+            background-color: #3b82f6;
+        }
+    </style>
 
     <!-- TITLE! -->
     <title>Webventory: Working Scholar Portal</title>
@@ -111,6 +136,9 @@
 
     <!-- MAIN CONTAINER -->
     <main class="dashboard-container">
+        <div class="under-menu-bar">
+            <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+        </div>
 
         <!-- PRIMARY TASK BANNER -->
         <section class="primary-task-card">
@@ -121,8 +149,14 @@
             </div>
             <div class="task-actions">
                 <button class="btn-secondary" id="viewGuideBtn">View WS Guide</button>
-                <a href="working_scholar_pending_requests.html" class="btn-primary" style="text-decoration:none;">Process Requests</a>
+                <!-- <a href="working_scholar_pending_requests.html" class="btn-primary" style="text-decoration:none;">Process Requests</a> -->
             </div>
+        </section>
+
+        <!-- WELCOME BANNER -->
+        <section class="welcome-banner">
+            <h2 id="welcome-user-heading">Welcome, NONE!</h2>
+            <p id="welcome-date-p">NONE</p>
         </section>
 
         <!-- PENDING REQUESTS TABLE CARD -->
@@ -148,11 +182,6 @@
             </table>
         </section>
 
-        <!-- WELCOME BANNER -->
-        <section class="welcome-banner">
-            <h2 id="welcome-user-heading">Welcome, NONE!</h2>
-            <p id="welcome-date-p">NONE</p>
-        </section>
 
         <!-- METRICS GRID -->
         <section class="metrics-grid" id="overview">
@@ -220,6 +249,15 @@
     </div>
 
     <!-- SCRIPT FILES -->
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'working_scholar_dashboard.html';
+            }
+        }
+    </script>
     <script src="../../static/script/working_scholar_script/dashboard/working_scholar_all_in_one.js"></script>
     <script src="../../static/script/working_scholar_script/dashboard/working_scholar_dashboard_live.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>

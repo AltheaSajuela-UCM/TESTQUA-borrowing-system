@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Admin Portal - Reports</title>
     <link rel="stylesheet" href="../../static/css/admin_style/reports/admin_reports_body.css">
+    <style>
+        .under-menu-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 14px;
+        }
+        .back-btn {
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.15s ease;
+        }
+        .back-btn:hover {
+            background-color: #3b82f6;
+        }
+    </style>
 </head>
 <body>
 
@@ -86,6 +111,9 @@
 
     <!-- Main Container -->
     <main class="main-content">
+        <div class="under-menu-bar">
+            <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+        </div>
 
         <!-- Page Title & Export Actions -->
         <div class="page-top-bar">
@@ -185,6 +213,15 @@
 
     </main>
 
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'admin_dashboard.html';
+            }
+        }
+    </script>
     <script src="../../static/script/admin_script/reports/admin_all_in_one.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
     

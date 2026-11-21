@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Working Scholar Portal - Pending Requests</title>
     <link rel="stylesheet" href="../../static/css/working_scholar_style/pending_requests/working_scholar_pending_requests_body.css">
+    <style>
+        .under-menu-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 14px;
+        }
+        .back-btn {
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.15s ease;
+        }
+        .back-btn:hover {
+            background-color: #3b82f6;
+        }
+    </style>
 </head>
 <body>
 
@@ -85,6 +110,9 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <div class="under-menu-bar">
+            <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+        </div>
 
         <!-- VIEW: Pending list -->
         <div id="view-requests-list" class="view-section active">
@@ -272,6 +300,15 @@
         </div>
     </div>
 
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'working_scholar_dashboard.html';
+            }
+        }
+    </script>
     <script src="../../static/script/api.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
     <script src="../../static/script/working_scholar_script/pending_requests/working_scholar_pending_requests_all_in_one.js"></script>

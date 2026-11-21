@@ -8,6 +8,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../static/css/admin_style/user/admin_users_body.css">
+    <style>
+        .under-menu-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 14px;
+        }
+        .back-btn {
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.15s ease;
+        }
+        .back-btn:hover {
+            background-color: #3b82f6;
+        }
+    </style>
 </head>
 <body>
 
@@ -95,6 +120,10 @@
 
     <!-- MAIN DASHBOARD BODY -->
     <main class="dashboard-body">
+        <div class="under-menu-bar">
+            <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+        </div>
+
         <div class="page-top-bar" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
             <div class="page-header" style="margin-bottom: 0;">
                 <h1>Manage Users</h1>
@@ -173,6 +202,15 @@
         </div>
     </div>
 
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'admin_dashboard.html';
+            }
+        }
+    </script>
     <!-- JavaScript -->
     <script src="../../static/script/admin_script/user/admin_all_in_one.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
