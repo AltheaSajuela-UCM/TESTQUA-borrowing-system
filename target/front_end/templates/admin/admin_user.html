@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Admin Portal</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
@@ -16,21 +22,22 @@
             margin-bottom: 14px;
         }
         .back-btn {
-            background-color: #2563eb;
-            color: #ffffff;
+            background-color: #174EA6;
+            color: #FFFFFF;
             border: none;
-            padding: 8px 14px;
+            height: 40px;
+            padding: 0 16px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: background-color 0.15s ease;
         }
         .back-btn:hover {
-            background-color: #3b82f6;
+            background-color: #1A73E8;
         }
     </style>
 </head>
@@ -131,7 +138,7 @@
             </div>
             
             <!-- ADD WORKING SCHOLAR BUTTON -->
-            <button id="addScholarBtn" class="btn-primary" style="display: none; background-color: #2563eb; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="openAddScholarModal()">Add Working Scholar</button>
+            <button id="addScholarBtn" class="btn-primary" style="display: none; background-color: #1A73E8; color: #FFFFFF; border: none; min-height: 40px; padding: 0 16px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;" onclick="openAddScholarModal()">Add Working Scholar</button>
         </div>
 
         <!-- Role Tabs Switcher -->
@@ -178,25 +185,25 @@
             <form onsubmit="handleCreateScholar(event)">
                 <div class="modal-body" style="gap: 12px;">
                     <div class="form-group" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
-                        <label style="font-size: 11px; font-weight: 600; color: #334155;">Full Name</label>
-                        <input type="text" id="wsFullName" placeholder="e.g. Ana Reyes" required style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+                        <label style="font-size: 14px; font-weight: 500; color: #202124;">Full Name</label>
+                        <input type="text" id="wsFullName" placeholder="e.g. Ana Reyes" required style="width: 100%; height: 40px; padding: 0 12px; border: 1px solid #DADCE0; border-radius: 6px; font-size: 16px; color: #202124; outline: none;">
                     </div>
 
                     <div class="form-group" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
-                        <label style="font-size: 11px; font-weight: 600; color: #334155;">Employee ID</label>
-                        <input type="text" id="wsEmployeeId" placeholder="e.g. 12345678" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
-                        <small style="font-size: 10px; color: #64748b;">8-digit ID number</small>
+                        <label style="font-size: 14px; font-weight: 500; color: #202124;">Employee ID</label>
+                        <input type="text" id="wsEmployeeId" placeholder="e.g. 12345678" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required style="width: 100%; height: 40px; padding: 0 12px; border: 1px solid #DADCE0; border-radius: 6px; font-size: 16px; color: #202124; outline: none;">
+                        <small style="font-size: 14px; color: #5F6368;">8-digit ID number</small>
                     </div>
 
                     <div class="form-group" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
-                        <label style="font-size: 11px; font-weight: 600; color: #334155;">Temporary Password</label>
-                        <input type="password" id="wsPassword" placeholder="e.g. At least 8 characters" minlength="8" required style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;">
+                        <label style="font-size: 14px; font-weight: 500; color: #202124;">Temporary Password</label>
+                        <input type="password" id="wsPassword" placeholder="e.g. At least 8 characters" minlength="8" required style="width: 100%; height: 40px; padding: 0 12px; border: 1px solid #DADCE0; border-radius: 6px; font-size: 16px; color: #202124; outline: none;">
                     </div>
                 </div>
 
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
-                    <button type="submit" class="modal-close-btn" style="background-color: #2563eb;">Create Account</button>
-                    <button type="button" onclick="closeAddScholarModal()" style="width: 100%; background-color: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 8px; border-radius: 8px; font-weight: 500; font-size: 12px; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="modal-close-btn" style="background-color: #1A73E8;">Create Account</button>
+                    <button type="button" onclick="closeAddScholarModal()" style="width: 100%; min-height: 40px; background-color: #174EA6; border: none; color: #FFFFFF; padding: 0 16px; border-radius: 6px; font-weight: 500; font-size: 14px; cursor: pointer;">Cancel</button>
                 </div>
             </form>
         </div>

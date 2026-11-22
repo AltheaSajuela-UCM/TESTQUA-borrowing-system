@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Working Scholar Portal - Return Processing</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="../../static/css/working_scholar_style/return_processing/working_scholar_return_processing.css">
     <style>
         .under-menu-bar {
@@ -13,21 +19,22 @@
             margin-bottom: 14px;
         }
         .back-btn {
-            background-color: #2563eb;
-            color: #ffffff;
+            background-color: #174EA6;
+            color: #FFFFFF;
             border: none;
-            padding: 8px 14px;
+            height: 40px;
+            padding: 0 16px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: background-color 0.15s ease;
         }
         .back-btn:hover {
-            background-color: #3b82f6;
+            background-color: #1A73E8;
         }
     </style>
 </head>
@@ -149,7 +156,7 @@
                     </div>
                 </div>
                 <div id="tx-results"></div>
-                <div id="return-error" style="display:none;color:#dc2626;font-size:13px;margin-top:8px;"></div>
+                <div id="return-error" style="display:none;color:#EA4335;font-size:14px;margin-top:8px;"></div>
             </div>
 
             <div class="return-card" id="return-form-card" style="display:none;">
@@ -191,7 +198,7 @@
         <div id="view-return-success" class="view-section feedback-screen">
             <h2>Item Returned</h2>
             <p id="success-msg"></p>
-            <a href="working_scholar_borrowed_items.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">Back to Borrowed Items</a>
+            <a href="working_scholar_borrowed_items.html" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Back to Borrowed Items</a>
         </div>
 
     </main>

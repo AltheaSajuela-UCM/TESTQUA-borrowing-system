@@ -6,10 +6,10 @@ HEADER & DROPDOWN STYLES
   justify-content: space-between;
   align-items: center;
   height: 64px;
-  padding: 0 1.5rem;
-  background-color: white;
-  border-bottom: 1px solid #e2e8f0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 0 24px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E0E4E8;
+  font-family: "Inter", "Roboto", "Open Sans", sans-serif;
   position: relative;
   z-index: 100;
 }
@@ -17,30 +17,31 @@ HEADER & DROPDOWN STYLES
 .header-left, .header-right {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 16px;
 }
 
 /* Menu Button */
 .menu-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 8px;
   background: transparent;
   border: none;
-  font-size: 0.9375rem;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
   font-weight: 500;
-  color: #1e293b;
+  color: #202124;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
+  border-radius: 6px;
   transition: background-color 0.2s ease;
 }
 
-.menu-btn:hover { background-color: #f1f5f9; }
-.menu-symbol { font-weight: bold; font-size: 1.1rem; }
+.menu-btn:hover { background-color: #F5F7FA; }
+.menu-symbol { font-weight: 600; font-size: 16px; }
 
-.brand-container { font-size: 0.9375rem; font-weight: 600; color: #0f172a; }
-.brand-context { font-weight: 400; color: #475569; margin-left: 0.25rem; }
+.brand-container { font-size: 16px; font-weight: 600; color: #202124; }
+.brand-context { font-weight: 400; color: #5F6368; margin-left: 4px; }
 
 /* Wrapper for absolute popups */
 .dropdown-wrapper {
@@ -50,9 +51,9 @@ HEADER & DROPDOWN STYLES
 .icon-btn {
   background: transparent;
   border: none;
-  font-size: 1.125rem;
+  font-size: 16px;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 8px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -60,24 +61,24 @@ HEADER & DROPDOWN STYLES
   transition: background-color 0.2s ease;
 }
 
-.icon-btn:hover { background-color: #f1f5f9; }
+.icon-btn:hover { background-color: #F5F7FA; }
 
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 8px;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px;
 }
-.user-profile:hover { background-color: #f8fafc; }
+.user-profile:hover { background-color: #F5F7FA; }
 
 .avatar {
   width: 32px;
   height: 32px;
-  background-color: #0284c7;
-  color: #ffffff;
-  font-size: 0.75rem;
+  background-color: #1A73E8;
+  color: #FFFFFF;
+  font-size: 14px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -93,9 +94,9 @@ HEADER & DROPDOWN STYLES
 }
 
 .profile-label {
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 500;
-  color: #334155;
+  color: #202124;
 }
 
 /* Common Dropdown Menu styling */
@@ -105,10 +106,10 @@ HEADER & DROPDOWN STYLES
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background: #ffffff;
-  border-radius: 12px;
+  background: #FFFFFF;
+  border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f1f5f9;
+  border: 1px solid #E0E4E8;
   z-index: 1000;
 }
 
@@ -134,13 +135,13 @@ HEADER & DROPDOWN STYLES
   top: 0; left: -280px;
   width: 260px;
   height: 100vh;
-  background: #ffffff;
+  background: #FFFFFF;
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
   z-index: 999;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 16px;
   transition: left 0.3s ease;
 }
 
@@ -150,52 +151,54 @@ HEADER & DROPDOWN STYLES
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #F1F3F5;
 }
 
-.brand-info { display: flex; align-items: center; gap: 8px; }
+.brand-info { display: flex; align-items: center; gap: 10px; }
 .logo-icon {
-  background: #2563eb; color: white;
+  background: #1A73E8; color: #FFFFFF;
   width: 32px; height: 32px; border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
-  font-weight: bold;
+  font-weight: 700; font-size: 14px;
 }
 
-.brand-title { margin: 0; font-size: 15px; }
-.role-subtitle { font-size: 12px; color: #64748b; }
+.brand-title { margin: 0; font-size: 20px; font-weight: 600; line-height: 1.25; color: #202124; }
+.role-subtitle { font-size: 14px; color: #5F6368; }
 
 .close-btn {
   background: none; border: none;
-  color: #64748b; cursor: pointer; font-size: 13px;
+  color: #5F6368; cursor: pointer; font-size: 14px;
 }
 
 .side-menu-links {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 1.5rem;
+  margin-top: 20px;
   flex-grow: 1;
 }
 
 .menu-link {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; border-radius: 8px;
-  color: #334155; text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 6px;
+  color: #202124; text-decoration: none;
   font-size: 14px; font-weight: 500;
   transition: background 0.2s;
 }
 
-.menu-link:hover { background: #f8fafc; }
-.menu-link.active { background: #f0f7ff; color: #2563eb; font-weight: 600; }
+.menu-link:hover { background: #F5F7FA; }
+.menu-link.active { background: #E8F0FE; color: #1A73E8; font-weight: 600; }
 
-.side-menu-footer { margin-top: auto; padding-top: 1rem; }
+.side-menu-footer { margin-top: auto; padding-top: 16px; }
 .logout-btn {
-  width: 100%; background: #ef4444; color: white;
-  border: none; padding: 10px; border-radius: 8px;
-  font-weight: 600; cursor: pointer;
+  width: 100%; min-height: 40px; background: #EA4335; color: #FFFFFF;
+  border: none; padding: 0 16px; border-radius: 6px;
+  font-size: 14px; font-weight: 500; cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background-color 0.2s;
 }
+.logout-btn:hover { background: #D33426; }
 
 /* ====================================
 2. NOTIFICATION POPUP
@@ -212,14 +215,14 @@ HEADER & DROPDOWN STYLES
 
 .tab-btn {
   border: none; background: transparent;
-  padding: 6px 14px; border-radius: 8px;
-  font-size: 13px; color: #475569;
+  padding: 6px 14px; border-radius: 6px;
+  font-size: 14px; color: #5F6368;
   cursor: pointer; transition: all 0.2s;
 }
 
 .tab-btn.active {
-  background: #2563eb;
-  color: white;
+  background: #1A73E8;
+  color: #FFFFFF;
   font-weight: 500;
 }
 
@@ -229,30 +232,32 @@ HEADER & DROPDOWN STYLES
 }
 
 .notif-card {
-  background: #f8fafc; border: 1px solid #e2e8f0;
-  border-radius: 8px; padding: 10px; font-size: 12px;
-  color: #334155;
+  background: #F5F7FA; border: 1px solid #E0E4E8;
+  border-radius: 6px; padding: 10px; font-size: 14px;
+  color: #202124; line-height: 1.45;
 }
 
 .notif-card.is-alert {
-  border-color: #fca5a5;
-  background-color: #fff5f5;
+  border-color: #EA4335;
+  background-color: #FDE8E7;
+  color: #EA4335;
 }
 
 .mark-read-btn {
   background: none; border: none;
-  color: #64748b; font-size: 11px;
+  color: #174EA6; font-size: 14px; font-weight: 500;
   cursor: pointer; margin-top: 6px; padding: 0;
   text-decoration: underline;
 }
 
 .notif-footer { margin-top: 10px; }
 .open-page-btn {
-  width: 100%; background: #f8fafc;
-  border: 1px solid #e2e8f0; padding: 8px;
-  border-radius: 8px; font-size: 12px;
-  color: #334155; cursor: pointer;
+  width: 100%; min-height: 40px; background: #FFFFFF;
+  border: 1px solid #DADCE0; padding: 0 16px;
+  border-radius: 6px; font-size: 14px; font-weight: 500;
+  color: #202124; cursor: pointer;
 }
+.open-page-btn:hover { background: #F5F7FA; }
 
 /* ====================================
 3. PROFILE POPUP
@@ -263,11 +268,11 @@ HEADER & DROPDOWN STYLES
 }
 
 .profile-item {
-  display: block; padding: 8px 16px;
-  color: #334155; text-decoration: none;
-  font-size: 13px; transition: background 0.2s;
+  display: block; padding: 10px 16px;
+  color: #202124; text-decoration: none;
+  font-size: 14px; font-weight: 500; transition: background 0.2s;
 }
 
-.profile-item:hover { background: #f8fafc; }
-.profile-item.danger { color: #dc2626; }
-.profile-popup hr { border: 0; border-top: 1px solid #f1f5f9; margin: 4px 0; }
+.profile-item:hover { background: #F5F7FA; }
+.profile-item.danger { color: #EA4335; }
+.profile-popup hr { border: 0; border-top: 1px solid #F1F3F5; margin: 4px 0; }

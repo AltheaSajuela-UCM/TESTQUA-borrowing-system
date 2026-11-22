@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Working Scholar Portal</title>
 
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- CSS FILES -->
     <link rel="stylesheet" href="../../static/css/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
 
@@ -18,21 +23,22 @@
             margin-bottom: 14px;
         }
         .back-btn {
-            background-color: #2563eb;
-            color: #ffffff;
+            background-color: #174EA6;
+            color: #FFFFFF;
             border: none;
-            padding: 8px 14px;
+            height: 40px;
+            padding: 0 16px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: background-color 0.15s ease;
         }
         .back-btn:hover {
-            background-color: #3b82f6;
+            background-color: #1A73E8;
         }
     </style>
 </head>
@@ -58,22 +64,22 @@
             <a href="working_scholar_dashboard.html" class="nav-item">
                 <i class="fa-solid fa-table-cells-large"></i> Dashboard
             </a>
-            <a href="working_scholar_dashboard.html#pending-requests" class="nav-item">
+            <a href="working_scholar_pending_requests.html" class="nav-item">
                 <i class="fa-solid fa-clock"></i> Pending Requests
             </a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+            <a href="working_scholar_cancelation_requests.html" class="nav-item">
                 <i class="fa-solid fa-ban"></i> Cancellation Requests
             </a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+            <a href="working_scholar_inventory.html" class="nav-item">
                 <i class="fa-solid fa-boxes-stacked"></i> Inventory
             </a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+            <a href="working_scholar_borrowed_items.html" class="nav-item">
                 <i class="fa-solid fa-clipboard-list"></i> Borrowed Items
             </a>
-            <a href="working_scholar_return_processing.html#overview" class="nav-item">
+            <a href="working_scholar_return_processing.html" class="nav-item">
                 <i class="fa-solid fa-rotate-left"></i> Return Processing
             </a>
-            <a href="working_scholar_dashboard.html#overview" class="nav-item">
+            <a href="working_scholar_history.html" class="nav-item">
                 <i class="fa-solid fa-history"></i> History
             </a>
         </nav>
@@ -167,7 +173,7 @@
 
                 <div class="form-group full-width">
                      <label for="academic-level">Academic Level</label>
-                    <input type="text" id="academic-level" name="academicLevel"value="" placeholder="Enter academic level" disabled>
+                    <input type="text" id="academic-level" name="academicLevel" value="" placeholder="Enter academic level" disabled>
                 </div>
             </form>
         </div>
@@ -184,7 +190,7 @@
         }
     </script>
     <script src="../../static/script/working_scholar_script/common.js"></script>
-    <sctipt src="../../static/script/api.js"></script>
+    <script src="../../static/script/api.js"></script>
     <script src="../../static/script/working_scholar_script/account_setting/working_scholar_all_in_one.js"></script>
     <script src="../../static/script/auth.js?v=2"></script>
 

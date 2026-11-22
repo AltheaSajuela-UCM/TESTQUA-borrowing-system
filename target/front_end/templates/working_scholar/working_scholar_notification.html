@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webventory: Working Scholar - Notifications</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="../../static/css/working_scholar_style/notification/working_scholar_notification_body.css">
     <style>
         .under-menu-bar {
@@ -13,21 +19,22 @@
             margin-bottom: 14px;
         }
         .back-btn {
-            background-color: #2563eb;
-            color: #ffffff;
+            background-color: #174EA6;
+            color: #FFFFFF;
             border: none;
-            padding: 8px 14px;
+            height: 40px;
+            padding: 0 16px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: background-color 0.15s ease;
         }
         .back-btn:hover {
-            background-color: #3b82f6;
+            background-color: #1A73E8;
         }
     </style>
 </head>
@@ -83,14 +90,14 @@
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     <span class="notification-dot" id="notif-dot" style="display: none;"></span>
                 </button>
-                <div id="notification-dropdown" class="dropdown-menu notification-menu" style="width: 320px; padding: 12px; display: none;">
-                    <div class="notif-tabs" style="display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
-                        <button class="tab-btn active" onclick="switchNotifTab('all', event)" style="background: none; border: none; padding: 6px 12px; font-size: 12px; font-weight: 500; color: #64748b; border-radius: 6px; cursor: pointer;">All</button>
-                        <button class="tab-btn" onclick="switchNotifTab('unread', event)" style="background: none; border: none; padding: 6px 12px; font-size: 12px; font-weight: 500; color: #64748b; border-radius: 6px; cursor: pointer;">Unread</button>
-                        <button class="tab-btn" onclick="switchNotifTab('alerts', event)" style="background: none; border: none; padding: 6px 12px; font-size: 12px; font-weight: 500; color: #64748b; border-radius: 6px; cursor: pointer;">Alerts</button>
+                <div id="notification-dropdown" class="dropdown-menu notification-menu">
+                    <div class="notif-tabs">
+                        <button class="tab-btn active" onclick="switchNotifTab('all', event)">All</button>
+                        <button class="tab-btn" onclick="switchNotifTab('unread', event)">Unread</button>
+                        <button class="tab-btn" onclick="switchNotifTab('alerts', event)">Alerts</button>
                     </div>
-                    <div class="notif-list" id="header-notif-list-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;">
-                        <div style="text-align: center; color: #94a3b8; padding: 16px; font-size: 12px;">NONE</div>
+                    <div class="notif-list" id="header-notif-list-container">
+                        <div style="text-align: center; color: #5F6368; padding: 16px; font-size: 14px;">NONE</div>
                     </div>
                 </div>
             </div>
