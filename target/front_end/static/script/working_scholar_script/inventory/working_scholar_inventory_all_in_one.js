@@ -1,6 +1,8 @@
 // Working Scholar Inventory: live data from backend/2_working_scholar/catalog.php
 // and the header notification bell from backend/api/notifications.php.
 // Requires ../../api.js (Webventory.api / Webventory.esc) to be loaded first.
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
+
 let inventoryData = [];
 let currentCategory = 'Academic';
 let activeItemId = null;
@@ -10,9 +12,40 @@ let notifFilter = 'all';
 const esc = (v) => Webventory.esc(v);
 
 // ------------------------------------------------------------ layout toggles
+function setSidebarOpen(isOpen) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('show', isOpen);
+    if (overlay) overlay.classList.toggle('show', isOpen);
+    try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+    } catch (err) { /* storage unavailable */ }
+}
+
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('show');
-    document.getElementById('sidebar-overlay').classList.toggle('show');
+    const sidebar = document.getElementById('sidebar');
+    const willOpen = sidebar ? !sidebar.classList.contains('show') : true;
+    setSidebarOpen(willOpen);
+}
+
+function initSidebarPersistence() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            setSidebarOpen(true);
+        }
+    } catch (err) { /* storage unavailable */ }
 }
 
 function toggleProfileDropdown() {
@@ -193,7 +226,10 @@ window.onclick = function (event) {
     if (!event.target.closest('.dropdown-container')) closeAllDropdowns();
 };
 
+document.addEventListener('DOMContentLoaded', initSidebarPersistence);
+
 window.onload = () => {
+    initSidebarPersistence();
     loadInventory();
     loadProfile();
     loadNotifications();

@@ -2,6 +2,7 @@
 // and backend/api/notifications.php (bell). Page markup is unchanged.
 // Put this file at: target/front_end/static/script/admin_script/user/admin_all_in_one.js
 const BASE = '../../../../backend/';
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
 async function api(path, opts) {
     opts = opts || {};
@@ -258,14 +259,20 @@ const sideMenu = document.getElementById('sideMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
 
+function setSideMenuOpen(isOpen) {
+    if (sideMenu) sideMenu.classList.toggle('active', isOpen);
+    if (menuOverlay) menuOverlay.classList.toggle('active', isOpen);
+    try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+    } catch (err) { /* storage unavailable */ }
+}
+
 function openSideMenu() {
-    sideMenu.classList.add('active');
-    menuOverlay.classList.add('active');
+    setSideMenuOpen(true);
 }
 
 function closeSideMenu() {
-    sideMenu.classList.remove('active');
-    menuOverlay.classList.remove('active');
+    setSideMenuOpen(false);
 }
 
 menuBtn.addEventListener('click', (e) => {
@@ -274,6 +281,25 @@ menuBtn.addEventListener('click', (e) => {
 });
 closeMenuBtn.addEventListener('click', closeSideMenu);
 menuOverlay.addEventListener('click', closeSideMenu);
+
+if (sideMenu) {
+    sideMenu.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.stopPropagation();
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+            } catch (err) { /* storage unavailable */ }
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            setSideMenuOpen(true);
+        }
+    } catch (err) { /* storage unavailable */ }
+});
 
 const notifWrapper = document.getElementById('notifDropdownWrapper');
 const notifBtn = document.getElementById('notifBtn');

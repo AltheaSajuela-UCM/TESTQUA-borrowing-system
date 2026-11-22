@@ -49,6 +49,7 @@ const menuBtn = document.getElementById('menuBtn');
 const sideMenu = document.getElementById('sideMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
 const notifDropdownWrapper = document.getElementById('notifDropdownWrapper');
 const notifBtn = document.getElementById('notifBtn');
@@ -58,43 +59,79 @@ const profileBtn = document.getElementById('profileBtn');
 
 // 1. SIDE MENU (DRAWER) TOGGLE
 function openSideMenu() {
-    sideMenu.classList.add('active');
-    menuOverlay.classList.add('active');
+    if (sideMenu && menuOverlay) {
+        sideMenu.classList.add('active');
+        menuOverlay.classList.add('active');
+        try {
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+        } catch (err) {}
+    }
 }
 
 function closeSideMenu() {
-    sideMenu.classList.remove('active');
-    menuOverlay.classList.remove('active');
+    if (sideMenu && menuOverlay) {
+        sideMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        try {
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
+        } catch (err) {}
+    }
 }
 
-menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openSideMenu();
-});
+if (menuBtn) {
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSideMenu();
+    });
+}
 
-closeMenuBtn.addEventListener('click', closeSideMenu);
-menuOverlay.addEventListener('click', closeSideMenu);
+if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeSideMenu);
+if (menuOverlay) menuOverlay.addEventListener('click', closeSideMenu);
+
+// Keep side menu open across page navigation when user clicks a menu link
+if (sideMenu) {
+    const sideLinks = sideMenu.querySelectorAll('a');
+    sideLinks.forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.stopPropagation();
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+            } catch (err) {}
+        });
+    });
+}
+
+// Restore side menu state on page load
+try {
+    if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+        openSideMenu();
+    }
+} catch (err) {}
 
 // 2. NOTIFICATION DROPDOWN TOGGLE
-notifBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    profileDropdownWrapper.classList.remove('active'); // Close profile if open
-    notifDropdownWrapper.classList.toggle('active');
-});
+if (notifBtn && notifDropdownWrapper) {
+    notifBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (profileDropdownWrapper) profileDropdownWrapper.classList.remove('active'); // Close profile if open
+        notifDropdownWrapper.classList.toggle('active');
+    });
+}
 
 // 3. PROFILE DROPDOWN TOGGLE
-profileBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    notifDropdownWrapper.classList.remove('active'); // Close notification if open
-    profileDropdownWrapper.classList.toggle('active');
-});
+if (profileBtn && profileDropdownWrapper) {
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (notifDropdownWrapper) notifDropdownWrapper.classList.remove('active'); // Close notification if open
+        profileDropdownWrapper.classList.toggle('active');
+    });
+}
 
 // CLOSE ALL DROPDOWNS ON CLICK OUTSIDE
 document.addEventListener('click', (e) => {
-    if (!notifDropdownWrapper.contains(e.target)) {
+    if (notifDropdownWrapper && !notifDropdownWrapper.contains(e.target)) {
         notifDropdownWrapper.classList.remove('active');
     }
-    if (!profileDropdownWrapper.contains(e.target)) {
+    if (profileDropdownWrapper && !profileDropdownWrapper.contains(e.target)) {
         profileDropdownWrapper.classList.remove('active');
     }
 });
@@ -107,6 +144,7 @@ const notifListEl = document.querySelector('#notifPopup .notif-list');
 const tabBtns = document.querySelectorAll('.tab-btn');
 
 function renderPopup() {
+    if (!notifListEl) return;
     let shown = notifs;
     if (notifTab === 'unread') shown = notifs.filter((n) => !n.read);
     else if (notifTab === 'alerts') shown = notifs.filter((n) => n.alert);
@@ -145,15 +183,17 @@ tabBtns.forEach((tab) => {
 });
 
 // Mark as read (stopPropagation: the list re-renders, which would otherwise look like an outside click)
-notifListEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('.mark-read-btn');
-    if (!btn) return;
-    e.stopPropagation();
-    const id = Number(btn.dataset.id);
-    const n = notifs.find((x) => x.id === id);
-    if (n) { n.read = true; saveReadId(notifOwner, id); }
-    renderPopup();
-});
+if (notifListEl) {
+    notifListEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.mark-read-btn');
+        if (!btn) return;
+        e.stopPropagation();
+        const id = Number(btn.dataset.id);
+        const n = notifs.find((x) => x.id === id);
+        if (n) { n.read = true; saveReadId(notifOwner, id); }
+        renderPopup();
+    });
+}
 
 const openPageBtn = document.querySelector('#notifPopup .open-page-btn');
 if (openPageBtn) {
@@ -179,18 +219,25 @@ async function loadDashboard() {
         const d = await studentApi('dashboard.php');
         const first = String(d.user.full_name || 'Student').split(' ')[0];
 
-        document.getElementById('welcomeName').textContent = `Welcome, ${first}!`;
-        document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
+        const welcomeNameEl = document.getElementById('welcomeName');
+        const todayDateEl = document.getElementById('todayDate');
+        if (welcomeNameEl) welcomeNameEl.textContent = `Welcome, ${first}!`;
+        if (todayDateEl) {
+            todayDateEl.textContent = new Date().toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
         guideSteps[0].title = `Welcome to Webventory, ${first}!`;
 
-        document.getElementById('statActive').textContent = d.stats.active;
-        document.getElementById('statOverdue').textContent = d.stats.overdue;
-        document.getElementById('statAvailable').textContent = d.stats.available;
+        const statActiveEl = document.getElementById('statActive');
+        const statOverdueEl = document.getElementById('statOverdue');
+        const statAvailableEl = document.getElementById('statAvailable');
+        if (statActiveEl) statActiveEl.textContent = d.stats.active;
+        if (statOverdueEl) statOverdueEl.textContent = d.stats.overdue;
+        if (statAvailableEl) statAvailableEl.textContent = d.stats.available;
 
         const body = document.getElementById('activeBorrowingsBody');
-        if (d.active_borrowings.length > 0) {
+        if (body && d.active_borrowings.length > 0) {
             body.innerHTML = d.active_borrowings.map((b) => {
                 const overdue = Number(b.is_overdue) === 1;
                 const pill = overdue
@@ -274,14 +321,14 @@ let currentGuideStep = 0;
 
 function updateGuideModal() {
     const data = guideSteps[currentGuideStep];
-    guideStepTitle.textContent = `BORROWING GUIDE · ${data.step}`;
-    guideTitle.textContent = data.title;
-    guideDescription.textContent = data.description;
-    guideBoxText.textContent = data.boxText;
-    guideNextBtn.textContent = data.nextText;
+    if (guideStepTitle) guideStepTitle.textContent = `BORROWING GUIDE · ${data.step}`;
+    if (guideTitle) guideTitle.textContent = data.title;
+    if (guideDescription) guideDescription.textContent = data.description;
+    if (guideBoxText) guideBoxText.textContent = data.boxText;
+    if (guideNextBtn) guideNextBtn.textContent = data.nextText;
 
     // Buttons state
-    guideBackBtn.disabled = currentGuideStep === 0;
+    if (guideBackBtn) guideBackBtn.disabled = currentGuideStep === 0;
 
     // Progress bar fills
     progressBars.forEach((bar, index) => {
@@ -293,30 +340,36 @@ function updateGuideModal() {
     });
 }
 
-openGuideBtn.addEventListener('click', () => {
-    currentGuideStep = 0;
-    updateGuideModal();
-    guideModalOverlay.classList.remove('hidden');
-});
-
-function closeGuideModal() {
-    guideModalOverlay.classList.add('hidden');
+if (openGuideBtn && guideModalOverlay) {
+    openGuideBtn.addEventListener('click', () => {
+        currentGuideStep = 0;
+        updateGuideModal();
+        guideModalOverlay.classList.remove('hidden');
+    });
 }
 
-guideExitBtn.addEventListener('click', closeGuideModal);
+function closeGuideModal() {
+    if (guideModalOverlay) guideModalOverlay.classList.add('hidden');
+}
 
-guideNextBtn.addEventListener('click', () => {
-    if (currentGuideStep < guideSteps.length - 1) {
-        currentGuideStep++;
-        updateGuideModal();
-    } else {
-        closeGuideModal(); // Finished all steps
-    }
-});
+if (guideExitBtn) guideExitBtn.addEventListener('click', closeGuideModal);
 
-guideBackBtn.addEventListener('click', () => {
-    if (currentGuideStep > 0) {
-        currentGuideStep--;
-        updateGuideModal();
-    }
-});
+if (guideNextBtn) {
+    guideNextBtn.addEventListener('click', () => {
+        if (currentGuideStep < guideSteps.length - 1) {
+            currentGuideStep++;
+            updateGuideModal();
+        } else {
+            closeGuideModal(); // Finished all steps
+        }
+    });
+}
+
+if (guideBackBtn) {
+    guideBackBtn.addEventListener('click', () => {
+        if (currentGuideStep > 0) {
+            currentGuideStep--;
+            updateGuideModal();
+        }
+    });
+}

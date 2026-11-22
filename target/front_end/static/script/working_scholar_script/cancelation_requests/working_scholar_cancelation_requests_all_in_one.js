@@ -1,6 +1,8 @@
 // Working Scholar - Cancellation Requests (wired to 2_working_scholar/cancellations.php)
 // Needs api.js, auth.js and common.js loaded BEFORE this file.
 
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
+
 let cancelationRequestsData = [];
 let activeCancelationIndex = null;
 
@@ -89,4 +91,28 @@ async function declineCancellation(index) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', loadCancellations);
+function initSidebarPersistence() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            if (sidebar) sidebar.classList.add('show');
+            if (overlay) overlay.classList.add('show');
+        }
+    } catch (err) { /* storage unavailable */ }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initSidebarPersistence();
+    loadCancellations();
+});

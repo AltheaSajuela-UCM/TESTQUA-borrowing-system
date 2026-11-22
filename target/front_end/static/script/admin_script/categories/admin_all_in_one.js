@@ -3,6 +3,7 @@
 // from the database instead of the two hard-coded ones.
 // Put this file at: target/front_end/static/script/admin_script/categories/admin_all_in_one.js
 const BASE = '../../../../backend/';
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
 async function api(path, opts) {
     opts = opts || {};
@@ -60,14 +61,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
-    function toggleSidebar() {
-        sidebar.classList.toggle('active');
-        sidebarOverlay.classList.toggle('hidden');
+    function setSidebarOpen(isOpen) {
+        if (sidebar) sidebar.classList.toggle('active', isOpen);
+        if (sidebarOverlay) sidebarOverlay.classList.toggle('hidden', !isOpen);
+        try {
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+        } catch (err) { /* storage unavailable */ }
     }
 
-    menuBtn.addEventListener('click', toggleSidebar);
-    closeSidebarBtn.addEventListener('click', toggleSidebar);
-    sidebarOverlay.addEventListener('click', toggleSidebar);
+    function toggleSidebar() {
+        const willOpen = sidebar ? !sidebar.classList.contains('active') : true;
+        setSidebarOpen(willOpen);
+    }
+
+    if (menuBtn) menuBtn.addEventListener('click', toggleSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            setSidebarOpen(true);
+        }
+    } catch (err) { /* storage unavailable */ }
 
     // ---------------------------------------------------------------- category cards
     const container = document.querySelector('.category-cards-container');

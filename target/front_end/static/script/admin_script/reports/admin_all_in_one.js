@@ -3,6 +3,7 @@
 // the table header follows each report, and a Leaderboard card is added next to the five existing ones.
 // Put this file at: target/front_end/static/script/admin_script/reports/admin_all_in_one.js
 const BASE = '../../../../backend/';
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
 async function api(path, opts) {
     opts = opts || {};
@@ -47,10 +48,41 @@ let currentNotifTab = 'all';
 let loadTimer = null;
 
 // ---------------------------------------------------------------- sidebar + dropdowns
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('show');
-    document.getElementById('sidebar-overlay').classList.toggle('show');
+function setSidebarOpen(isOpen) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('show', isOpen);
+    if (overlay) overlay.classList.toggle('show', isOpen);
+    try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+    } catch (e) { /* storage unavailable */ }
 }
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const willOpen = sidebar ? !sidebar.classList.contains('show') : true;
+    setSidebarOpen(willOpen);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            setSidebarOpen(true);
+        }
+    } catch (err) { /* storage unavailable */ }
+});
 
 function toggleProfileDropdown() {
     closeAllDropdowns();

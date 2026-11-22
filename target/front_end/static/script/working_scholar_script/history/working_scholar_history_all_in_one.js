@@ -1,6 +1,8 @@
 // Working Scholar > History: loads the activity log from backend/2_working_scholar/history.php.
 // Header, sidebar and notifications come from common.js
 // (load order: api.js -> auth.js -> common.js -> this file).
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
+
 let historyData = [];
 
 // Render the table (handles the empty state)
@@ -71,4 +73,28 @@ async function loadHistory() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', loadHistory);
+function initSidebarPersistence() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            if (sidebar) sidebar.classList.add('show');
+            if (overlay) overlay.classList.add('show');
+        }
+    } catch (err) { /* storage unavailable */ }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initSidebarPersistence();
+    loadHistory();
+});

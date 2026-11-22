@@ -1,5 +1,7 @@
 // Working Scholar Notifications: live data from backend/api/notifications.php.
 // Requires ../../api.js (Webventory.api / Webventory.esc) to be loaded first.
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
+
 let notificationsData = [];
 let currentFilter = 'all';     // main list tabs
 let headerFilter = 'all';      // header bell dropdown tabs
@@ -8,11 +10,40 @@ let headerData = [];
 const esc = (v) => Webventory.esc(v);
 
 // ------------------------------------------------------------ layout toggles
-function toggleSidebar() {
+function setSidebarOpen(isOpen) {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
-    if (sidebar) sidebar.classList.toggle('show');
-    if (overlay) overlay.classList.toggle('show');
+    if (sidebar) sidebar.classList.toggle('show', isOpen);
+    if (overlay) overlay.classList.toggle('show', isOpen);
+    try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+    } catch (err) { /* storage unavailable */ }
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const willOpen = sidebar ? !sidebar.classList.contains('show') : true;
+    setSidebarOpen(willOpen);
+}
+
+function initSidebarPersistence() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            setSidebarOpen(true);
+        }
+    } catch (err) { /* storage unavailable */ }
 }
 
 function toggleProfileDropdown() {
@@ -165,6 +196,7 @@ window.onclick = function (event) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    initSidebarPersistence();
     loadProfile();
     loadNotifications();
     setInterval(loadNotifications, 30000);

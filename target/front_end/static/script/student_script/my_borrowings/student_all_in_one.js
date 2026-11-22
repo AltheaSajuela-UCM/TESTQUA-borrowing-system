@@ -3,6 +3,7 @@
 // ==========================================
 const STUDENT_API = '../../../../backend/3_student/';
 const LOGIN_PAGE = '../../login_page/index.html';
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
 function esc(v) {
     return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, (c) => (
@@ -147,18 +148,43 @@ const drawerBackdrop = document.getElementById('drawer-backdrop');
 const drawerContent = document.getElementById('drawer-content');
 
 function openDrawer() {
-  drawerBackdrop.classList.remove('hidden');
-  drawerContent.classList.remove('drawer-closed');
+  if (drawerBackdrop) drawerBackdrop.classList.remove('hidden');
+  if (drawerContent) drawerContent.classList.remove('drawer-closed');
+  try {
+    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+  } catch (err) { /* storage unavailable */ }
 }
 
 function closeDrawer() {
-  drawerBackdrop.classList.add('hidden');
-  drawerContent.classList.add('drawer-closed');
+  if (drawerBackdrop) drawerBackdrop.classList.add('hidden');
+  if (drawerContent) drawerContent.classList.add('drawer-closed');
+  try {
+    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
+  } catch (err) { /* storage unavailable */ }
 }
 
-openMenuBtn.addEventListener('click', openDrawer);
-closeDrawerBtn.addEventListener('click', closeDrawer);
-drawerBackdrop.addEventListener('click', closeDrawer);
+if (openMenuBtn) openMenuBtn.addEventListener('click', openDrawer);
+if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+// Keep drawer open across page navigation when user clicks a drawer link
+if (drawerContent) {
+  drawerContent.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.stopPropagation();
+      try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+      } catch (err) { /* storage unavailable */ }
+    });
+  });
+}
+
+// Restore drawer state on page load
+try {
+  if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+    openDrawer();
+  }
+} catch (err) { /* storage unavailable */ }
 
 // Close dropdowns on outside click
 window.addEventListener('click', () => {

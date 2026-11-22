@@ -3,6 +3,7 @@
 // ==========================================
 const STUDENT_API = '../../../../backend/3_student/';
 const LOGIN_PAGE = '../../login_page/index.html';
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
 function esc(v) {
     return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, (c) => (
@@ -49,10 +50,42 @@ let notifOwner = '';
 let currentFilter = 'all';
 
 // Toggle Sidebar Navigation Drawer
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('show');
-    document.getElementById('sidebar-overlay').classList.toggle('show');
+function setSidebarOpen(isOpen) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('show', isOpen);
+    if (overlay) overlay.classList.toggle('show', isOpen);
+    try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+    } catch (e) { /* storage unavailable */ }
 }
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const willOpen = sidebar ? !sidebar.classList.contains('show') : true;
+    setSidebarOpen(willOpen);
+}
+
+// Keep sidebar open across page navigation when user clicks a sidebar link
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            setSidebarOpen(true);
+        }
+    } catch (err) { /* storage unavailable */ }
+});
 
 // Toggle Profile Dropdown
 function toggleProfileDropdown() {

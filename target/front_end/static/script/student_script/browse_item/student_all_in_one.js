@@ -5,11 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebarDrawer');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
     function openSidebar() {
         if (sidebar && sidebarOverlay) {
             sidebar.classList.add('active');
             sidebarOverlay.classList.add('active');
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+            } catch (err) {}
         }
     }
 
@@ -17,12 +21,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sidebar && sidebarOverlay) {
             sidebar.classList.remove('active');
             sidebarOverlay.classList.remove('active');
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
+            } catch (err) {}
         }
     }
 
     if (menuBtn) menuBtn.addEventListener('click', openSidebar);
     if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // Keep sidebar open across page navigation when user clicks a menu link
+    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+            } catch (err) {}
+        });
+    });
+
+    // Restore sidebar state on page load
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            openSidebar();
+        }
+    } catch (err) {}
 
     // --- 2. DROPDOWN ELEMENTS ---
     const notifBtn = document.getElementById('notifBtn');

@@ -1,3 +1,5 @@
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
+
 // Elements Selection
 const menuBtn = document.getElementById('menuBtn');
 const sideMenu = document.getElementById('sideMenu');
@@ -13,14 +15,20 @@ const profileBtn = document.getElementById('profileBtn');
 const profilePopup = document.getElementById('profilePopup');
 
 // 1. SIDE MENU (DRAWER) TOGGLE
+function setSideMenuOpen(isOpen) {
+    if (sideMenu) sideMenu.classList.toggle('active', isOpen);
+    if (menuOverlay) menuOverlay.classList.toggle('active', isOpen);
+    try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+    } catch (err) { /* storage unavailable */ }
+}
+
 function openSideMenu() {
-    if (sideMenu) sideMenu.classList.add('active');
-    if (menuOverlay) menuOverlay.classList.add('active');
+    setSideMenuOpen(true);
 }
 
 function closeSideMenu() {
-    if (sideMenu) sideMenu.classList.remove('active');
-    if (menuOverlay) menuOverlay.classList.remove('active');
+    setSideMenuOpen(false);
 }
 
 if (menuBtn) {
@@ -37,6 +45,25 @@ if (closeMenuBtn) {
 if (menuOverlay) {
     menuOverlay.addEventListener('click', closeSideMenu);
 }
+
+if (sideMenu) {
+    sideMenu.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.stopPropagation();
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+            } catch (err) { /* storage unavailable */ }
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            setSideMenuOpen(true);
+        }
+    } catch (err) { /* storage unavailable */ }
+});
 
 // 2. NOTIFICATION DROPDOWN TOGGLE
 if (notifBtn && notifDropdownWrapper) {

@@ -1,6 +1,8 @@
 // Working Scholar - Return Processing (wired to 2_working_scholar/borrowing.php)
 // Needs api.js, auth.js and common.js loaded BEFORE this file.
 
+const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
+
 let activeTx = null;       // the active borrowing being returned
 let idReturned = false;    // working scholar confirmed the student's ID was handed back
 
@@ -123,7 +125,29 @@ async function completeReturn() {
     }
 }
 
+function initSidebarPersistence() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+                } catch (err) { /* storage unavailable */ }
+            });
+        });
+    }
+    try {
+        if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
+            if (sidebar) sidebar.classList.add('show');
+            if (overlay) overlay.classList.add('show');
+        }
+    } catch (err) { /* storage unavailable */ }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+    initSidebarPersistence();
     const tx = new URLSearchParams(window.location.search).get('tx');
     if (!tx) return;
     document.getElementById('find-tx-input').value = tx;
