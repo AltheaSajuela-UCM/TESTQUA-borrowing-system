@@ -19,6 +19,31 @@ body {
 .hidden { display: none !important; }
 .text-right { text-align: right; }
 
+/* Primary Action Button */
+.btn-primary,
+#addScholarBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+    background-color: #1A73E8;
+    color: #FFFFFF;
+    border: none;
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-primary:hover,
+#addScholarBtn:hover {
+    background-color: #174EA6;
+}
+
 /* Header */
 .site-header {
     background-color: #FFFFFF;
@@ -430,8 +455,17 @@ hr {
 /* Role Tabs */
 .role-tabs {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 1.25rem;
+}
+
+.role-tabs-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .role-tab-btn {
@@ -448,6 +482,7 @@ hr {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    line-height: 1;
 }
 
 .role-tab-btn.active {

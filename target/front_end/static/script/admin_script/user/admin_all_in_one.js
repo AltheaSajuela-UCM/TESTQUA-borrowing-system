@@ -65,7 +65,7 @@ function renderTable() {
 
     // Show button only when viewing Working Scholars
     if (addScholarBtn) {
-        addScholarBtn.style.display = isStudents ? 'none' : 'block';
+        addScholarBtn.style.display = isStudents ? 'none' : 'inline-flex';
     }
 
     if (usersData.length === 0) {

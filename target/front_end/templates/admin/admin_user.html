@@ -141,15 +141,17 @@
                 <h1>Manage Users</h1>
                 <p>Students and SAO Working Scholars</p>
             </div>
-            
-            <!-- ADD WORKING SCHOLAR BUTTON -->
-            <button id="addScholarBtn" class="btn-primary" style="display: none; background-color: #1A73E8; color: #FFFFFF; border: none; min-height: 40px; padding: 0 16px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;" onclick="openAddScholarModal()">Add Working Scholar</button>
         </div>
 
         <!-- Role Tabs Switcher -->
         <div class="role-tabs">
-            <button class="role-tab-btn active" data-role="students">Students</button>
-            <button class="role-tab-btn" data-role="scholars">SAO Working Scholars</button>
+            <div class="role-tabs-left">
+                <button class="role-tab-btn active" data-role="students">Students</button>
+                <button class="role-tab-btn" data-role="scholars">SAO Working Scholars</button>
+            </div>
+
+            <!-- ADD WORKING SCHOLAR BUTTON -->
+            <button id="addScholarBtn" class="btn-primary" style="display: none; background-color: #1A73E8; color: #FFFFFF; border: none; min-height: 40px; padding: 0 16px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;" onclick="openAddScholarModal()">Add Working Scholar</button>
         </div>
 
         <!-- Users Table Card -->
