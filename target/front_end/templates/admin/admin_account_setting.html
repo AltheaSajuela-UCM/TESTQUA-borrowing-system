@@ -42,9 +42,6 @@
 </head>
 <body>
 
-    <!-- Left-edge hover trigger zone -->
-    <div id="left-edge-hover" class="left-edge-hover"></div>
-
     <!-- Sidebar Menu Drawer -->
     <aside id="sidebar" class="sidebar closed">
         <div class="sidebar-header">
@@ -109,7 +106,9 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <div class="under-menu-bar">
-            <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+            <a href="admin_dashboard.html">
+                <button type="button" class="back-btn"> Back</button>
+            </a>
         </div>
 
         <div class="content-header">
@@ -150,16 +149,17 @@
         </div>
     </main>
 
-    <script>
-        function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = 'admin_dashboard.html';
-            }
-        }
-    </script>
-    <script src="../../static/script/admin_script/account_setting/admin_all_in_one.js"></script>
-    <script src="../../static/script/auth.js?v=2"></script>
+     <!-- <script>
+         function goBack() {
+             if (window.history.length > 1) {
+                 window.history.back();
+             } else {
+                 window.location.href = 'admin_dashboard.html';
+             }
+         }
+     </script> -->
+     <script src="../../static/script/admin_script/account_setting/admin_all_in_one.js"></script>
+     <script src="../../static/script/auth.js?v=2"></script>
+     
 </body>
 </html>

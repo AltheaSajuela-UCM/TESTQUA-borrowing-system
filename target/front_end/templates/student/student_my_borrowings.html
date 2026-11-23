@@ -16,30 +16,32 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="../../static/css/student_style/my_borrowings/student_my_borrowings_global.css">
   <style>
-      .under-menu-bar {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          margin-bottom: 14px;
-      }
-      .back-btn {
-          background-color: #174EA6;
-          color: #FFFFFF;
-          border: none;
-          height: 40px;
-          padding: 0 16px;
-          border-radius: 6px;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          transition: background-color 0.15s ease;
-      }
-      .back-btn:hover {
-          background-color: #1A73E8;
-      }
+    .under-menu-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .back-btn {
+      background-color: #174EA6;
+      color: #FFFFFF;
+      border: none;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.15s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #1A73E8;
+    }
   </style>
 </head>
 
@@ -136,7 +138,9 @@
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <div class="under-menu-bar">
-      <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+      <a href="student_dashboard.html">
+        <button type="button" class="back-btn"> Back</button>
+      </a>
     </div>
 
     <div class="page-header">
@@ -163,7 +167,9 @@
             </tr>
           </thead>
           <tbody id="borrowings-body">
-            <tr><td colspan="6" style="text-align:center;color:#5F6368;padding:24px;font-size:14px;">Loading...</td></tr>
+            <tr>
+              <td colspan="6" style="text-align:center;color:#5F6368;padding:24px;font-size:14px;">Loading...</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -186,18 +192,18 @@
   </div>
 
   <script>
-      function goBack() {
-          if (window.history.length > 1) {
-              window.history.back();
-          } else {
-              window.location.href = 'student_dashboard.html';
-          }
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'student_dashboard.html';
       }
+    }
   </script>
   <!-- JavaScript -->
   <script src="../../static/script/student_script/my_borrowings/student_all_in_one.js"></script>
   <script src="../../static/script/auth.js?v=2"></script>
-  
+
 </body>
 
 </html>

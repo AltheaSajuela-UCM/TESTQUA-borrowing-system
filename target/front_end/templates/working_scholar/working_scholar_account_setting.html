@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS FILES -->
-    <link rel="stylesheet" href="../../static/css/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
+    <link rel="stylesheet"
+        href="../../static/css/working_scholar_style/account_setting/working_scholar_account_setting_body.css">
 
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,6 +24,7 @@
             justify-content: flex-start;
             margin-bottom: 14px;
         }
+
         .back-btn {
             background-color: #174EA6;
             color: #FFFFFF;
@@ -37,11 +40,13 @@
             gap: 8px;
             transition: background-color 0.15s ease;
         }
+
         .back-btn:hover {
             background-color: #1A73E8;
         }
     </style>
 </head>
+
 <body>
 
     <!-- Left-edge hover trigger zone -->
@@ -88,7 +93,8 @@
         </nav>
 
         <div class="sidebar-footer">
-            <a href="../../../../index.html" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+            <a href="../../../../index.html" class="logout-btn"
+                style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </a>
         </div>
@@ -118,7 +124,8 @@
 
                 <!-- Dropdown Menu -->
                 <div id="profile-dropdown" class="dropdown-menu hidden">
-                    <a href="#" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                    <a href="#" class="logout-btn"
+                        style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
                         <span class="icon">↪</span> Logout
                     </a>
                 </div>
@@ -129,7 +136,9 @@
     <!-- MAIN CONTENT AREA -->
     <main class="main-content">
         <div class="under-menu-bar">
-            <button type="button" class="back-btn" onclick="goBack()">&larr; Back</button>
+            <a href="working_scholar_dashboard.html">
+                <button type="button" class="back-btn"> Back</button>
+            </a>
         </div>
 
         <div class="content-header">
@@ -166,17 +175,20 @@
 
                 <div class="form-group full-width">
                     <label for="mobile-number">Mobile Number</label>
-                    <input type="text" id="mobile-number" name="mobileNumber" value="" placeholder="Enter mobile number" disabled>
+                    <input type="text" id="mobile-number" name="mobileNumber" value="" placeholder="Enter mobile number"
+                        disabled>
                 </div>
 
                 <div class="form-group full-width">
                     <label for="program-year">Program and Year</label>
-                    <input type="text" id="program-year" name="programYear" value="" placeholder="Program and Year" disabled>
+                    <input type="text" id="program-year" name="programYear" value="" placeholder="Program and Year"
+                        disabled>
                 </div>
 
                 <div class="form-group full-width">
-                     <label for="academic-level">Academic Level</label>
-                    <input type="text" id="academic-level" name="academicLevel" value="" placeholder="Enter academic level" disabled>
+                    <label for="academic-level">Academic Level</label>
+                    <input type="text" id="academic-level" name="academicLevel" value=""
+                        placeholder="Enter academic level" disabled>
                 </div>
             </form>
         </div>
@@ -198,4 +210,5 @@
     <script src="../../static/script/auth.js?v=2"></script>
 
 </body>
+
 </html>
