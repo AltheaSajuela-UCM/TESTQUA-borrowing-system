@@ -126,7 +126,7 @@ function generate_due_alerts(PDO $pdo, ?int $userId = null): void
 
 // ---------------------------------------------------------------- items / categories
 const ITEM_SELECT = "i.id, i.item_code, i.name, i.category, i.description, i.stock, i.item_condition,
-        i.is_available, i.availability_status,
+        i.is_available, i.availability_status, i.image_path,
         COALESCE(i.requires_waiver, c.requires_waiver, 0)             AS requires_waiver,
         COALESCE(i.requires_id_surrender, c.requires_id_surrender, 0) AS requires_id_surrender,
         COALESCE(c.max_active_borrows, 2)                             AS max_active_borrows";

@@ -113,6 +113,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 5. ITEM CATALOG (loaded from the backend) ---
+    // Item photo (image_path is relative to the site root); falls back to the old placeholder if missing/broken.
+    const IMAGE_BASE = '../../../../';
+    function placeholderHtml(it) {
+        return it.category === 'Academic'
+            ? '<div class="placeholder-graphic"><div class="graphic-block green"></div><div class="graphic-block magenta"></div><div class="graphic-block cyan"></div></div>'
+            : '<div style="font-size: 28px;">🎲</div>';
+    }
+    function itemImageHtml(it) {
+        if (!it.image_path) return placeholderHtml(it);
+        const fallback = placeholderHtml(it).replace(/"/g, '&quot;');
+        return `<img class="item-photo" src="${esc(IMAGE_BASE + it.image_path)}" alt="${esc(it.name)}" loading="lazy"
+                     onerror="this.outerHTML='${fallback}'">`;
+    }
+
     const API_URL   = '../../../../backend/3_student/browse.php';
     const LOGIN_URL = '../../login_page/index.html';
 
@@ -165,9 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         itemsGrid.innerHTML = shown.map(it => {
-            const image = it.category === 'Academic'
-                ? '<div class="placeholder-graphic"><div class="graphic-block green"></div><div class="graphic-block magenta"></div><div class="graphic-block cyan"></div></div>'
-                : '<div style="font-size: 28px;">🎲</div>';
+            const image = itemImageHtml(it);
             const badge = it.status === 'available'
                 ? '<span class="status-badge available">Available</span>'
                 : '<span class="status-badge borrowed">Borrowed</span>';
@@ -254,9 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         detailCondition.textContent = item.item_condition || 'Good';
         detailWaiver.textContent = yesNo(item.requires_waiver);
         detailIdSurrender.textContent = yesNo(item.requires_id_surrender);
-        detailImageBox.innerHTML = item.category === 'Academic'
-            ? '<div class="placeholder-graphic"><div class="graphic-block green"></div><div class="graphic-block magenta"></div><div class="graphic-block cyan"></div></div>'
-            : '<div style="font-size: 28px;">🎲</div>';
+        detailImageBox.innerHTML = itemImageHtml(item);
 
         const available = item.status === 'available';
         detailStatusContainer.innerHTML = available
