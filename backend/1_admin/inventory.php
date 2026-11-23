@@ -4,6 +4,7 @@
 //
 // GET    ?category=&q=|search=&status=Available|Under Maintenance|Unavailable  -> {success, items}
 // POST   {item_code, name, category, stock, item_condition?, description?, availability_status?,
+//         image_path?: 'photo/AC_NC/xxx.png',
 //         requires_waiver?: 0|1|null, requires_id_surrender?: 0|1|null}       (null = inherit from the category)
 // PUT    {id, ...same fields, all optional}
 // POST   {action:'update', id, ...}  and  {action:'set_available', id, is_available}  (older front-end calls still work)
@@ -32,6 +33,16 @@ $b      = json_body();
 $action = (string) ($b['action'] ?? '');
 if ($method === 'POST' && in_array($action, ['update', 'set_available'], true)) $method = 'PUT';
 
+// Picture path must stay inside the project's photo/ folder (no '..', no absolute or remote URLs).
+$img = function ($v) {
+    $v = trim((string) $v);
+    if ($v === '') return null;
+    if (!preg_match('#^photo/[\w &\-./]+\.(png|jpe?g|webp|gif)$#i', $v) || strpos($v, '..') !== false) {
+        respond(['error' => 'image_path must be a file inside the photo/ folder'], 400);
+    }
+    return $v;
+};
+
 // null / '' / 'inherit' -> NULL (inherit); anything else -> 0/1
 $tri = fn($v) => ($v === null || $v === '' || $v === 'inherit') ? null : (int) (bool) $v;
 
@@ -47,10 +58,10 @@ if ($method === 'POST') {
     if ($stock === false || $stock < 0)               respond(['error' => 'Stock must be 0 or more'], 400);
     if (!in_array($stat, AVAILABILITY_STATUSES, true)) respond(['error' => 'Invalid availability_status'], 400);
     try {
-        $pdo->prepare('INSERT INTO inventories (item_code, name, category, description, stock, item_condition, availability_status,
+        $pdo->prepare('INSERT INTO inventories (item_code, name, category, description, image_path, stock, item_condition, availability_status,
                                                 requires_waiver, requires_id_surrender, is_available)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)')
-            ->execute([$code, $name, $cat, trim((string) ($b['description'] ?? '')) ?: null, $stock, $cond, $stat,
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)')
+            ->execute([$code, $name, $cat, trim((string) ($b['description'] ?? '')) ?: null, $img($b['image_path'] ?? ''), $stock, $cond, $stat,
                        $tri($b['requires_waiver'] ?? null), $tri($b['requires_id_surrender'] ?? null)]);
     } catch (PDOException $e) {
         respond(['error' => 'Item code already exists'], 409);
@@ -80,6 +91,7 @@ if ($method === 'PUT') {
     $stock = filter_var($b['stock'] ?? $it['stock'], FILTER_VALIDATE_INT);
     $cond  = trim((string) ($b['item_condition'] ?? $it['item_condition'])) ?: 'Good';
     $desc  = array_key_exists('description', $b) ? (trim((string) $b['description']) ?: null) : $it['description'];
+    $pic   = array_key_exists('image_path', $b) ? $img($b['image_path']) : $it['image_path'];
     $wv    = array_key_exists('requires_waiver', $b) ? $tri($b['requires_waiver']) : $it['requires_waiver'];
     $ids   = array_key_exists('requires_id_surrender', $b) ? $tri($b['requires_id_surrender']) : $it['requires_id_surrender'];
 
@@ -89,9 +101,9 @@ if ($method === 'PUT') {
     if (!in_array($stat, AVAILABILITY_STATUSES, true)) respond(['error' => 'Invalid availability_status'], 400);
 
     try {
-        $pdo->prepare('UPDATE inventories SET item_code=?, name=?, category=?, description=?, stock=?, item_condition=?,
+        $pdo->prepare('UPDATE inventories SET item_code=?, name=?, category=?, description=?, image_path=?, stock=?, item_condition=?,
                               availability_status=?, requires_waiver=?, requires_id_surrender=? WHERE id=?')
-            ->execute([$code, $name, $cat, $desc, $stock, $cond, $stat, $wv, $ids, $id]);
+            ->execute([$code, $name, $cat, $desc, $pic, $stock, $cond, $stat, $wv, $ids, $id]);
     } catch (PDOException $e) {
         respond(['error' => 'Item code already exists'], 409);
     }

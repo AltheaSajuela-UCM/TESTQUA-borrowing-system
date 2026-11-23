@@ -3,7 +3,7 @@ require_once __DIR__ . '/../auth.php';
 require_role('student');
 header('Content-Type: application/json');
 
-$sql = 'SELECT id, item_code, name, category, stock, item_condition, is_available
+$sql = 'SELECT id, item_code, name, category, image_path, stock, item_condition, is_available
         FROM inventories WHERE 1=1 AND is_available = 1';
 $params = [];
 if (!empty($_GET['category'])) {
@@ -15,7 +15,7 @@ if (!empty($_GET['search'])) {
     $like = '%' . $_GET['search'] . '%';
     array_push($params, $like, $like);
 }
-$sql .= ' ORDER BY category, name';
+$sql .= ' ORDER BY category, item_code';
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);

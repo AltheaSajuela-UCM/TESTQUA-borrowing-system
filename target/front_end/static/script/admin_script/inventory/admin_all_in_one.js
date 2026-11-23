@@ -62,7 +62,7 @@ async function loadItems() {
     } catch (err) {
         allItems = [];
         document.getElementById('inventoryTableBody').innerHTML =
-            `<tr><td colspan="6" class="empty-state">${esc(err.message)}</td></tr>`;
+            `<tr><td colspan="7" class="empty-state">${esc(err.message)}</td></tr>`;
         return;
     }
     renderInventoryTable();
@@ -87,12 +87,13 @@ function renderInventoryTable() {
     const items = itemsFor(currentCategory);
 
     if (items.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" class="empty-state">No items found in this category.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" class="empty-state">No items found in this category.</td></tr>`;
         return;
     }
 
     tableBody.innerHTML = items.map(item => `
         <tr>
+            <td>${item.image_path ? `<img src="${esc('../../../../' + item.image_path)}" alt="${esc(item.name)}" style="width:44px;height:44px;object-fit:contain;border-radius:6px;background:#f8fafc;">` : ''}</td>
             <td style="font-weight: 500;">${esc(item.item_code)}</td>
             <td>${esc(item.name)}</td>
             <td>${esc(item.category)}</td>
@@ -276,6 +277,12 @@ stockGroup.innerHTML = '<label>Stock</label><input type="number" min="0" value="
 addItemModal.querySelector('.modal-form-actions').before(stockGroup);
 const addStockInput = document.getElementById('addStockInput');
 
+const imageGroup = document.createElement('div');
+imageGroup.className = 'form-group';
+imageGroup.innerHTML = '<label>Photo (optional, max 2 MB)</label><input type="file" id="addImageInput" accept="image/png,image/jpeg,image/webp,image/gif">';
+addItemModal.querySelector('.modal-form-actions').before(imageGroup);
+const addImageInput = document.getElementById('addImageInput');
+
 const addSubmitBtn = addItemModal.querySelector('.btn-primary');
 addSubmitBtn.removeAttribute('onclick');          // it used to just close the modal
 addSubmitBtn.addEventListener('click', submitAddItem);
@@ -288,6 +295,20 @@ async function submitAddItem() {
     if (isNaN(stock) || stock < 0) { alert('Stock must be 0 or more.'); return; }
 
     try {
+        // 1) upload the photo first (if one was chosen)
+        let imagePath = '';
+        const file = addImageInput.files[0];
+        if (file) {
+            const fd = new FormData();
+            fd.append('image', file);
+            fd.append('item_code', code);
+            const up = await fetch(BASE + '1_admin/upload_image.php', { method: 'POST', credentials: 'same-origin', body: fd });
+            const upData = await up.json().catch(() => ({}));
+            if (!up.ok) throw new Error(upData.error || 'Photo upload failed');
+            imagePath = upData.image_path;
+        }
+
+        // 2) create the item with the photo path
         await api('1_admin/inventory.php', {
             method: 'POST',
             body: {
@@ -295,12 +316,14 @@ async function submitAddItem() {
                 name: name,
                 category: addCategorySelect.value,
                 item_condition: addConditionSelect.value,
-                stock: stock
+                stock: stock,
+                image_path: imagePath
             }
         });
         addNameInput.value = '';
         addCodeInput.value = '';
         addStockInput.value = '1';
+        addImageInput.value = '';
         closeModal('addItemModal');
         await loadItems();
     } catch (err) {

@@ -174,7 +174,7 @@ async function loadInventory() {
 
 function showTableMessage(msg) {
     document.getElementById('table-body').innerHTML =
-        `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">${esc(msg)}</td></tr>`;
+        `<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 32px; font-size: 13px;">${esc(msg)}</td></tr>`;
 }
 
 function switchCategory(category, evt) {
@@ -207,6 +207,7 @@ function renderTable() {
         else if (low !== 'available') badgeClass = 'maintenance';
 
         return `<tr>
+            <td>${item.image_path ? `<img src="${esc('../../../../' + item.image_path)}" alt="${esc(item.name)}" style="width:44px;height:44px;object-fit:contain;border-radius:6px;background:#f8fafc;">` : ''}</td>
             <td>${esc(item.item_code || '—')}</td>
             <td><strong>${esc(item.name || '—')}</strong></td>
             <td>${esc(item.category || '—')}</td>
