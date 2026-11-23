@@ -1,5 +1,5 @@
-
 const PROFILE_API = "../../../../backend/2_working_scholar/account_setting.php";
+const SIDEBAR_STORAGE_KEY = "webventory_sidebar_open";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -10,28 +10,73 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Edit button found:", testButton);
 
 
-    // 1. Sidebar Toggle Logic
+    // 1. Sidebar Toggle & Hover Logic
     const menuBtn = document.getElementById("menu-btn");
+    const leftEdgeHover = document.getElementById("left-edge-hover");
     const closeSidebarBtn = document.getElementById("close-sidebar-btn");
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebar-overlay");
+    let sidebarCloseTimer = null;
+
+    function setSidebarState(isOpen, persist = true, showOverlay = true) {
+        clearTimeout(sidebarCloseTimer);
+        if (sidebar) sidebar.classList.toggle("closed", !isOpen);
+        if (overlay) overlay.classList.toggle("hidden", !(isOpen && showOverlay));
+        if (persist) {
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? "true" : "false");
+            } catch (err) {}
+        }
+    }
+
+    const openSidebar = () => setSidebarState(true, true, true);
+    const closeSidebar = () => setSidebarState(false, true, false);
+
+    function scheduleSidebarClose() {
+        clearTimeout(sidebarCloseTimer);
+        sidebarCloseTimer = setTimeout(() => {
+            const hoveringMenu = menuBtn && menuBtn.matches(":hover");
+            const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(":hover");
+            const hoveringSidebar = sidebar && sidebar.matches(":hover");
+            if (!hoveringMenu && !hoveringEdge && !hoveringSidebar) {
+                setSidebarState(false, false, false);
+            }
+        }, 150);
+    }
 
     if (menuBtn && sidebar && overlay) {
-        menuBtn.addEventListener("click", () => {
-            sidebar.classList.remove("closed");
-            overlay.classList.remove("hidden");
-        });
+        menuBtn.addEventListener("mouseenter", () => setSidebarState(true, false, false));
+        menuBtn.addEventListener("mouseleave", scheduleSidebarClose);
+        menuBtn.addEventListener("click", openSidebar);
 
-        const closeSidebar = () => {
-            sidebar.classList.add("closed");
-            overlay.classList.add("hidden");
-        };
+        if (leftEdgeHover) {
+            leftEdgeHover.addEventListener("mouseenter", () => setSidebarState(true, false, false));
+            leftEdgeHover.addEventListener("mouseleave", scheduleSidebarClose);
+        }
+
+        sidebar.addEventListener("mouseenter", () => clearTimeout(sidebarCloseTimer));
+        sidebar.addEventListener("mouseleave", scheduleSidebarClose);
 
         if (closeSidebarBtn) {
             closeSidebarBtn.addEventListener("click", closeSidebar);
         }
 
         overlay.addEventListener("click", closeSidebar);
+
+        sidebar.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", (e) => {
+                e.stopPropagation();
+                try {
+                    localStorage.setItem(SIDEBAR_STORAGE_KEY, "true");
+                } catch (err) {}
+            });
+        });
+
+        try {
+            if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true") {
+                openSidebar();
+            }
+        } catch (err) {}
     }
 
     // 2. Profile Dropdown Toggle Logic

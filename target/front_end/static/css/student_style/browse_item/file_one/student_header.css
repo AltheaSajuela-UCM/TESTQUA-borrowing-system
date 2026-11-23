@@ -79,6 +79,16 @@
   color: #202124;
 }
 
+/* Left-edge trigger zone for hover */
+.left-edge-hover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 100vh;
+  z-index: 999;
+}
+
 /* SIDEBAR DRAWER */
 .sidebar-overlay {
   position: fixed;

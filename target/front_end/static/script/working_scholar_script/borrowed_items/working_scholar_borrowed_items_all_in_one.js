@@ -1,16 +1,11 @@
 // Borrowed Items page logic: fetches active borrowings from the backend and renders the table.
 // Backend: backend/2_working_scholar/borrowing.php?view=all  ->  { borrowings: [...] }
 
-// Borrowed Items page logic: fetches active borrowings from the backend and renders the table.
-// Backend: backend/2_working_scholar/borrowing.php?view=all  ->  { borrowings: [...] }
-
-// Borrowed Items page logic: fetches active borrowings from the backend and renders the table.
-// Backend: backend/2_working_scholar/borrowing.php?view=all  ->  { borrowings: [...] }
-
 const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
 
 let borrowedItemsData = [];
 let currentFilter = 'All';
+let sidebarCloseTimer = null;
 
 // Maps one row from borrowing.php to the field names the table uses.
 function mapBorrowing(b) {
@@ -102,10 +97,51 @@ function viewBorrowDetails(id) {
     window.location.href = `working_scholar_return_processing.html?id=${id}`;
 }
 
-function initSidebarPersistence() {
+function setSidebarOpen(isOpen, persist = true) {
+    clearTimeout(sidebarCloseTimer);
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('show', isOpen);
+    if (overlay) overlay.classList.toggle('show', isOpen);
+    if (persist) {
+        try {
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+        } catch (err) { /* storage unavailable */ }
+    }
+}
+
+function scheduleSidebarClose() {
+    clearTimeout(sidebarCloseTimer);
+    sidebarCloseTimer = setTimeout(() => {
+        const menuBtn = document.getElementById('menu-btn');
+        const leftEdgeHover = document.getElementById('left-edge-hover');
+        const sidebar = document.getElementById('sidebar');
+        const hoveringMenu = menuBtn && menuBtn.matches(':hover');
+        const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(':hover');
+        const hoveringSidebar = sidebar && sidebar.matches(':hover');
+        if (!hoveringMenu && !hoveringEdge && !hoveringSidebar) {
+            setSidebarOpen(false, false);
+        }
+    }, 150);
+}
+
+function initSidebarPersistence() {
+    const menuBtn = document.getElementById('menu-btn');
+    const leftEdgeHover = document.getElementById('left-edge-hover');
+    const sidebar = document.getElementById('sidebar');
+
+    if (menuBtn) {
+        menuBtn.addEventListener('mouseenter', () => setSidebarOpen(true, false));
+        menuBtn.addEventListener('mouseleave', scheduleSidebarClose);
+    }
+    if (leftEdgeHover) {
+        leftEdgeHover.addEventListener('mouseenter', () => setSidebarOpen(true, false));
+        leftEdgeHover.addEventListener('mouseleave', scheduleSidebarClose);
+    }
     if (sidebar) {
+        sidebar.addEventListener('mouseenter', () => clearTimeout(sidebarCloseTimer));
+        sidebar.addEventListener('mouseleave', scheduleSidebarClose);
+
         sidebar.querySelectorAll('a').forEach((link) => {
             link.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -117,8 +153,7 @@ function initSidebarPersistence() {
     }
     try {
         if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
-            if (sidebar) sidebar.classList.add('show');
-            if (overlay) overlay.classList.add('show');
+            setSidebarOpen(true, true);
         }
     } catch (err) { /* storage unavailable */ }
 }

@@ -120,6 +120,16 @@ HEADER & DROPDOWN STYLES
 /* ====================================
 1. SIDE MENU DRAWER (SLIDE IN)
 ==================================== */
+/* Left-edge trigger zone for hover */
+.left-edge-hover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 100vh;
+  z-index: 997;
+}
+
 .menu-overlay {
   display: none;
   position: fixed;

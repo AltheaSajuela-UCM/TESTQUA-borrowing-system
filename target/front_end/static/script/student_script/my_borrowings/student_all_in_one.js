@@ -141,29 +141,58 @@ profileBtn.addEventListener('click', (e) => {
   notifPopover.classList.add('hidden');
 });
 
-// Slide-out Drawer Navigation
+// Slide-out Drawer Navigation & Hover
 const openMenuBtn = document.getElementById('open-menu-btn');
+const leftEdgeHover = document.getElementById('left-edge-hover');
 const closeDrawerBtn = document.getElementById('close-drawer-btn');
 const drawerBackdrop = document.getElementById('drawer-backdrop');
 const drawerContent = document.getElementById('drawer-content');
+let drawerCloseTimer = null;
+
+function setDrawerState(isOpen, persist = true, showBackdrop = true) {
+  clearTimeout(drawerCloseTimer);
+  if (drawerContent) drawerContent.classList.toggle('drawer-closed', !isOpen);
+  if (drawerBackdrop) drawerBackdrop.classList.toggle('hidden', !(isOpen && showBackdrop));
+  if (persist) {
+    try {
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+    } catch (err) { /* storage unavailable */ }
+  }
+}
 
 function openDrawer() {
-  if (drawerBackdrop) drawerBackdrop.classList.remove('hidden');
-  if (drawerContent) drawerContent.classList.remove('drawer-closed');
-  try {
-    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
-  } catch (err) { /* storage unavailable */ }
+  setDrawerState(true, true, true);
 }
 
 function closeDrawer() {
-  if (drawerBackdrop) drawerBackdrop.classList.add('hidden');
-  if (drawerContent) drawerContent.classList.add('drawer-closed');
-  try {
-    localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
-  } catch (err) { /* storage unavailable */ }
+  setDrawerState(false, true, false);
 }
 
-if (openMenuBtn) openMenuBtn.addEventListener('click', openDrawer);
+function scheduleDrawerClose() {
+  clearTimeout(drawerCloseTimer);
+  drawerCloseTimer = setTimeout(() => {
+    const hoveringMenu = openMenuBtn && openMenuBtn.matches(':hover');
+    const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(':hover');
+    const hoveringDrawer = drawerContent && drawerContent.matches(':hover');
+    if (!hoveringMenu && !hoveringEdge && !hoveringDrawer) {
+      setDrawerState(false, false, false);
+    }
+  }, 150);
+}
+
+if (openMenuBtn) {
+  openMenuBtn.addEventListener('mouseenter', () => setDrawerState(true, false, false));
+  openMenuBtn.addEventListener('mouseleave', scheduleDrawerClose);
+  openMenuBtn.addEventListener('click', openDrawer);
+}
+if (leftEdgeHover) {
+  leftEdgeHover.addEventListener('mouseenter', () => setDrawerState(true, false, false));
+  leftEdgeHover.addEventListener('mouseleave', scheduleDrawerClose);
+}
+if (drawerContent) {
+  drawerContent.addEventListener('mouseenter', () => clearTimeout(drawerCloseTimer));
+  drawerContent.addEventListener('mouseleave', scheduleDrawerClose);
+}
 if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
 if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
 

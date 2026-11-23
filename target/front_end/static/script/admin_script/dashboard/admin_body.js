@@ -78,4 +78,53 @@
     }
     load();
     setInterval(load, 30000);                       // keep the numbers fresh
+
+    // Hover-to-open for #menuBtn and #leftEdgeHover on #sideMenu
+    document.addEventListener('DOMContentLoaded', function () {
+        var menuBtn = document.getElementById('menuBtn');
+        var leftEdgeHover = document.getElementById('leftEdgeHover');
+        var sideMenu = document.getElementById('sideMenu');
+        var menuOverlay = document.getElementById('menuOverlay');
+        var closeTimer = null;
+
+        if (!sideMenu) return;
+
+        function openMenu() {
+            clearTimeout(closeTimer);
+            sideMenu.classList.add('active');
+            if (menuOverlay) menuOverlay.classList.add('active');
+        }
+
+        function closeMenu() {
+            sideMenu.classList.remove('active');
+            if (menuOverlay) menuOverlay.classList.remove('active');
+        }
+
+        function scheduleClose() {
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(function () {
+                var hoveringMenu = menuBtn && menuBtn.matches(':hover');
+                var hoveringEdge = leftEdgeHover && leftEdgeHover.matches(':hover');
+                var hoveringDrawer = sideMenu.matches(':hover');
+                if (!hoveringMenu && !hoveringEdge && !hoveringDrawer) {
+                    closeMenu();
+                }
+            }, 150);
+        }
+
+        if (menuBtn) {
+            menuBtn.addEventListener('mouseenter', openMenu);
+            menuBtn.addEventListener('mouseleave', scheduleClose);
+        }
+
+        if (leftEdgeHover) {
+            leftEdgeHover.addEventListener('mouseenter', openMenu);
+            leftEdgeHover.addEventListener('mouseleave', scheduleClose);
+        }
+
+        sideMenu.addEventListener('mouseenter', function () {
+            clearTimeout(closeTimer);
+        });
+        sideMenu.addEventListener('mouseleave', scheduleClose);
+    });
 })();

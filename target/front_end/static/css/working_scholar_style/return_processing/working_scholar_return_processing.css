@@ -129,6 +129,9 @@ body {
 .mark-read-btn { background: none; border: none; color: #174EA6; font-weight: 600; font-size: 14px; cursor: pointer; text-align: left; margin-top: 4px; }
 .mark-read-btn:hover { text-decoration: underline; }
 
+/* Left-edge trigger zone for hover */
+.left-edge-hover { position: fixed; top: 0; left: 0; width: 14px; height: 100vh; z-index: 290; }
+
 /* Sidebar Navigation Drawer */
 .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.4); z-index: 300; display: none; }
 .sidebar-overlay.show { display: block; }

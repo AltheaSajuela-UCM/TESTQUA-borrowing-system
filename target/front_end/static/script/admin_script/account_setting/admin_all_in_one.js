@@ -10,45 +10,62 @@ function initialsOf(name) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Sidebar Toggle Logic
+    // 1. Sidebar Hover & Toggle Logic
     const menuBtn = document.getElementById("menu-btn");
+    const leftEdgeHover = document.getElementById("left-edge-hover");
     const closeSidebarBtn = document.getElementById("close-sidebar-btn");
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebar-overlay");
+    let closeTimer = null;
 
-    if (menuBtn && sidebar && overlay) {
-        menuBtn.addEventListener("click", () => {
+    if (sidebar && overlay) {
+        const openSidebar = () => {
+            clearTimeout(closeTimer);
             sidebar.classList.remove("closed");
+            sidebar.classList.add("open");
             overlay.classList.remove("hidden");
-        });
+        };
 
         const closeSidebar = () => {
+            sidebar.classList.remove("open");
             sidebar.classList.add("closed");
             overlay.classList.add("hidden");
         };
+
+        const scheduleClose = () => {
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(() => {
+                const hoveringMenu = menuBtn && menuBtn.matches(":hover");
+                const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(":hover");
+                const hoveringSidebar = sidebar.matches(":hover");
+                if (!hoveringMenu && !hoveringEdge && !hoveringSidebar) {
+                    closeSidebar();
+                }
+            }, 150);
+        };
+
+        if (menuBtn) {
+            menuBtn.addEventListener("mouseenter", openSidebar);
+            menuBtn.addEventListener("mouseleave", scheduleClose);
+            menuBtn.addEventListener("click", () => {
+                if (sidebar.classList.contains("open")) closeSidebar();
+                else openSidebar();
+            });
+        }
+
+        if (leftEdgeHover) {
+            leftEdgeHover.addEventListener("mouseenter", openSidebar);
+            leftEdgeHover.addEventListener("mouseleave", scheduleClose);
+        }
+
+        sidebar.addEventListener("mouseenter", () => clearTimeout(closeTimer));
+        sidebar.addEventListener("mouseleave", scheduleClose);
 
         if (closeSidebarBtn) closeSidebarBtn.addEventListener("click", closeSidebar);
         overlay.addEventListener("click", closeSidebar);
     }
 
-    // 2. Profile Dropdown Toggle Logic
-    const profileMenuBtn = document.getElementById("profile-menu-btn");
-    const profileDropdown = document.getElementById("profile-dropdown");
-
-    if (profileMenuBtn && profileDropdown) {
-        profileMenuBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle("hidden");
-        });
-
-        document.addEventListener("click", () => {
-            if (!profileDropdown.classList.contains("hidden")) {
-                profileDropdown.classList.add("hidden");
-            }
-        });
-    }
-
-    // 3. Load and save the profile
+    // 2. Load and save the profile
     const editBtn = document.getElementById("edit-btn");
     const formInputs = document.querySelectorAll("#settings-form input");
     const nameInput = document.getElementById("full-name");
@@ -132,4 +149,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadProfile();
 });
-    

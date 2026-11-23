@@ -46,10 +46,12 @@ function saveReadId(owner, id) {
 
 // Elements Selection
 const menuBtn = document.getElementById('menuBtn');
+const leftEdgeHover = document.getElementById('leftEdgeHover');
 const sideMenu = document.getElementById('sideMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
 const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
+let sideMenuCloseTimer = null;
 
 const notifDropdownWrapper = document.getElementById('notifDropdownWrapper');
 const notifBtn = document.getElementById('notifBtn');
@@ -57,32 +59,55 @@ const notifBtn = document.getElementById('notifBtn');
 const profileDropdownWrapper = document.getElementById('profileDropdownWrapper');
 const profileBtn = document.getElementById('profileBtn');
 
-// 1. SIDE MENU (DRAWER) TOGGLE
-function openSideMenu() {
-    if (sideMenu && menuOverlay) {
-        sideMenu.classList.add('active');
-        menuOverlay.classList.add('active');
+// 1. SIDE MENU (DRAWER) TOGGLE & HOVER
+function setSideMenuState(isOpen, persist = true, showOverlay = true) {
+    clearTimeout(sideMenuCloseTimer);
+    if (sideMenu) sideMenu.classList.toggle('active', isOpen);
+    if (menuOverlay) menuOverlay.classList.toggle('active', isOpen && showOverlay);
+    if (persist) {
         try {
-            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
         } catch (err) {}
     }
+}
+
+function openSideMenu() {
+    setSideMenuState(true, true, true);
 }
 
 function closeSideMenu() {
-    if (sideMenu && menuOverlay) {
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-        try {
-            localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
-        } catch (err) {}
-    }
+    setSideMenuState(false, true, false);
+}
+
+function scheduleSideMenuClose() {
+    clearTimeout(sideMenuCloseTimer);
+    sideMenuCloseTimer = setTimeout(() => {
+        const hoveringMenu = menuBtn && menuBtn.matches(':hover');
+        const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(':hover');
+        const hoveringDrawer = sideMenu && sideMenu.matches(':hover');
+        if (!hoveringMenu && !hoveringEdge && !hoveringDrawer) {
+            setSideMenuState(false, false, false);
+        }
+    }, 150);
 }
 
 if (menuBtn) {
+    menuBtn.addEventListener('mouseenter', () => setSideMenuState(true, false, false));
+    menuBtn.addEventListener('mouseleave', scheduleSideMenuClose);
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         openSideMenu();
     });
+}
+
+if (leftEdgeHover) {
+    leftEdgeHover.addEventListener('mouseenter', () => setSideMenuState(true, false, false));
+    leftEdgeHover.addEventListener('mouseleave', scheduleSideMenuClose);
+}
+
+if (sideMenu) {
+    sideMenu.addEventListener('mouseenter', () => clearTimeout(sideMenuCloseTimer));
+    sideMenu.addEventListener('mouseleave', scheduleSideMenuClose);
 }
 
 if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeSideMenu);

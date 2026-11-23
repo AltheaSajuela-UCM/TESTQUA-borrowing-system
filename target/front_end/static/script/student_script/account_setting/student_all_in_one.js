@@ -1,19 +1,47 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Sidebar Toggle Logic
+    // 1. Sidebar Toggle & Hover Logic
     const menuBtn = document.getElementById("menu-btn");
+    const leftEdgeHover = document.getElementById("left-edge-hover");
     const closeSidebarBtn = document.getElementById("close-sidebar-btn");
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebar-overlay");
+    let sidebarCloseTimer = null;
+
+    function setSidebarOpen(isOpen, showOverlay = true) {
+        clearTimeout(sidebarCloseTimer);
+        if (sidebar) sidebar.classList.toggle("closed", !isOpen);
+        if (overlay) overlay.classList.toggle("hidden", !(isOpen && showOverlay));
+    }
+
+    function scheduleSidebarClose() {
+        clearTimeout(sidebarCloseTimer);
+        sidebarCloseTimer = setTimeout(() => {
+            const hoveringMenu = menuBtn && menuBtn.matches(":hover");
+            const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(":hover");
+            const hoveringSidebar = sidebar && sidebar.matches(":hover");
+            if (!hoveringMenu && !hoveringEdge && !hoveringSidebar) {
+                setSidebarOpen(false, false);
+            }
+        }, 150);
+    }
 
     if (menuBtn && sidebar && overlay) {
+        menuBtn.addEventListener("mouseenter", () => setSidebarOpen(true, false));
+        menuBtn.addEventListener("mouseleave", scheduleSidebarClose);
         menuBtn.addEventListener("click", () => {
-            sidebar.classList.remove("closed");
-            overlay.classList.remove("hidden");
+            setSidebarOpen(true, true);
         });
 
+        if (leftEdgeHover) {
+            leftEdgeHover.addEventListener("mouseenter", () => setSidebarOpen(true, false));
+            leftEdgeHover.addEventListener("mouseleave", scheduleSidebarClose);
+        }
+
+        sidebar.addEventListener("mouseenter", () => clearTimeout(sidebarCloseTimer));
+        sidebar.addEventListener("mouseleave", scheduleSidebarClose);
+
         const closeSidebar = () => {
-            sidebar.classList.add("closed");
-            overlay.classList.add("hidden");
+            setSidebarOpen(false, false);
         };
 
         if (closeSidebarBtn) closeSidebarBtn.addEventListener("click", closeSidebar);

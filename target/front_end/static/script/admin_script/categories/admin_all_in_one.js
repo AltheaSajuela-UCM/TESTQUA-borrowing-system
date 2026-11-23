@@ -27,6 +27,7 @@ function esc(v) {
 document.addEventListener('DOMContentLoaded', () => {
     let categories = [];
     let editingId = null;                       // null = adding, number = editing that category
+    let sidebarCloseTimer = null;
 
     // ---------------------------------------------------------------- dropdowns
     const notifBtn = document.getElementById('notifBtn');
@@ -57,28 +58,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---------------------------------------------------------------- sidebar
     const menuBtn = document.getElementById('menuBtn');
+    const leftEdgeHover = document.getElementById('leftEdgeHover');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
-    function setSidebarOpen(isOpen) {
+    function setSidebarOpen(isOpen, persist = true) {
+        clearTimeout(sidebarCloseTimer);
         if (sidebar) sidebar.classList.toggle('active', isOpen);
         if (sidebarOverlay) sidebarOverlay.classList.toggle('hidden', !isOpen);
-        try {
-            localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
-        } catch (err) { /* storage unavailable */ }
+        if (persist) {
+            try {
+                localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+            } catch (err) { /* storage unavailable */ }
+        }
     }
 
     function toggleSidebar() {
         const willOpen = sidebar ? !sidebar.classList.contains('active') : true;
-        setSidebarOpen(willOpen);
+        setSidebarOpen(willOpen, true);
     }
 
-    if (menuBtn) menuBtn.addEventListener('click', toggleSidebar);
-    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+    function scheduleSidebarClose() {
+        clearTimeout(sidebarCloseTimer);
+        sidebarCloseTimer = setTimeout(() => {
+            const hoveringMenu = menuBtn && menuBtn.matches(':hover');
+            const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(':hover');
+            const hoveringSidebar = sidebar && sidebar.matches(':hover');
+            if (!hoveringMenu && !hoveringEdge && !hoveringSidebar) {
+                setSidebarOpen(false, false);
+            }
+        }, 150);
+    }
+
+    if (menuBtn) {
+        menuBtn.addEventListener('mouseenter', () => setSidebarOpen(true, false));
+        menuBtn.addEventListener('mouseleave', scheduleSidebarClose);
+        menuBtn.addEventListener('click', toggleSidebar);
+    }
+    if (leftEdgeHover) {
+        leftEdgeHover.addEventListener('mouseenter', () => setSidebarOpen(true, false));
+        leftEdgeHover.addEventListener('mouseleave', scheduleSidebarClose);
+    }
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', () => setSidebarOpen(false, true));
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', () => setSidebarOpen(false, true));
 
     if (sidebar) {
+        sidebar.addEventListener('mouseenter', () => clearTimeout(sidebarCloseTimer));
+        sidebar.addEventListener('mouseleave', scheduleSidebarClose);
+
         sidebar.querySelectorAll('a').forEach((link) => {
             link.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -91,9 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
         if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
-            setSidebarOpen(true);
+            setSidebarOpen(true, true);
+        } else {
+            setSidebarOpen(false, false);
         }
-    } catch (err) { /* storage unavailable */ }
+    } catch (err) {
+        setSidebarOpen(false, false);
+    }
 
     // ---------------------------------------------------------------- category cards
     const container = document.querySelector('.category-cards-container');

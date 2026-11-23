@@ -121,6 +121,16 @@ body {
   display: block;
 }
 
+/* Left-edge trigger zone for hover */
+.left-edge-hover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 100vh;
+  z-index: 997;
+}
+
 /* Side Menu Drawer */
 .menu-overlay {
   display: none;

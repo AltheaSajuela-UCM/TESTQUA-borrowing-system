@@ -246,6 +246,16 @@ body {
     border-color: #E0E4E8;
 }
 
+/* Left-edge trigger zone for hover */
+.left-edge-hover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 14px;
+    height: 100vh;
+    z-index: 998;
+}
+
 /* Sidebar Drawer Styles */
 .sidebar {
     position: fixed;

@@ -1,7 +1,6 @@
-const SIDEBAR_STORAGE_KEY = 'webventory_sidebar_open';
-
 // Elements Selection
 const menuBtn = document.getElementById('menuBtn');
+const leftEdgeHover = document.getElementById('left-edge-hover');
 const sideMenu = document.getElementById('sideMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
@@ -14,28 +13,52 @@ const profileDropdownWrapper = document.getElementById('profileDropdownWrapper')
 const profileBtn = document.getElementById('profileBtn');
 const profilePopup = document.getElementById('profilePopup');
 
-// 1. SIDE MENU (DRAWER) TOGGLE
-function setSideMenuOpen(isOpen) {
+let sidebarCloseTimer = null;
+
+// 1. SIDE MENU (DRAWER) TOGGLE & HOVER
+function setSideMenuState(isOpen, persist = true, showOverlay = true) {
+    clearTimeout(sidebarCloseTimer);
     if (sideMenu) sideMenu.classList.toggle('active', isOpen);
-    if (menuOverlay) menuOverlay.classList.toggle('active', isOpen);
-    try {
-        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
-    } catch (err) { /* storage unavailable */ }
+    if (menuOverlay) menuOverlay.classList.toggle('active', !!(isOpen && showOverlay));
+    if (persist) {
+        try {
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+        } catch (err) { /* storage unavailable */ }
+    }
 }
 
 function openSideMenu() {
-    setSideMenuOpen(true);
+    setSideMenuState(true, true, true);
 }
 
 function closeSideMenu() {
-    setSideMenuOpen(false);
+    setSideMenuState(false, true, false);
+}
+
+function scheduleSideMenuClose() {
+    clearTimeout(sidebarCloseTimer);
+    sidebarCloseTimer = setTimeout(() => {
+        const hoveringMenu = menuBtn && menuBtn.matches(':hover');
+        const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(':hover');
+        const hoveringDrawer = sideMenu && sideMenu.matches(':hover');
+        if (!hoveringMenu && !hoveringEdge && !hoveringDrawer) {
+            setSideMenuState(false, false, false);
+        }
+    }, 150);
 }
 
 if (menuBtn) {
+    menuBtn.addEventListener('mouseenter', () => setSideMenuState(true, false, false));
+    menuBtn.addEventListener('mouseleave', scheduleSideMenuClose);
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         openSideMenu();
     });
+}
+
+if (leftEdgeHover) {
+    leftEdgeHover.addEventListener('mouseenter', () => setSideMenuState(true, false, false));
+    leftEdgeHover.addEventListener('mouseleave', scheduleSideMenuClose);
 }
 
 if (closeMenuBtn) {
@@ -47,6 +70,9 @@ if (menuOverlay) {
 }
 
 if (sideMenu) {
+    sideMenu.addEventListener('mouseenter', () => clearTimeout(sidebarCloseTimer));
+    sideMenu.addEventListener('mouseleave', scheduleSideMenuClose);
+
     sideMenu.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -60,7 +86,7 @@ if (sideMenu) {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
-            setSideMenuOpen(true);
+            openSideMenu();
         }
     } catch (err) { /* storage unavailable */ }
 });

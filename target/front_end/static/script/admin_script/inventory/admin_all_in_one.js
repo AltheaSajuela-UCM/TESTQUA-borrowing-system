@@ -32,6 +32,7 @@ let currentRuleCategory = 'academic';
 let currentAvailCategory = 'academic';
 let selectedRuleItem = null;
 let selectedAvailItem = null;
+let sideMenuCloseTimer = null;
 
 let notificationsData = [];
 let currentNotifTab = 'all';
@@ -397,34 +398,61 @@ notifTabBtns.forEach(btn => {
 
 // ---------------------------------------------------------------- menu, dropdowns, modals
 const menuBtn = document.getElementById('menuBtn');
+const leftEdgeHover = document.getElementById('leftEdgeHover');
 const sideMenu = document.getElementById('sideMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
 
-function setSideMenuOpen(isOpen) {
+function setSideMenuOpen(isOpen, persist = true) {
+    clearTimeout(sideMenuCloseTimer);
     if (sideMenu) sideMenu.classList.toggle('active', isOpen);
     if (menuOverlay) menuOverlay.classList.toggle('active', isOpen);
-    try {
-        localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
-    } catch (err) { /* storage unavailable */ }
+    if (persist) {
+        try {
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, isOpen ? 'true' : 'false');
+        } catch (err) { /* storage unavailable */ }
+    }
 }
 
 function openSideMenu() {
-    setSideMenuOpen(true);
+    setSideMenuOpen(true, true);
 }
 
 function closeSideMenu() {
-    setSideMenuOpen(false);
+    setSideMenuOpen(false, true);
 }
 
-menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openSideMenu();
-});
-closeMenuBtn.addEventListener('click', closeSideMenu);
-menuOverlay.addEventListener('click', closeSideMenu);
+function scheduleSideMenuClose() {
+    clearTimeout(sideMenuCloseTimer);
+    sideMenuCloseTimer = setTimeout(() => {
+        const hoveringMenu = menuBtn && menuBtn.matches(':hover');
+        const hoveringEdge = leftEdgeHover && leftEdgeHover.matches(':hover');
+        const hoveringDrawer = sideMenu && sideMenu.matches(':hover');
+        if (!hoveringMenu && !hoveringEdge && !hoveringDrawer) {
+            setSideMenuOpen(false, false);
+        }
+    }, 150);
+}
+
+if (menuBtn) {
+    menuBtn.addEventListener('mouseenter', () => setSideMenuOpen(true, false));
+    menuBtn.addEventListener('mouseleave', scheduleSideMenuClose);
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSideMenu();
+    });
+}
+if (leftEdgeHover) {
+    leftEdgeHover.addEventListener('mouseenter', () => setSideMenuOpen(true, false));
+    leftEdgeHover.addEventListener('mouseleave', scheduleSideMenuClose);
+}
+if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeSideMenu);
+if (menuOverlay) menuOverlay.addEventListener('click', closeSideMenu);
 
 if (sideMenu) {
+    sideMenu.addEventListener('mouseenter', () => clearTimeout(sideMenuCloseTimer));
+    sideMenu.addEventListener('mouseleave', scheduleSideMenuClose);
+
     sideMenu.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -438,7 +466,7 @@ if (sideMenu) {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         if (localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true') {
-            setSideMenuOpen(true);
+            setSideMenuOpen(true, true);
         }
     } catch (err) { /* storage unavailable */ }
 });
