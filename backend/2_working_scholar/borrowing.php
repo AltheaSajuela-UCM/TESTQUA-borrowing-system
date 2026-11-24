@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                    t.id_surrendered, t.id_returned_at, t.release_condition, t.waiver_accepted_at, t.last_reminder_at,
                    u.id AS user_id, u.id_number AS user_id_number, u.full_name AS borrower, u.mobile_number, u.campus,
                    i.id AS item_id, i.item_code, i.name AS item_name, i.category, i.stock,
+                   t.unit_id, un.unit_code,
                    COALESCE(i.requires_id_surrender, c.requires_id_surrender, 0) AS requires_id_surrender,
                    pu.full_name AS processed_by_name,
                    (t.status = "active" AND t.expected_return_date < NOW()) AS is_overdue,
@@ -26,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                    IF(t.status = "active" AND t.expected_return_date < NOW(), DATEDIFF(NOW(), t.expected_return_date), 0) AS days_overdue
             FROM transactions t
             JOIN inventories i ON i.id = t.inventory_id
+            LEFT JOIN item_units un ON un.id = t.unit_id
             LEFT JOIN categories c ON c.name = i.category
             JOIN users u ON u.id = t.user_id
             LEFT JOIN users pu ON pu.id = t.processed_by
@@ -118,20 +120,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($item['requires_id_surrender'] && empty($body['id_surrendered'])) throw new InvalidArgumentException('Collect the student ID before releasing this item');
             $when = $schedule($body['expected_return_date'] ?? null, $item['category']);
 
-            $new = (int) $item['stock'] - 1;
-            $pdo->prepare('UPDATE inventories SET stock = ? WHERE id = ?')->execute([$new, $item['id']]);
-            sync_availability($pdo, (int) $item['id']);
-            $pdo->prepare("INSERT INTO transactions (user_id, inventory_id, status, notes, processed_by, processed_at, expected_return_date,
+            $unit = reserve_unit($pdo, (int) $item['id']);
+            if (!$unit) throw new InvalidArgumentException('All copies of this item are taken right now');
+            set_unit_status($pdo, (int) $unit['id'], 'borrowed');
+            sync_stock($pdo, (int) $item['id']);
+            $pdo->prepare("INSERT INTO transactions (user_id, inventory_id, unit_id, status, notes, processed_by, processed_at, expected_return_date,
                                                       waiver_accepted_at, id_surrendered, release_condition)
-                           VALUES (?, ?, 'active', 'Manual entry by Working Scholar', ?, NOW(), ?, ?, ?, ?)")
-                ->execute([$student['id'], $item['id'], $user['id'], $when->format('Y-m-d H:i:s'),
+                           VALUES (?, ?, ?, 'active', 'Manual entry by Working Scholar', ?, NOW(), ?, ?, ?, ?)")
+                ->execute([$student['id'], $item['id'], $unit['id'], $user['id'], $when->format('Y-m-d H:i:s'),
                            $item['requires_waiver'] ? date('Y-m-d H:i:s') : null,
                            $item['requires_id_surrender'] ? 1 : 0,
                            trim((string) ($body['item_condition'] ?? $item['item_condition']))]);
             $newTx = (int) $pdo->lastInsertId();
             $pdo->commit();
 
-            log_audit($user, 'Released Item', 'Transaction', tx_code($newTx), 'Manual entry: released ' . $item['name'] . ' to ' . $student['full_name'],
+            log_audit($user, 'Released Item', 'Transaction', tx_code($newTx), 'Manual entry: released ' . $item['name'] . ' (' . $unit['unit_code'] . ') to ' . $student['full_name'],
                       ['type' => 'Borrow Request', 'student' => $student['full_name'], 'item' => $item['name']]);
             notify((int) $student['id'], 'You borrowed ' . $item['name'] . '. Return it by ' . $when->format('M j, Y g:i A') . '.', 'info', $newTx);
             respond(['success' => true, 'action' => $action, 'transaction_id' => $newTx, 'transaction_code' => tx_code($newTx)], 201);
@@ -162,7 +165,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($body['student_id']) && (string) $body['student_id'] !== $student['id_number']) {
                 throw new InvalidArgumentException('Student ID does not match this request');
             }
-            if (!decorate_item($item)['can_borrow']) throw new InvalidArgumentException('Item is out of stock or unavailable');
+            // The request already holds its own unit, so only the item's status matters here (not the free stock).
+            if ($item['availability_status'] !== 'Available') throw new InvalidArgumentException('Item is unavailable');
 
             $elig = student_eligibility($pdo, (int) $tx['user_id'], $item['category'], $txId);
             if (!$elig['allowed']) throw new InvalidArgumentException($elig['reason']);
@@ -172,8 +176,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $when = $schedule($body['expected_return_date'] ?? $tx['expected_return_date'], $item['category']);
 
-            $pdo->prepare('UPDATE inventories SET stock = stock - 1 WHERE id = ?')->execute([$item['id']]);
-            sync_availability($pdo, (int) $item['id']);
+            $unitId = $tx['unit_id'] ? (int) $tx['unit_id'] : null;
+            if (!$unitId) {   // older request made before units existed: give it a copy now
+                $u = reserve_unit($pdo, (int) $item['id']);
+                if (!$u) throw new InvalidArgumentException('All copies of this item are taken right now');
+                $unitId = (int) $u['id'];
+                $pdo->prepare('UPDATE transactions SET unit_id = ? WHERE id = ?')->execute([$unitId, $txId]);
+            }
+            set_unit_status($pdo, $unitId, 'borrowed');
+            sync_stock($pdo, (int) $item['id']);
             $pdo->prepare("UPDATE transactions SET status = 'active', processed_by = ?, processed_at = NOW(), expected_return_date = ?,
                                   id_surrendered = ?, release_condition = ? WHERE id = ?")
                 ->execute([$user['id'], $when->format('Y-m-d H:i:s'), $item['requires_id_surrender'] ? 1 : 0,
@@ -192,6 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ->execute([$reason !== '' ? $reason : null, $user['id'], $txId]);
             $pdo->prepare("UPDATE cancellation_requests SET status = 'accepted', resolved_by = ?, resolved_at = NOW()
                            WHERE transaction_id = ? AND status = 'pending'")->execute([$user['id'], $txId]);
+            release_tx_unit($pdo, $tx);   // the copy goes back on the shelf
 
             log_audit($user, 'Rejected Request', 'Transaction', $code, $reason ?: 'Incomplete submission', $meta);
             notify((int) $student['id'], "Your {$item['name']} borrow request was rejected" . ($reason !== '' ? ": $reason" : '.'), 'alert', $txId);
@@ -217,11 +229,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $late = trim((string) ($body['late_notes'] ?? ''));
 
-            // A lost item does not go back into stock.
-            if ($cond !== 'Lost') {
+            // A lost copy stays out of stock (status 'lost'); anything else goes back on the shelf.
+            $retUnit = $tx['unit_id'] ? (int) $tx['unit_id'] : null;
+            if ($retUnit) {
+                set_unit_status($pdo, $retUnit, $cond === 'Lost' ? 'lost' : 'available', $cond === 'Good' ? 'Good' : $cond);
+                sync_stock($pdo, (int) $item['id']);
+            } elseif ($cond !== 'Lost') {     // older borrowing without a unit
                 $pdo->prepare('UPDATE inventories SET stock = stock + 1 WHERE id = ?')->execute([$item['id']]);
+                sync_availability($pdo, (int) $item['id']);
             }
-            sync_availability($pdo, (int) $item['id']);
             $pdo->prepare("UPDATE transactions SET status = 'returned', returned_at = NOW(), received_by = ?, return_condition = ?,
                                   late_notes = ?, id_returned_at = ? WHERE id = ?")
                 ->execute([$user['id'], $cond, $late !== '' ? mb_substr($late, 0, 500) : null,

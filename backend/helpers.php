@@ -152,6 +152,71 @@ function sync_availability(PDO $pdo, int $itemId): void
         ->execute([$itemId]);
 }
 
+// ---------------------------------------------------------------- per-unit tracking (item_units)
+// Every physical copy has its own ID (AC-001-01, AC-001-02, ...). A request holds ONE unit from the moment it is
+// submitted, so testers approving / rejecting / cancelling different requests never touch the same copy.
+// inventories.stock is kept equal to the number of units with status 'available'.
+// Call these inside a DB transaction (they use SELECT ... FOR UPDATE).
+
+// Locks and reserves one free unit of an item. Returns ['id' =>, 'unit_code' =>] or null when none is free.
+function reserve_unit(PDO $pdo, int $itemId): ?array
+{
+    $s = $pdo->prepare("SELECT id, unit_code FROM item_units WHERE inventory_id = ? AND status = 'available' ORDER BY unit_no LIMIT 1 FOR UPDATE");
+    $s->execute([$itemId]);
+    $u = $s->fetch();
+    if (!$u) return null;
+    $pdo->prepare("UPDATE item_units SET status = 'reserved' WHERE id = ?")->execute([$u['id']]);
+    return $u;
+}
+
+// Sets one unit's status (available | reserved | borrowed | lost) and optionally its condition.
+function set_unit_status(PDO $pdo, ?int $unitId, string $status, ?string $condition = null): void
+{
+    if (!$unitId) return;
+    if ($condition !== null) {
+        $pdo->prepare('UPDATE item_units SET status = ?, unit_condition = ? WHERE id = ?')->execute([$status, $condition, $unitId]);
+    } else {
+        $pdo->prepare('UPDATE item_units SET status = ? WHERE id = ?')->execute([$status, $unitId]);
+    }
+}
+
+// stock = free units; also refreshes is_available.
+function sync_stock(PDO $pdo, int $itemId): void
+{
+    $pdo->prepare("UPDATE inventories SET stock = (SELECT COUNT(*) FROM item_units WHERE inventory_id = ? AND status = 'available') WHERE id = ?")
+        ->execute([$itemId, $itemId]);
+    sync_availability($pdo, $itemId);
+}
+
+// Gives a transaction its unit back (rejected / cancelled). Works for older rows that have no unit_id too.
+function release_tx_unit(PDO $pdo, array $tx): void
+{
+    set_unit_status($pdo, isset($tx['unit_id']) ? (int) $tx['unit_id'] : null, 'available');
+    sync_stock($pdo, (int) $tx['inventory_id']);
+}
+
+// The admin's "stock" number = units on the shelf. Adds new units, or removes shelf units that were never used in a transaction.
+function resize_units(PDO $pdo, int $itemId, string $itemCode, int $total): void
+{
+    $c = $pdo->prepare("SELECT COUNT(*) FROM item_units WHERE inventory_id = ? AND status = 'available'");
+    $c->execute([$itemId]);
+    $have = (int) $c->fetchColumn();
+    if ($total > $have) {
+        $m = $pdo->prepare('SELECT COALESCE(MAX(unit_no), 0) FROM item_units WHERE inventory_id = ?');
+        $m->execute([$itemId]);
+        $n = (int) $m->fetchColumn();
+        $ins = $pdo->prepare('INSERT INTO item_units (inventory_id, unit_no, unit_code) VALUES (?, ?, ?)');
+        for ($k = 0; $k < $total - $have; $k++) {
+            $n++;
+            $ins->execute([$itemId, $n, $itemCode . '-' . str_pad((string) $n, 2, '0', STR_PAD_LEFT)]);
+        }
+    } elseif ($total < $have) {      // only units sitting on the shelf can be removed
+        $pdo->prepare("DELETE FROM item_units WHERE inventory_id = ? AND status = 'available' AND id NOT IN (SELECT unit_id FROM (SELECT unit_id FROM transactions WHERE unit_id IS NOT NULL) z) ORDER BY unit_no DESC LIMIT " . ($have - $total))
+            ->execute([$itemId]);
+    }
+    sync_stock($pdo, $itemId);
+}
+
 // ---------------------------------------------------------------- rules
 // Office hours: Mon-Fri 8:00-11:30 AM and 1:00-5:00 PM. Saturday: Academic items only. Sunday closed.
 // Returns an error string, or null when the schedule is acceptable.

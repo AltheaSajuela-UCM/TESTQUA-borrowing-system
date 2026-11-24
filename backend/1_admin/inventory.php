@@ -67,7 +67,7 @@ if ($method === 'POST') {
         respond(['error' => 'Item code already exists'], 409);
     }
     $id = (int) $pdo->lastInsertId();
-    sync_availability($pdo, $id);
+    resize_units($pdo, $id, $code, $stock);   // one unit (own ID) per piece in stock
     log_audit($admin, 'Added Item', 'Item', $id, "Added $name ($code), stock $stock", ['type' => 'Item Update', 'item' => $name]);
     respond(['success' => true, 'id' => $id], 201);
 }
@@ -107,7 +107,8 @@ if ($method === 'PUT') {
     } catch (PDOException $e) {
         respond(['error' => 'Item code already exists'], 409);
     }
-    sync_availability($pdo, (int) $id);
+    if ((int) $it['stock'] !== $stock) resize_units($pdo, (int) $id, $code, $stock);   // add / remove units to match the new stock
+    else sync_availability($pdo, (int) $id);
 
     $changes = [];
     if ((int) $it['stock'] !== $stock)           $changes[] = "stock {$it['stock']} -> $stock";

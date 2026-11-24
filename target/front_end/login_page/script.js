@@ -390,8 +390,8 @@ async function handleFormSubmit(e) {
     const idVal = document.getElementById('signInId').value.trim();
     const password = document.getElementById('signInPassword').value;
 
-    if (idVal.length !== 8) {
-        alert('ID Number must be exactly 8 digits.');
+    if (idVal.length < 4) {
+        alert('Please enter your ID number.');
         return;
     }
 

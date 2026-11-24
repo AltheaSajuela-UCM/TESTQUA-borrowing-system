@@ -12,10 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     generate_due_alerts($pdo, (int) $user['id']);
     $sql = 'SELECT t.id, t.status, t.requested_at, t.processed_at, t.expected_return_date,
                    t.returned_at, t.reject_reason, t.return_condition, t.waiver_accepted_at, t.id_surrendered,
-                   i.item_code, i.name AS item_name, i.category,
+                   i.item_code, un.unit_code, i.name AS item_name, i.category,
                    (t.status = "active" AND t.expected_return_date < NOW()) AS is_overdue,
                    EXISTS(SELECT 1 FROM cancellation_requests cr WHERE cr.transaction_id = t.id AND cr.status = "pending") AS cancel_requested
             FROM transactions t JOIN inventories i ON i.id = t.inventory_id
+            LEFT JOIN item_units un ON un.id = t.unit_id
             WHERE t.user_id = ?';
     $p = [$user['id']];
     if (!empty($_GET['status'])) { $sql .= ' AND t.status = ?'; $p[] = $_GET['status']; }

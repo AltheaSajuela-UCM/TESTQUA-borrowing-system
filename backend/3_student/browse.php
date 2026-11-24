@@ -48,18 +48,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dup->execute([$user['id'], $itemId]);
     if ($dup->fetchColumn()) respond(['error' => 'You already have a pending or active request for this item'], 409);
 
-    // Stock is only reduced when a Working Scholar approves the request.
-    $pdo->prepare("INSERT INTO transactions (user_id, inventory_id, status, expected_return_date, waiver_accepted_at)
-                   VALUES (?, ?, 'pending', ?, ?)")
-        ->execute([$user['id'], $itemId, $date->format('Y-m-d H:i:s'), $item['requires_waiver'] ? date('Y-m-d H:i:s') : null]);
-    $txId = (int) $pdo->lastInsertId();
+    // Each request holds its own physical copy (unit) right away, so approvals/rejections by other
+    // testers can never leave this request without an item. The unit goes back on reject / cancel / return.
+    $pdo->beginTransaction();
+    try {
+        $unit = reserve_unit($pdo, $itemId);
+        if (!$unit) { $pdo->rollBack(); respond(['error' => 'All copies of this item are taken right now'], 409); }
+        $pdo->prepare("INSERT INTO transactions (user_id, inventory_id, unit_id, status, expected_return_date, waiver_accepted_at)
+                       VALUES (?, ?, ?, 'pending', ?, ?)")
+            ->execute([$user['id'], $itemId, $unit['id'], $date->format('Y-m-d H:i:s'), $item['requires_waiver'] ? date('Y-m-d H:i:s') : null]);
+        $txId = (int) $pdo->lastInsertId();
+        sync_stock($pdo, $itemId);
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        respond(['error' => 'Server error'], 500);
+    }
 
-    log_audit($user, 'Submitted Request', 'Transaction', tx_code($txId), 'Requested ' . $item['name'],
+    log_audit($user, 'Submitted Request', 'Transaction', tx_code($txId), 'Requested ' . $item['name'] . ' (' . $unit['unit_code'] . ')',
               ['type' => 'Borrow Request', 'student' => $user['full_name'], 'item' => $item['name']]);
     notify_role('working_scholar', $user['full_name'] . ' requested ' . $item['name'] . '.', 'info', $txId);
 
     respond([
-        'success' => true, 'transaction_id' => $txId, 'transaction_code' => tx_code($txId), 'status' => 'pending',
+        'success' => true, 'transaction_id' => $txId, 'transaction_code' => tx_code($txId), 'unit_code' => $unit['unit_code'], 'status' => 'pending',
         'requires_id_surrender' => (bool) $item['requires_id_surrender'],   // tell the student to bring their ID
     ], 201);
 }

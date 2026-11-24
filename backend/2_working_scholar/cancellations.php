@@ -10,11 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $status = $_GET['status'] ?? 'pending';
     $sql = 'SELECT cr.id, cr.transaction_id, cr.reason, cr.status, cr.requested_at, cr.resolved_at,
                    u.full_name AS student_name, u.id_number AS student_id,
-                   i.name AS item_name, i.item_code
+                   i.name AS item_name, i.item_code, un.unit_code
             FROM cancellation_requests cr
             JOIN transactions t ON t.id = cr.transaction_id
             JOIN users u ON u.id = cr.user_id
-            JOIN inventories i ON i.id = t.inventory_id';
+            JOIN inventories i ON i.id = t.inventory_id
+            LEFT JOIN item_units un ON un.id = t.unit_id';
     $p = [];
     if ($status !== 'all') { $sql .= ' WHERE cr.status = ?'; $p[] = $status; }
     $stmt = $pdo->prepare($sql . ' ORDER BY cr.requested_at DESC');
@@ -53,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $pdo->prepare("UPDATE transactions SET status = 'cancelled', processed_by = ?, processed_at = NOW() WHERE id = ?")
                 ->execute([$user['id'], $tx['id']]);
+            release_tx_unit($pdo, $tx);   // the copy goes back on the shelf
             $pdo->prepare("UPDATE cancellation_requests SET status = 'accepted', resolved_by = ?, resolved_at = NOW() WHERE id = ?")
                 ->execute([$user['id'], $reqId]);
             log_audit($user, 'Accepted Cancellation', 'Transaction', tx_code((int) $tx['id']), 'Cancelled ' . $tx['item_name'], $meta);

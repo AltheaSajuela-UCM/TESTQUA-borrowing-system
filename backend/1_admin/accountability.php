@@ -80,8 +80,15 @@ if ($action === 'resolve') {
                               notes = CONCAT_WS(' | ', NULLIF(notes, ''), NULLIF(?, '')) WHERE id = ?")
             ->execute([$replacement, $admin['id'], $notes, $case['id']]);
         if ($replacement && $case['type'] === 'Lost') {          // a replacement for a lost item goes back into stock
-            $pdo->prepare('UPDATE inventories SET stock = stock + 1 WHERE id = ?')->execute([$case['inventory_id']]);
-            sync_availability($pdo, (int) $case['inventory_id']);
+            $lu = $pdo->prepare("SELECT un.id FROM transactions t JOIN item_units un ON un.id = t.unit_id WHERE t.id = ? AND un.status = 'lost'");
+            $lu->execute([$case['transaction_id']]);
+            if ($lostUnit = $lu->fetchColumn()) {
+                set_unit_status($pdo, (int) $lostUnit, 'available', 'Good');
+                sync_stock($pdo, (int) $case['inventory_id']);
+            } else {
+                $pdo->prepare('UPDATE inventories SET stock = stock + 1 WHERE id = ?')->execute([$case['inventory_id']]);
+                sync_availability($pdo, (int) $case['inventory_id']);
+            }
         }
         $left = $pdo->prepare("SELECT COUNT(*) FROM accountability_cases WHERE user_id = ? AND status = 'Open'");
         $left->execute([$case['user_id']]);
