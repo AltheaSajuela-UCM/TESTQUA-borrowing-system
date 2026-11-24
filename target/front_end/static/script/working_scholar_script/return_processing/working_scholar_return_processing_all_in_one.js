@@ -49,7 +49,7 @@ function selectTransaction(r) {
 
     document.getElementById('return-item-name').innerText = r.item_name;
     document.getElementById('return-item-meta').innerText =
-        r.item_code + ' · ' + r.borrower + ' · ' + r.transaction_code;
+        (r.unit_code || r.item_code) + ' · ' + r.borrower + ' · ' + r.transaction_code;
     const badge = document.getElementById('return-status-badge');
     if (badge) {
         const overdue = Number(r.is_overdue) === 1;

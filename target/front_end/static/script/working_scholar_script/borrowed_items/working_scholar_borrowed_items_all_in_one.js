@@ -13,6 +13,7 @@ function mapBorrowing(b) {
         id:            b.id,
         item_name:     b.item_name,
         transaction_no: b.transaction_code,
+        unit_code:     b.unit_code,
         borrower_name: b.borrower,
         id_number:     b.user_id_number,
         date_borrowed: b.processed_at,
@@ -79,7 +80,7 @@ function renderBorrowedTable(filter) {
         const statusClass = String(item.status).toLowerCase().replace(/\s+/g, '-');
 
         tr.innerHTML = `
-            <td><strong>${esc(item.item_name || item.item)}</strong><br><small style="color:#64748b;">${esc(item.transaction_no || '—')}</small></td>
+            <td><strong>${esc(item.item_name || item.item)}</strong><br><small style="color:#64748b;">${esc(item.transaction_no || '—')}${item.unit_code ? ' · ' + esc(item.unit_code) : ''}</small></td>
             <td>${esc(item.borrower_name || item.borrower)}<br><small style="color:#64748b;">${esc(item.id_number || '')}</small></td>
             <td>${fmtDate(item.date_borrowed)}</td>
             <td>${fmtDate(item.due_date)}</td>
@@ -94,7 +95,7 @@ function renderBorrowedTable(filter) {
 
 function viewBorrowDetails(id) {
     // Action handler for reviewing a specific borrowed item entry
-    window.location.href = `working_scholar_return_processing.html?id=${id}`;
+    window.location.href = `working_scholar_return_processing.html?tx=${id}`;
 }
 
 function setSidebarOpen(isOpen, persist = true) {
